@@ -1,0 +1,8 @@
+{
+  "source": "https://raw.githubusercontent.com/lm-sys/FastChat/main/fastchat/llm_judge/data/mt_bench/question.jsonl",
+  "sha256": "119565adbab82227089cefdb44c8d7e2cf04dc0a0ec233634c82e7d4e2a944f7",
+  "retrieved": "2026-09-20T23:44:20+00:00",
+  "license": "Apache-2.0 (FastChat)",
+  "records": 80,
+  "note": "first turn only"
+}

@@ -1,0 +1,28 @@
+{
+  "name": "pilot",
+  "description": "Pipeline validation on a small dev slice. Not a result: too few prompts to conclude anything.",
+  "prompts": "experiments/prompts/mt_bench.jsonl",
+  "split": {
+    "seed": 20260920,
+    "dev_fraction": 0.25,
+    "note": "Seeded shuffle. Held-out prompts are scored once per arm, after thresholds are fixed."
+  },
+  "pair": {
+    "name": "qwen-7x",
+    "strong": "qwen.qwen3-235b-a22b-2507",
+    "weak": "qwen.qwen3-32b",
+    "note": "Placeholder pair while Anthropic model access is pending. Pairs are config; adding Claude is a config change plus a preregistration amendment."
+  },
+  "arms": ["always_strong", "always_weak", "length", "routellm"],
+  "request": {
+    "max_tokens": 512,
+    "temperature": 0.0,
+    "path": "/inference/v1/chat/completions"
+  },
+  "judge": {
+    "model": "mistral.mistral-large-3-675b-instruct",
+    "note": "Outside both candidate families, per the preregistration's bias mitigation. Recorded per run because judge choice affects results.",
+    "max_tokens": 256,
+    "dual_ordering": true
+  }
+}

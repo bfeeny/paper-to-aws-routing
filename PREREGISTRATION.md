@@ -58,6 +58,12 @@ open-weight, which also means a reproducer needs no gated model entitlements.
 | `openai.gpt-oss-120b` / `openai.gpt-oss-20b` | same family, ~6× gap |
 | `mistral.mistral-large-3-675b-instruct` / `mistral.ministral-3-3b-instruct` | same vendor, extreme gap |
 | `zai.glm-5` / `qwen.qwen3-32b` | cross-vendor |
+| _(pending)_ `claude-sonnet` / `claude-haiku` | workhorse pair — the deployment most teams actually run |
+| _(pending)_ `claude-opus` / `claude-haiku` | maximum price and capability gap |
+
+Running several pair "gap sizes" (≈6×, ≈7×, extreme) tests something RouteLLM does not:
+whether the router's advantage scales with the price ratio, and whether quality loss
+scales with the capability gap.
 
 `openai.gpt-oss-*` is the only family callable on both `/v1/chat/completions` and
 `/v1/responses`, so it also serves as the control for API-shape effects.
@@ -69,6 +75,13 @@ open-weight, which also means a reproducer needs no gated model entitlements.
 the gated commercial models: all Anthropic Claude, all OpenAI GPT-5.x, Gemma-4,
 Grok. Raw probe: `results/model-availability/2026-09-20.jsonl`
 (`runner/probe_models.py`).
+
+**Anthropic models are doubly blocked in the study account (2026-09-20).** Beyond the
+mantle entitlement, every Claude model in us-east-1 is inference-profile-only (0 of 13
+support direct on-demand invocation), and both the `us.` and `global.` profiles route
+to Regions denied by an organization SCP that restricts this account to us-east-1.
+Claude pairs therefore require an SCP change in the management account, not just model
+access. Pairs are config: adding them later is a config change plus an amendment here.
 
 Two consequences for any router built on this endpoint:
 1. **Model discovery cannot be trusted as a capability list.** A router that builds

@@ -1,0 +1,20 @@
+{
+  "_note": [
+    "Per-1,000-token prices in USD, and the quota weight applied to output tokens.",
+    "Prices are NOT auto-discoverable; fill them from the Amazon Bedrock pricing page",
+    "and record the date. Any model left null still gets a token ledger — the dollar",
+    "column is simply omitted rather than guessed.",
+    "quota_output_weight models Bedrock's burndown, where newer Claude output tokens",
+    "count 5x. Defaults to 1.0 where unknown."
+  ],
+  "_priced_on": null,
+  "models": {
+    "qwen.qwen3-235b-a22b-2507": { "input_per_1k": null, "output_per_1k": null, "quota_output_weight": 1.0 },
+    "qwen.qwen3-32b": { "input_per_1k": null, "output_per_1k": null, "quota_output_weight": 1.0 },
+    "openai.gpt-oss-120b": { "input_per_1k": null, "output_per_1k": null, "quota_output_weight": 1.0 },
+    "openai.gpt-oss-20b": { "input_per_1k": null, "output_per_1k": null, "quota_output_weight": 1.0 },
+    "mistral.mistral-large-3-675b-instruct": { "input_per_1k": null, "output_per_1k": null, "quota_output_weight": 1.0 },
+    "mistral.ministral-3-3b-instruct": { "input_per_1k": null, "output_per_1k": null, "quota_output_weight": 1.0 },
+    "zai.glm-5": { "input_per_1k": null, "output_per_1k": null, "quota_output_weight": 1.0 }
+  }
+}
