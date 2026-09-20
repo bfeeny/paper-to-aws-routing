@@ -26,7 +26,7 @@ publishes.
 - **H2 (beats the heuristic).** At matched quality, the trained router costs less
   than the input-length heuristic from AWS's interceptor documentation.
 - **H3 (transfer).** A router trained on one strong/weak pair retains its advantage
-  on unseen pairs, including cross-vendor and proprietary-vs-open pairs.
+  on unseen pairs, including cross-vendor pairs and pairs with different parameter gaps.
 - **H4 (latency).** Interceptor overhead is material relative to end-to-end latency,
   and large enough to change the deployment recommendation for interactive traffic.
 - **H5 (accounting).** Savings measured in list-price dollars differ from savings
@@ -49,15 +49,34 @@ Each arm is a separate CloudFormation stack, so runs cannot contaminate each oth
 
 ## 4. Model pairs
 
+Chosen from models this account can actually invoke (see §4a). All pairs are
+open-weight, which also means a reproducer needs no gated model entitlements.
+
 | Pair | Type |
 | --- | --- |
-| `claude-sonnet-5` / `claude-haiku-4-5` | same family, different size |
-| `gpt-5.5` / `gpt-oss-20b` | same vendor, proprietary vs open weights |
-| `qwen3-235b-a22b-2507` / `qwen3-32b` | open weights, different size |
-| `claude-sonnet-5` / `qwen3-32b` | cross-vendor, proprietary vs open |
+| `qwen.qwen3-235b-a22b-2507` / `qwen.qwen3-32b` | same family, ~7× parameter gap |
+| `openai.gpt-oss-120b` / `openai.gpt-oss-20b` | same family, ~6× gap |
+| `mistral.mistral-large-3-675b-instruct` / `mistral.ministral-3-3b-instruct` | same vendor, extreme gap |
+| `zai.glm-5` / `qwen.qwen3-32b` | cross-vendor |
 
-All are reachable through one `bedrock-mantle` connector target, which is what
-makes the transfer test affordable.
+`openai.gpt-oss-*` is the only family callable on both `/v1/chat/completions` and
+`/v1/responses`, so it also serves as the control for API-shape effects.
+
+### 4a. Catalogue vs entitlement (measured 2026-09-20)
+
+`/v1/models` lists **55** models; **38** are callable and **17** return
+`permission_error: not available for this account`. The unavailable set is exactly
+the gated commercial models: all Anthropic Claude, all OpenAI GPT-5.x, Gemma-4,
+Grok. Raw probe: `results/model-availability/2026-09-20.jsonl`
+(`runner/probe_models.py`).
+
+Two consequences for any router built on this endpoint:
+1. **Model discovery cannot be trusted as a capability list.** A router that builds
+   its catalogue from `/v1/models` will route to models that 403 at call time.
+2. **The API surface varies by family.** Claude is served from
+   `/anthropic/v1/messages`, not `/v1/chat/completions`; `/v1/responses` is
+   supported by only a subset. Cross-family routing therefore changes the request
+   schema, not just the model string — a cost the paper's formulation does not model.
 
 ## 5. Data
 

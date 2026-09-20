@@ -57,9 +57,22 @@ The study is designed to run for tens of dollars: gateway invocations are billed
 Lambda provisioned concurrency is deliberately **not** used — it would cost more per
 month than the experiment, and the honest cold-start latency is itself a result.
 
+## Early result: catalogue vs entitlement
+
+Before any routing experiment, `runner/probe_models.py` measured what the endpoint
+will actually serve. On 2026-09-20, `/v1/models` listed **55** models of which
+**38** were callable; the other **17** returned `not available for this account` —
+all Anthropic Claude, all OpenAI GPT-5.x, Gemma-4 and Grok. The API surface also
+varies by family: Claude is served from `/anthropic/v1/messages`, and `/v1/responses`
+works for only a subset.
+
+So a router cannot treat model discovery as a capability list, and cross-family
+routing changes the request schema rather than just the model string. Raw data:
+`results/model-availability/2026-09-20.jsonl`.
+
 ## Status
 
-Scaffolding. No experimental runs yet; no results to cite.
+Scaffolding plus the availability probe. No routing runs yet; no results to cite.
 
 ## License
 
