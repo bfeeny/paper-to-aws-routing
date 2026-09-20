@@ -1,0 +1,167 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  LLM routing study: an Amazon Bedrock AgentCore Gateway with a bedrock-mantle
+  inference target and a REQUEST interceptor that selects the model per request.
+  Everything here is disposable — delete the stack to remove all of it.
+
+Parameters:
+  StackPrefix:
+    Type: String
+    Default: routingstudy
+    AllowedPattern: "^[a-zA-Z0-9]{1,24}$"
+    Description: Alphanumeric only; AgentCore gateway and target names disallow hyphens.
+
+  RouterStrategy:
+    Type: String
+    Default: passthrough
+    AllowedValues: [passthrough, always_strong, always_weak, length, routellm]
+    Description: Routing arm. One stack per arm keeps runs independent and attributable.
+
+  StrongModel:
+    Type: String
+    Default: anthropic.claude-sonnet-5
+  WeakModel:
+    Type: String
+    Default: anthropic.claude-haiku-4-5
+
+  LengthThresholdChars:
+    Type: Number
+    Default: 2000
+    Description: Used by the `length` arm — AWS's published heuristic, reimplemented as a baseline.
+
+  RouterThreshold:
+    Type: Number
+    Default: 0.5
+    Description: Used by the `routellm` arm. Sweep this to trace the cost/quality curve.
+
+  LogRetentionDays:
+    Type: Number
+    Default: 30
+
+Resources:
+  # ---------- Interceptor ----------
+  InterceptorRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: { Service: lambda.amazonaws.com }
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+
+  InterceptorLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${StackPrefix}-router"
+      RetentionInDays: !Ref LogRetentionDays
+
+  RouterFunction:
+    Type: AWS::Lambda::Function
+    DependsOn: InterceptorLogGroup
+    Properties:
+      FunctionName: !Sub "${StackPrefix}-router"
+      Runtime: python3.13
+      Handler: handler.lambda_handler
+      Role: !GetAtt InterceptorRole.Arn
+      Timeout: 10
+      MemorySize: 512
+      # `make deploy` rewrites this to an S3 artifact via `aws cloudformation package`.
+      Code: ../router/
+      Environment:
+        Variables:
+          ROUTER_STRATEGY: !Ref RouterStrategy
+          STRONG_MODEL: !Ref StrongModel
+          WEAK_MODEL: !Ref WeakModel
+          LENGTH_THRESHOLD_CHARS: !Ref LengthThresholdChars
+          ROUTER_THRESHOLD: !Ref RouterThreshold
+          TARGET_NAME: mantle
+          METRIC_NAMESPACE: !Sub "${StackPrefix}/Router"
+
+  # The gateway service role invokes the interceptor; scope to this function only.
+  RouterInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt RouterFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: bedrock-agentcore.amazonaws.com
+      SourceAccount: !Ref AWS::AccountId
+
+  # ---------- Gateway ----------
+  GatewayRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: { Service: bedrock-agentcore.amazonaws.com }
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+      Policies:
+        - PolicyName: mantle-inference
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              # The connector calls Bedrock's OpenAI-compatible endpoint as this role.
+              - Effect: Allow
+                Action: bedrock-mantle:CreateInference
+                Resource: !Sub "arn:aws:bedrock-mantle:${AWS::Region}:${AWS::AccountId}:project/*"
+              - Effect: Allow
+                Action:
+                  - bedrock-mantle:Get*
+                  - bedrock-mantle:List*
+                Resource: "*"
+        - PolicyName: invoke-interceptor
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !GetAtt RouterFunction.Arn
+
+  Gateway:
+    Type: AWS::BedrockAgentCore::Gateway
+    Properties:
+      Name: !Ref StackPrefix
+      RoleArn: !GetAtt GatewayRole.Arn
+      AuthorizerType: AWS_IAM
+      Description: !Sub "LLM routing study (${RouterStrategy})"
+      InterceptorConfigurations:
+        - InterceptionPoints: [REQUEST]
+          Interceptor:
+            Lambda:
+              Arn: !GetAtt RouterFunction.Arn
+          InputConfiguration:
+            PassRequestHeaders: false # the router reads the body only; keeps auth headers out of logs
+
+  MantleTarget:
+    Type: AWS::BedrockAgentCore::GatewayTarget
+    Properties:
+      GatewayIdentifier: !Ref Gateway
+      Name: mantle
+      Description: Bedrock OpenAI-compatible endpoint (all models behind one target)
+      TargetConfiguration:
+        Inference:
+          Connector:
+            Source:
+              ConnectorId: bedrock-mantle
+      CredentialProviderConfigurations:
+        - CredentialProviderType: GATEWAY_IAM_ROLE
+
+Outputs:
+  GatewayUrl:
+    Description: Base URL; the runner appends /inference/v1/chat/completions
+    Value: !GetAtt Gateway.GatewayUrl
+  GatewayIdentifier:
+    Value: !Ref Gateway
+  RouterStrategy:
+    Value: !Ref RouterStrategy
+  RouterFunctionName:
+    Value: !Ref RouterFunction
+  MetricNamespace:
+    Value: !Sub "${StackPrefix}/Router"

@@ -1,0 +1,30 @@
+# Packaging / build
+.packaged.yaml
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+
+# Local environment
+.env
+.env.*
+!.env.example
+*.log
+
+# Agent / assistant working files — keep them out of the record
+CLAUDE.md
+AGENTS.md
+.claude/
+.cursor/
+.aider*
+.github/copilot-instructions.md
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+
+# Raw runs are committed deliberately via `results/<run-id>/`; ignore scratch
+scratch/
+tmp/
