@@ -28,3 +28,6 @@ AGENTS.md
 # Raw runs are committed deliberately via `results/<run-id>/`; ignore scratch
 scratch/
 tmp/
+
+# Arena dataset cache (184 MB) — refetch with experiments/fetch_arena.py
+experiments/cache/
