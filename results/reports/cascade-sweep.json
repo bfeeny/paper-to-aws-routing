@@ -1,7 +1,7 @@
 {
   "labels": "experiments/cascade_labels.jsonl",
   "n": 2709,
-  "escalation_rate": 0.1285,
+  "escalation_rate": 0.1222,
   "priced_as": {
     "strong": "claude-opus-4-5",
     "weak": "claude-haiku-4-5",
@@ -12,96 +12,96 @@
     {
       "router": "transfer (110k GPT-4/Mixtral)",
       "n": 2709,
-      "positives": 348,
-      "auc": 0.575,
+      "positives": 331,
+      "auc": 0.567,
       "auc_ci95": [
-        0.542,
-        0.607
+        0.535,
+        0.6
       ],
-      "apgr": 0.565,
-      "cpt_50": 0.425,
+      "apgr": 0.5591,
+      "cpt_50": 0.43,
       "cpt_80": 0.71,
       "note": "full cascade set, never trained on it"
     },
     {
       "router": "prompt length",
       "n": 2709,
-      "positives": 348,
-      "auc": 0.59,
+      "positives": 331,
+      "auc": 0.592,
       "auc_ci95": [
-        0.56,
-        0.621
+        0.561,
+        0.622
       ],
-      "apgr": 0.5785,
+      "apgr": 0.5806,
       "cpt_50": 0.41000000000000003,
-      "cpt_80": 0.68,
+      "cpt_80": 0.665,
       "note": "free baseline, full set"
     },
     {
       "router": "in-distribution (cascade)",
       "n": 813,
-      "positives": 116,
-      "auc": 0.746,
+      "positives": 108,
+      "auc": 0.744,
       "auc_ci95": [
         0.694,
-        0.795
+        0.794
       ],
-      "apgr": 0.7107,
+      "apgr": 0.7118,
       "cpt_50": 0.2,
-      "cpt_80": 0.52,
+      "cpt_80": 0.53,
       "note": "trained on 1896, scored on 813 held out"
     },
     {
       "router": "prompt length (same hold-out)",
       "n": 813,
-      "positives": 116,
+      "positives": 108,
       "auc": 0.604,
       "auc_ci95": [
         0.551,
-        0.653
+        0.655
       ],
-      "apgr": 0.5891,
+      "apgr": 0.5903,
       "cpt_50": 0.405,
-      "cpt_80": 0.66,
+      "cpt_80": 0.65,
       "note": "comparable to the row above"
     },
     {
       "router": "transfer, alt coding",
       "n": 2709,
-      "positives": 505,
-      "auc": 0.552,
+      "positives": 480,
+      "auc": 0.537,
       "auc_ci95": [
-        0.524,
-        0.581
+        0.509,
+        0.567
       ],
-      "apgr": 0.5418,
-      "cpt_50": 0.445,
-      "cpt_80": 0.76,
+      "apgr": 0.5308,
+      "cpt_50": 0.455,
+      "cpt_80": 0.775,
       "note": "unanswerable counted as positive"
     }
   ],
   "confound_benchmark_identity": {
-    "oracle_auc": 0.763,
+    "oracle_auc": 0.751,
     "oracle_ci95": [
-      0.712,
-      0.799
+      0.695,
+      0.787
     ],
     "escalation_rate_by_benchmark": {
-      "bbh": 0.2516,
+      "bbh": 0.2386,
       "gsm8k": 0.0188,
-      "math": 0.2356,
+      "math": 0.2199,
       "mmlu": 0.0615,
-      "mmlu_pro": 0.1313
+      "mmlu_pro": 0.1278
     },
     "within_benchmark": [
       {
         "benchmark": "bbh",
         "n": 131,
-        "positives": 48,
-        "auc": 0.748,
+        "positives": 44,
+        "auc": 0.781,
         "auc_ci95": [
-          0.663,
-          0.83
+          0.698,
+          0.855
         ]
       },
       {
@@ -114,21 +114,21 @@
       {
         "benchmark": "math",
         "n": 85,
-        "positives": 20,
-        "auc": 0.688,
+        "positives": 16,
+        "auc": 0.639,
         "auc_ci95": [
-          0.538,
-          0.82
+          0.496,
+          0.767
         ]
       },
       {
         "benchmark": "mmlu",
         "n": 191,
         "positives": 12,
-        "auc": 0.6,
+        "auc": 0.592,
         "auc_ci95": [
-          0.425,
-          0.757
+          0.408,
+          0.758
         ]
       },
       {
@@ -137,7 +137,7 @@
         "positives": 33,
         "auc": 0.607,
         "auc_ci95": [
-          0.498,
+          0.501,
           0.706
         ]
       }

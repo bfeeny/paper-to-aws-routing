@@ -25,6 +25,18 @@ def _bedrock():
     return _client
 
 
+def threshold_for(call_rate_pct: int) -> float | None:
+    """Score threshold that routes roughly `call_rate_pct`% of traffic to strong.
+
+    A fixed 0.5 is wrong here and silently so: the trained scores are bounded
+    well below it by the 9.4% class imbalance, so 0.5 routes nothing at all.
+    Thresholds come from the held-out score distribution instead.
+    """
+    spec = json.loads(_ARTIFACT.read_text())
+    table = spec.get("operating_points", {}).get("thresholds_by_call_rate_pct", {})
+    return table.get(str(int(call_rate_pct)))
+
+
 def load():
     """Return callable(text) -> P(strong model is needed). Raises if no artifact."""
     spec = json.loads(_ARTIFACT.read_text())

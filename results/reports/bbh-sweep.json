@@ -1,7 +1,7 @@
 {
   "labels": "experiments/bbh_labels.jsonl",
   "n": 2430,
-  "escalation_rate": 0.2905,
+  "escalation_rate": 0.2774,
   "priced_as": {
     "strong": "claude-opus-4-5",
     "weak": "claude-haiku-4-5",
@@ -12,92 +12,92 @@
     {
       "router": "transfer (110k GPT-4/Mixtral)",
       "n": 2430,
-      "positives": 706,
-      "auc": 0.435,
+      "positives": 674,
+      "auc": 0.434,
       "auc_ci95": [
-        0.41,
-        0.459
+        0.408,
+        0.457
       ],
-      "apgr": 0.4537,
+      "apgr": 0.4522,
       "cpt_50": 0.5750000000000001,
-      "cpt_80": 0.8300000000000001,
+      "cpt_80": 0.835,
       "note": "full cascade set, never trained on it"
     },
     {
       "router": "prompt length",
       "n": 2430,
-      "positives": 706,
-      "auc": 0.561,
+      "positives": 674,
+      "auc": 0.551,
       "auc_ci95": [
-        0.538,
-        0.584
+        0.528,
+        0.574
       ],
-      "apgr": 0.5433,
-      "cpt_50": 0.445,
-      "cpt_80": 0.7000000000000001,
+      "apgr": 0.537,
+      "cpt_50": 0.45,
+      "cpt_80": 0.715,
       "note": "free baseline, full set"
     },
     {
       "router": "in-distribution (cascade)",
       "n": 729,
-      "positives": 215,
-      "auc": 0.833,
+      "positives": 206,
+      "auc": 0.842,
       "auc_ci95": [
-        0.802,
-        0.863
+        0.812,
+        0.871
       ],
-      "apgr": 0.7347,
-      "cpt_50": 0.23,
-      "cpt_80": 0.41500000000000004,
+      "apgr": 0.7451,
+      "cpt_50": 0.22,
+      "cpt_80": 0.41000000000000003,
       "note": "trained on 1701, scored on 729 held out"
     },
     {
       "router": "prompt length (same hold-out)",
       "n": 729,
-      "positives": 215,
+      "positives": 206,
       "auc": 0.55,
       "auc_ci95": [
-        0.505,
-        0.592
+        0.506,
+        0.593
       ],
-      "apgr": 0.5352,
-      "cpt_50": 0.455,
+      "apgr": 0.536,
+      "cpt_50": 0.445,
       "cpt_80": 0.675,
       "note": "comparable to the row above"
     },
     {
       "router": "transfer, alt coding",
       "n": 2430,
-      "positives": 824,
-      "auc": 0.436,
+      "positives": 788,
+      "auc": 0.433,
       "auc_ci95": [
-        0.412,
-        0.46
+        0.408,
+        0.457
       ],
-      "apgr": 0.4574,
-      "cpt_50": 0.5650000000000001,
-      "cpt_80": 0.835,
+      "apgr": 0.4544,
+      "cpt_50": 0.5700000000000001,
+      "cpt_80": 0.84,
       "note": "unanswerable counted as positive"
     }
   ],
   "confound_benchmark_identity": {
-    "oracle_auc": 0.466,
+    "oracle_auc": 0.468,
     "oracle_ci95": [
-      0.455,
-      0.546
+      0.454,
+      0.547
     ],
     "escalation_rate_by_benchmark": {
-      "bbh": 0.2887
+      "bbh": 0.2751
     },
     "within_benchmark": [
       {
         "benchmark": "bbh",
         "n": 729,
-        "positives": 215,
-        "auc": 0.833,
+        "positives": 206,
+        "auc": 0.842,
         "auc_ci95": [
-          0.802,
-          0.863
+          0.812,
+          0.871
         ]
       }
     ]

@@ -35,7 +35,12 @@ STRONG = os.environ["STRONG_MODEL"]
 WEAK = os.environ["WEAK_MODEL"]
 TARGET = os.environ.get("TARGET_NAME", "mantle")
 LENGTH_THRESHOLD = int(float(os.environ.get("LENGTH_THRESHOLD_CHARS", "2000")))
-ROUTER_THRESHOLD = float(os.environ.get("ROUTER_THRESHOLD", "0.5"))
+# A raw score threshold if you truly want one, otherwise a target call rate the
+# artifact resolves against its own score distribution. The old default of 0.5
+# routed 0% of traffic to the strong model -- every `routellm` run before this
+# was an always_weak run with an embedding call bolted on.
+ROUTER_THRESHOLD = os.environ.get("ROUTER_THRESHOLD")
+ROUTER_CALL_RATE = int(float(os.environ.get("ROUTER_CALL_RATE_PCT", "30")))
 NAMESPACE = os.environ.get("METRIC_NAMESPACE", "routingstudy/Router")
 
 # Loaded lazily so a missing artifact degrades visibly instead of failing the request.
@@ -77,6 +82,21 @@ def _load_scorer():
     return _scorer
 
 
+_threshold_cache = None
+
+
+def _threshold() -> float | None:
+    """Resolve the score cut once: pinned value, else the calibrated call rate."""
+    global _threshold_cache
+    if _threshold_cache is None:
+        if ROUTER_THRESHOLD is not None:
+            _threshold_cache = float(ROUTER_THRESHOLD)
+        else:
+            from routellm_scorer import threshold_for
+            _threshold_cache = threshold_for(ROUTER_CALL_RATE)
+    return _threshold_cache
+
+
 def decide(text: str) -> tuple[str, float | None, str]:
     """Return (model, score, decision_kind)."""
     if STRATEGY == "always_strong":
@@ -91,7 +111,10 @@ def decide(text: str) -> tuple[str, float | None, str]:
             # Fail toward quality, and make the fallback countable.
             return STRONG, None, "fallback_no_artifact"
         score = float(scorer(text))
-        return (STRONG if score >= ROUTER_THRESHOLD else WEAK), score, "scored"
+        cut = _threshold()
+        if cut is None:
+            return STRONG, score, "fallback_no_threshold"
+        return (STRONG if score >= cut else WEAK), score, "scored"
     return "", None, "passthrough"
 
 

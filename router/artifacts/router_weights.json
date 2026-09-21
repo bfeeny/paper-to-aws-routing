@@ -299,5 +299,19 @@
       "score_spread": 0.23,
       "score_std": 0.05
     }
+  },
+  "operating_points": {
+    "description": "call_rate_pct -> score threshold, from the held-out score distribution. A fixed 0.5 routes nothing: hold-out scores top out at 0.439.",
+    "score_max_holdout": 0.4392,
+    "thresholds_by_call_rate_pct": {
+      "5": 0.202935,
+      "10": 0.166561,
+      "15": 0.14493,
+      "20": 0.130039,
+      "25": 0.117931,
+      "30": 0.107925,
+      "40": 0.092285,
+      "50": 0.079775
+    }
   }
 }

@@ -1,0 +1,43 @@
+{
+  "labels": "experiments/cascade_labels.jsonl",
+  "group_field": "benchmark",
+  "n": 2709,
+  "auc_real": 0.744,
+  "auc_within_group_shuffle": 0.643,
+  "loo": [
+    {
+      "group": "bbh",
+      "router": 0.512,
+      "length": 0.637
+    },
+    {
+      "group": "gsm8k",
+      "router": 0.689,
+      "length": 0.643
+    },
+    {
+      "group": "math",
+      "router": 0.543,
+      "length": 0.616
+    },
+    {
+      "group": "mmlu",
+      "router": 0.538,
+      "length": 0.555
+    },
+    {
+      "group": "mmlu_pro",
+      "router": 0.509,
+      "length": 0.529
+    }
+  ],
+  "loo_mean_router": 0.558,
+  "loo_mean_length": 0.596,
+  "paired_cluster_bootstrap_router_minus_oracle": {
+    "mean": 0.025,
+    "ci95": [
+      -0.046,
+      0.123
+    ]
+  }
+}

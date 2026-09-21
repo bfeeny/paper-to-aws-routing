@@ -1,0 +1,53 @@
+{
+  "labels": "experiments/math_labels.jsonl",
+  "group_field": "subject",
+  "n": 2520,
+  "auc_real": 0.674,
+  "auc_within_group_shuffle": 0.626,
+  "loo": [
+    {
+      "group": "algebra",
+      "router": 0.571,
+      "length": 0.545
+    },
+    {
+      "group": "counting_and_probability",
+      "router": 0.718,
+      "length": 0.841
+    },
+    {
+      "group": "geometry",
+      "router": 0.528,
+      "length": 0.635
+    },
+    {
+      "group": "intermediate_algebra",
+      "router": 0.597,
+      "length": 0.63
+    },
+    {
+      "group": "number_theory",
+      "router": 0.487,
+      "length": 0.696
+    },
+    {
+      "group": "prealgebra",
+      "router": 0.691,
+      "length": 0.752
+    },
+    {
+      "group": "precalculus",
+      "router": 0.609,
+      "length": 0.657
+    }
+  ],
+  "loo_mean_router": 0.6,
+  "loo_mean_length": 0.679,
+  "paired_cluster_bootstrap_router_minus_oracle": {
+    "mean": 0.031,
+    "ci95": [
+      -0.064,
+      0.142
+    ]
+  }
+}

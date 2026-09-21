@@ -1,0 +1,113 @@
+{
+  "labels": "experiments/bbh_labels.jsonl",
+  "group_field": "subject",
+  "n": 2430,
+  "auc_real": 0.842,
+  "auc_within_group_shuffle": 0.838,
+  "loo": [
+    {
+      "group": "causal_judgement",
+      "router": 0.402,
+      "length": 0.563
+    },
+    {
+      "group": "date_understanding",
+      "router": 0.518,
+      "length": 0.491
+    },
+    {
+      "group": "disambiguation_qa",
+      "router": 0.457,
+      "length": 0.468
+    },
+    {
+      "group": "dyck_languages",
+      "router": 0.59,
+      "length": 0.573
+    },
+    {
+      "group": "geometric_shapes",
+      "router": 0.444,
+      "length": 0.581
+    },
+    {
+      "group": "logical_deduction_seven_objects",
+      "router": 0.524,
+      "length": 0.331
+    },
+    {
+      "group": "logical_deduction_three_objects",
+      "router": 0.575,
+      "length": 0.265
+    },
+    {
+      "group": "movie_recommendation",
+      "router": 0.448,
+      "length": 0.443
+    },
+    {
+      "group": "penguins_in_a_table",
+      "router": 0.343,
+      "length": 0.616
+    },
+    {
+      "group": "reasoning_about_colored_objects",
+      "router": 0.384,
+      "length": 0.601
+    },
+    {
+      "group": "ruin_names",
+      "router": 0.585,
+      "length": 0.237
+    },
+    {
+      "group": "salient_translation_error_detection",
+      "router": 0.778,
+      "length": 0.162
+    },
+    {
+      "group": "snarks",
+      "router": 0.718,
+      "length": 0.463
+    },
+    {
+      "group": "sports_understanding",
+      "router": 0.549,
+      "length": 0.587
+    },
+    {
+      "group": "temporal_sequences",
+      "router": 0.487,
+      "length": 0.38
+    },
+    {
+      "group": "tracking_shuffled_objects_five_objects",
+      "router": 0.499,
+      "length": 0.465
+    },
+    {
+      "group": "tracking_shuffled_objects_seven_objects",
+      "router": 0.482,
+      "length": 0.561
+    },
+    {
+      "group": "tracking_shuffled_objects_three_objects",
+      "router": 0.535,
+      "length": 0.525
+    },
+    {
+      "group": "word_sorting",
+      "router": 0.657,
+      "length": 0.689
+    }
+  ],
+  "loo_mean_router": 0.525,
+  "loo_mean_length": 0.474,
+  "paired_cluster_bootstrap_router_minus_oracle": {
+    "mean": -0.021,
+    "ci95": [
+      -0.055,
+      0.008
+    ]
+  }
+}
