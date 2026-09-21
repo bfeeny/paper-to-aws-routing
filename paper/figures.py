@@ -26,18 +26,34 @@ sys.path.insert(0, str(ROOT / "analysis"))
 OUT = ROOT / "paper" / "figures"
 REP = ROOT / "results" / "reports"
 
-SURFACE, INK, INK2, GRID = "#fcfcfb", "#0b0b0b", "#52514e", "#e4e3df"
-BLUE, ORANGE, AQUA = "#2a78d6", "#eb6834", "#1baf7a"
-REF = "#9a9994"          # reference lines: chance, ceiling
+# Two selected themes, not one inverted: each is the same three hues stepped
+# for its own surface and validated against it. A transparent background would
+# not work -- the ink colours are chosen for one ground and vanish on the other.
+THEMES = {
+    "light": dict(SURFACE="#fcfcfb", INK="#0b0b0b", INK2="#52514e", GRID="#e4e3df",
+                  BLUE="#2a78d6", ORANGE="#eb6834", AQUA="#1baf7a", REF="#9a9994"),
+    "dark": dict(SURFACE="#1a1a19", INK="#ffffff", INK2="#c3c2b7", GRID="#34342f",
+                 BLUE="#3987e5", ORANGE="#d95926", AQUA="#199e70", REF="#7d7c76"),
+}
+SUFFIX = ""
 
-plt.rcParams.update({
-    "figure.facecolor": SURFACE, "axes.facecolor": SURFACE, "savefig.facecolor": SURFACE,
-    "font.family": "DejaVu Sans", "font.size": 9,
-    "text.color": INK, "axes.labelcolor": INK2, "xtick.color": INK2, "ytick.color": INK2,
-    "axes.edgecolor": GRID, "axes.spines.top": False, "axes.spines.right": False,
-    "axes.spines.left": False, "axes.grid": True, "grid.color": GRID, "grid.linewidth": 0.8,
-    "axes.axisbelow": True, "legend.frameon": False, "figure.dpi": 200,
-})
+
+def apply_theme(name: str) -> None:
+    global SUFFIX
+    globals().update(THEMES[name])
+    SUFFIX = "" if name == "light" else "-dark"
+    plt.rcParams.update({
+        "figure.facecolor": SURFACE, "axes.facecolor": SURFACE, "savefig.facecolor": SURFACE,
+        "font.family": "DejaVu Sans", "font.size": 9,
+        "text.color": INK, "axes.labelcolor": INK2, "xtick.color": INK2, "ytick.color": INK2,
+        "axes.edgecolor": GRID, "axes.spines.top": False, "axes.spines.right": False,
+        "axes.spines.left": False, "axes.grid": True, "grid.color": GRID,
+        "grid.linewidth": 0.8, "axes.axisbelow": True, "legend.frameon": False,
+        "legend.labelcolor": INK, "figure.dpi": 200,
+    })
+
+
+apply_theme("light")
 
 
 def load(name):
@@ -46,6 +62,7 @@ def load(name):
 
 def save(fig, name):
     OUT.mkdir(parents=True, exist_ok=True)
+    name = name.replace(".png", f"{SUFFIX}.png")
     fig.savefig(OUT / name, bbox_inches="tight", dpi=200)
     plt.close(fig)
     print(f"wrote paper/figures/{name}")
@@ -195,8 +212,36 @@ def fig_deferral():
     save(fig, "fig5-deferral-math.png")
 
 
+# The gateway diagram is hand-drawn SVG in the light palette of the blog's paper
+# stylesheet; its dark twin swaps each token for the stylesheet's dark value.
+DIAGRAM_DARK = {
+    "#fcfcfb": "#1a1a19",   # surface
+    "#f2f1ee": "#262624",   # box fill
+    "#eef4fb": "#1d2940",   # accent fill
+    "#1f2a37": "#eef2f7",   # ink
+    "#5f6b7a": "#a3adbd",   # muted
+    "#1f6fb2": "#6aaee8",   # accent
+}
+
+
+def diagram():
+    import subprocess
+    src = OUT / "fig1-gateway.svg"
+    dark = src.read_text()
+    for a, b in DIAGRAM_DARK.items():
+        dark = dark.replace(a, b)
+    (OUT / "fig1-gateway-dark.svg").write_text(dark)
+    for svg in ("fig1-gateway.svg", "fig1-gateway-dark.svg"):
+        subprocess.run(["rsvg-convert", str(OUT / svg), "-o",
+                        str(OUT / svg.replace(".svg", ".png"))], check=True)
+        print(f"wrote paper/figures/{svg.replace('.svg', '.png')}")
+
+
 if __name__ == "__main__":
-    fig_threshold_sweep()
-    fig_what_routers_learn()
-    fig_mtbench()
-    fig_deferral()
+    diagram()
+    for theme in ("light", "dark"):
+        apply_theme(theme)
+        fig_threshold_sweep()
+        fig_what_routers_learn()
+        fig_mtbench()
+        fig_deferral()

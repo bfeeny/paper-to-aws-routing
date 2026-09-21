@@ -107,7 +107,10 @@ router ships as JSON weights and scores with one Amazon Titan Text Embeddings V2
 call plus a 256-term dot product, about 110 ms end to end. The stack is plain
 CloudFormation plus a Makefile and deploys and tears down with one command.
 
-![Request path through the gateway](figures/fig1-gateway.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/fig1-gateway-dark.png">
+  <img alt="Request path through the gateway" src="figures/fig1-gateway.png">
+</picture>
 
 *Figure 1. The request path. The client asks for a virtual model; the REQUEST
 interceptor embeds and scores the prompt and rewrites the model field before the
@@ -205,7 +208,10 @@ strong-model calls than the router (57.5% vs 58.0%). The router's advantage is
 confined to aggressive savings. It recovers half the gap with 24.5% of calls,
 where length needs 31.5%.
 
-![Threshold sweep on the RouteLLM hold-out](figures/fig2-threshold-sweep.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/fig2-threshold-sweep-dark.png">
+  <img alt="Threshold sweep on the RouteLLM hold-out" src="figures/fig2-threshold-sweep.png">
+</picture>
 
 *Figure 2. Quality recovered against the share of requests sent to the strong
 model (left) and against cost per 1,000 requests (right), priced as Haiku → Opus.
@@ -241,7 +247,10 @@ compare the router against the group-rate oracle.
 *Table 1. Linear probe on Titan features. Every bootstrap interval spans zero.
 No router is distinguishable from knowing the group base rate.*
 
-![In-distribution, shuffled and held-out-group AUC](figures/fig3-what-routers-learn.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/fig3-what-routers-learn-dark.png">
+  <img alt="In-distribution, shuffled and held-out-group AUC" src="figures/fig3-what-routers-learn.png">
+</picture>
 
 *Figure 3. The same router scored three ways. Shuffling labels within each group
 destroys all within-group signal yet barely moves the in-distribution score;
@@ -335,7 +344,10 @@ questions and GPT-4 judgements, we label each (question, turn)
 | extraction | 40.0% | | roleplay | 20.0% |
 | reasoning | 35.0% | | humanities | 10.0% |
 
-![MT-Bench strong-needed rate by category](figures/fig4-mtbench-categories.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/fig4-mtbench-categories-dark.png">
+  <img alt="MT-Bench strong-needed rate by category" src="figures/fig4-mtbench-categories.png">
+</picture>
 
 *Figure 4. RouteLLM's MT-Bench evaluation set, labelled from the published
 GPT-4 judgements. The base rate of "GPT-4 needed" varies more across
@@ -377,7 +389,10 @@ the same L2 logistic model and evaluate it exactly as in §3.
 *Table 3. Deferral survives leave-one-group-out where prompt-only routing does
 not, except on BBH.*
 
-![Deferral vs prompt-only by held-out MATH subject](figures/fig5-deferral-math.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="figures/fig5-deferral-math-dark.png">
+  <img alt="Deferral vs prompt-only by held-out MATH subject" src="figures/fig5-deferral-math.png">
+</picture>
 
 *Figure 5. Each MATH subject held out in turn. Deferral beats prompt-only routing
 on five of seven subjects, by as much as 0.37 AUC (number theory), and loses
