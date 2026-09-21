@@ -35,6 +35,22 @@ results/       committed raw outputs, one directory per run
 paper/         manuscript, figures built from results/
 ```
 
+## Scoring
+
+Two independent methods, deliberately:
+
+```bash
+python3 analysis/judge.py --baseline results/<strong-run> --candidate results/<arm-run>
+python3 analysis/agentcore_eval.py --run results/<arm-run>
+```
+
+`judge.py` is the primary metric: pairwise, both orderings, prompt versioned here and
+hashed into every summary. `agentcore_eval.py` is corroboration via **Amazon Bedrock
+AgentCore Evaluations** — managed pointwise evaluators whose capacity doesn't consume
+the experiment's own model quota. Where the two agree, a result is robust; where they
+disagree, the disagreement is reported. See [docs/agentcore-fit.md](docs/agentcore-fit.md)
+for which AgentCore capabilities this study uses, and which it deliberately doesn't.
+
 ## Tracking and teardown
 
 Every AWS resource this study creates is named `routingstudy*` and tagged

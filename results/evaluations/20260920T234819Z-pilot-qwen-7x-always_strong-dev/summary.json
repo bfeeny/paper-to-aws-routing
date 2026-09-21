@@ -1,0 +1,21 @@
+{
+  "run_id": "20260920T234819Z-pilot-qwen-7x-always_strong-dev",
+  "arm": "always_strong",
+  "pair": {
+    "name": "qwen-7x",
+    "strong": "qwen.qwen3-235b-a22b-2507",
+    "weak": "qwen.qwen3-32b",
+    "note": "Placeholder pair while Anthropic model access is pending. Pairs are config; adding Claude is a config change plus a preregistration amendment."
+  },
+  "evaluated_utc": "2026-09-21T00:46:15+00:00",
+  "evaluators": {
+    "Builtin.Helpfulness": {
+      "scored": 5,
+      "failed_batches": 0,
+      "mean": 0.932,
+      "stdev": 0.0931,
+      "judge_tokens": 12503
+    }
+  },
+  "note": "Managed evaluators: model and rubric are controlled by AWS and may change. Treat as corroboration for the versioned pairwise judge, not as provenance."
+}
