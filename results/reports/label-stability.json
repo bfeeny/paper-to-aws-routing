@@ -1,0 +1,9 @@
+{
+  "ceiling_auc": 0.912,
+  "ceiling_ci95": [
+    0.863,
+    0.956
+  ],
+  "n": 181,
+  "positives": 83
+}
