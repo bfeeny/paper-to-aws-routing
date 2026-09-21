@@ -150,6 +150,7 @@ def main() -> int:
     ap.add_argument("--l2", type=float, default=1.0)
     ap.add_argument("--dims", type=int, default=DIMS, choices=[256, 512, 1024])
     ap.add_argument("--holdout-frac", type=float, default=0.15)
+    ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--profile", default="personal")
     ap.add_argument("--region", default="us-east-1")
     args = ap.parse_args()
@@ -157,7 +158,8 @@ def main() -> int:
     rows = [json.loads(l) for l in (ROOT / args.labels).read_text().splitlines() if l.strip()]
     print(f"labels: {len(rows)} ({sum(r['label'] for r in rows) / len(rows):.1%} strong-needed)")
 
-    X = embed([r["prompt"] for r in rows], args.profile, args.region, args.dims)
+    X = embed([r["prompt"] for r in rows], args.profile, args.region, args.dims,
+              workers=args.workers)
     y = np.array([r["label"] for r in rows], dtype=float)
 
     cut = int(len(rows) * (1 - args.holdout_frac))
@@ -170,7 +172,7 @@ def main() -> int:
         cfg = json.loads((ROOT / args.experiment).read_text())
         texts, ys = external_labels(ROOT / args.external, ROOT / cfg["prompts"])
         if len(ys):
-            Xext = embed(texts, args.profile, args.region, args.dims)
+            Xext = embed(texts, args.profile, args.region, args.dims, workers=args.workers)
             report["external_mtbench"] = evaluate(Xext, ys, w, b)
 
     artifact = {

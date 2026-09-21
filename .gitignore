@@ -31,3 +31,6 @@ tmp/
 
 # Arena dataset cache (184 MB) — refetch with experiments/fetch_arena.py
 experiments/cache/
+
+# data-prep venv (pyarrow/matplotlib); runtime stays stdlib-only
+.venv/
