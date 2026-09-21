@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 300" width="1520" height="600"
+     font-family="Helvetica, Arial, sans-serif" role="img"
+     aria-label="The client asks the AgentCore Gateway for a virtual model. A request interceptor Lambda embeds the prompt with Titan, scores it, and rewrites the model field; gateway routing then invokes Haiku or Opus on Bedrock. Decisions are logged to CloudWatch. A response interceptor for deferral is shown dashed as proposed.">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#1f2a37"/>
+    </marker>
+    <marker id="am" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#5f6b7a"/>
+    </marker>
+  </defs>
+  <rect width="760" height="300" fill="#fcfcfb"/>
+
+  <!-- client -->
+  <rect x="10" y="100" width="120" height="60" rx="6" fill="#f2f1ee" stroke="#1f2a37" stroke-width="1.5"/>
+  <text x="70" y="126" text-anchor="middle" font-size="13" font-weight="600" fill="#1f2a37">Client</text>
+  <text x="70" y="145" text-anchor="middle" font-size="11" font-family="Menlo, monospace" fill="#5f6b7a">model: "auto"</text>
+
+  <!-- gateway container -->
+  <rect x="155" y="20" width="400" height="260" rx="8" fill="none" stroke="#5f6b7a" stroke-width="1.2" stroke-dasharray="5 4"/>
+  <text x="165" y="276" font-size="11" fill="#5f6b7a">Amazon Bedrock AgentCore Gateway</text>
+
+  <!-- request interceptor: the hop under discussion -->
+  <rect x="175" y="60" width="150" height="96" rx="6" fill="#eef4fb" stroke="#1f6fb2" stroke-width="2"/>
+  <text x="250" y="84" text-anchor="middle" font-size="12.5" font-weight="600" fill="#1f6fb2">REQUEST interceptor</text>
+  <text x="250" y="101" text-anchor="middle" font-size="11" fill="#1f2a37">AWS Lambda</text>
+  <text x="250" y="121" text-anchor="middle" font-size="10.5" fill="#1f2a37">score the prompt,</text>
+  <text x="250" y="136" text-anchor="middle" font-size="10.5" fill="#1f2a37">compare to threshold,</text>
+  <text x="250" y="151" text-anchor="middle" font-size="10.5" fill="#1f2a37">rewrite model</text>
+
+  <!-- routing -->
+  <rect x="375" y="60" width="160" height="96" rx="6" fill="#f2f1ee" stroke="#1f2a37" stroke-width="1.5"/>
+  <text x="455" y="90" text-anchor="middle" font-size="12.5" font-weight="600" fill="#1f2a37">model-based routing</text>
+  <text x="455" y="112" text-anchor="middle" font-size="10.5" font-family="Menlo, monospace" fill="#5f6b7a">mantle/haiku-4-5</text>
+  <text x="455" y="128" text-anchor="middle" font-size="10.5" fill="#5f6b7a">or</text>
+  <text x="455" y="144" text-anchor="middle" font-size="10.5" font-family="Menlo, monospace" fill="#5f6b7a">mantle/opus-4-5</text>
+
+  <!-- response interceptor: proposed -->
+  <rect x="175" y="188" width="360" height="62" rx="6" fill="none" stroke="#5f6b7a" stroke-width="1.3" stroke-dasharray="5 4"/>
+  <text x="355" y="213" text-anchor="middle" font-size="12" font-weight="600" fill="#5f6b7a">RESPONSE interceptor (proposed)</text>
+  <text x="355" y="232" text-anchor="middle" font-size="10.5" fill="#5f6b7a">defer: escalate when the weak answer looks like a failure</text>
+
+  <!-- bedrock -->
+  <rect x="585" y="20" width="165" height="260" rx="8" fill="none" stroke="#5f6b7a" stroke-width="1.2" stroke-dasharray="5 4"/>
+  <text x="595" y="276" font-size="11" fill="#5f6b7a">Amazon Bedrock</text>
+  <rect x="600" y="50" width="135" height="52" rx="6" fill="#f2f1ee" stroke="#1f2a37" stroke-width="1.5"/>
+  <text x="667" y="72" text-anchor="middle" font-size="12" font-weight="600" fill="#1f2a37">Titan Embeddings V2</text>
+  <text x="667" y="90" text-anchor="middle" font-size="10.5" fill="#5f6b7a">256-d vector</text>
+  <rect x="600" y="125" width="135" height="52" rx="6" fill="#f2f1ee" stroke="#1f2a37" stroke-width="1.5"/>
+  <text x="667" y="147" text-anchor="middle" font-size="12" font-weight="600" fill="#1f2a37">Claude Haiku 4.5</text>
+  <text x="667" y="165" text-anchor="middle" font-size="10.5" fill="#5f6b7a">weak, 1×</text>
+  <rect x="600" y="200" width="135" height="52" rx="6" fill="#f2f1ee" stroke="#1f2a37" stroke-width="1.5"/>
+  <text x="667" y="222" text-anchor="middle" font-size="12" font-weight="600" fill="#1f2a37">Claude Opus 4.5</text>
+  <text x="667" y="240" text-anchor="middle" font-size="10.5" fill="#5f6b7a">strong, ~5×</text>
+
+  <!-- cloudwatch -->
+  <rect x="10" y="205" width="120" height="52" rx="6" fill="#f2f1ee" stroke="#1f2a37" stroke-width="1.5"/>
+  <text x="70" y="227" text-anchor="middle" font-size="12" font-weight="600" fill="#1f2a37">CloudWatch</text>
+  <text x="70" y="245" text-anchor="middle" font-size="10" fill="#5f6b7a">score, decision, latency</text>
+
+  <!-- arrows -->
+  <path d="M130 130 H173" stroke="#1f2a37" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+  <path d="M325 108 H373" stroke="#1f2a37" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+  <text x="349" y="100" text-anchor="middle" font-size="10" fill="#5f6b7a">rewrite</text>
+  <path d="M250 60 V38 H575 V76 H598" stroke="#1f6fb2" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+  <text x="420" y="33" text-anchor="middle" font-size="10.5" fill="#1f6fb2">embed prompt, ~110 ms</text>
+  <path d="M535 108 H568 V151 H598" stroke="#1f2a37" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+  <path d="M568 151 V226 H598" stroke="#1f2a37" stroke-width="1.6" fill="none" marker-end="url(#a)"/>
+  <path d="M175 140 H145 V231 H132" stroke="#5f6b7a" stroke-width="1.3" stroke-dasharray="4 3" fill="none" marker-end="url(#am)"/>
+</svg>

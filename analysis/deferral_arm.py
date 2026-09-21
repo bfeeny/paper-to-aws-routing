@@ -108,7 +108,7 @@ def main() -> int:
           f"-> {max(shuf,0)/real:.0%} is group lookup")
 
     print("\nleave-one-group-out:")
-    d_l, p_l, t_l = [], [], []
+    d_l, p_l, t_l, per = [], [], [], []
     for grp in sorted(set(g)):
         m = g == grp
         if y[m].sum() < args.min_pos or (1 - y[m]).sum() < args.min_pos:
@@ -118,6 +118,8 @@ def main() -> int:
         p = auc(y[m], fit_score(P, tr_i, te_i, y))
         t = auc(y[m], F[m, 0])
         d_l.append(d); p_l.append(p); t_l.append(t)
+        per.append({"group": grp, "deferral": round(d, 3), "prompt_only": round(p, 3),
+                    "out_tokens": round(t, 3), "n": int(m.sum()), "positives": int(y[m].sum())})
         print(f"  {grp:30} deferral {d:.3f}   prompt {p:.3f}   out_tokens {t:.3f}")
     print(f"  {'MEAN':30} deferral {np.mean(d_l):.3f}   prompt {np.mean(p_l):.3f}"
           f"   out_tokens {np.mean(t_l):.3f}")
@@ -128,6 +130,7 @@ def main() -> int:
         "labels": args.labels, "n": len(recs), "escalation_rate": round(float(y.mean()), 4),
         "random_split": rows, "within_group_shuffle": {"real": round(real, 3),
                                                        "shuffled": round(shuf, 3)},
+        "loto_by_group": per,
         "loto_mean": {"deferral": round(float(np.mean(d_l)), 3),
                       "prompt_only": round(float(np.mean(p_l)), 3),
                       "out_tokens_alone": round(float(np.mean(t_l)), 3)},

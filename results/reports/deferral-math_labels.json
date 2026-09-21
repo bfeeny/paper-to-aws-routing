@@ -33,8 +33,66 @@
   ],
   "within_group_shuffle": {
     "real": 0.846,
-    "shuffled": 0.84
+    "shuffled": 0.838
   },
+  "loto_by_group": [
+    {
+      "group": "algebra",
+      "deferral": 0.557,
+      "prompt_only": 0.571,
+      "out_tokens": 0.581,
+      "n": 360,
+      "positives": 16
+    },
+    {
+      "group": "counting_and_probability",
+      "deferral": 0.795,
+      "prompt_only": 0.718,
+      "out_tokens": 0.828,
+      "n": 360,
+      "positives": 15
+    },
+    {
+      "group": "geometry",
+      "deferral": 0.771,
+      "prompt_only": 0.528,
+      "out_tokens": 0.77,
+      "n": 360,
+      "positives": 43
+    },
+    {
+      "group": "intermediate_algebra",
+      "deferral": 0.791,
+      "prompt_only": 0.597,
+      "out_tokens": 0.793,
+      "n": 360,
+      "positives": 55
+    },
+    {
+      "group": "number_theory",
+      "deferral": 0.855,
+      "prompt_only": 0.487,
+      "out_tokens": 0.86,
+      "n": 360,
+      "positives": 10
+    },
+    {
+      "group": "prealgebra",
+      "deferral": 0.66,
+      "prompt_only": 0.691,
+      "out_tokens": 0.632,
+      "n": 360,
+      "positives": 16
+    },
+    {
+      "group": "precalculus",
+      "deferral": 0.839,
+      "prompt_only": 0.609,
+      "out_tokens": 0.836,
+      "n": 360,
+      "positives": 41
+    }
+  ],
   "loto_mean": {
     "deferral": 0.752,
     "prompt_only": 0.6,

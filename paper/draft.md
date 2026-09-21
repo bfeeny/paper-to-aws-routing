@@ -9,8 +9,8 @@ date: 2026-09-21
 
 **Brian Feeny**
 
-*Draft, 21 September 2026. Independent work. The author is employed by Amazon Web
-Services; the views and assessments here are his own.*
+*Draft, 21 September 2026. Independent work. I work at Amazon Web Services; the
+views and assessments here are my own.*
 
 ---
 
@@ -107,6 +107,14 @@ router ships as JSON weights and scores with one Amazon Titan Text Embeddings V2
 call plus a 256-term dot product, about 110 ms end to end. The stack is plain
 CloudFormation plus a Makefile and deploys and tears down with one command.
 
+![Request path through the gateway](figures/fig1-gateway.png)
+
+*Figure 1. The request path. The client asks for a virtual model; the REQUEST
+interceptor embeds and scores the prompt and rewrites the model field before the
+gateway resolves routing. The dashed RESPONSE interceptor is where the deferral
+policy of §6 would run; it is proposed here, not evaluated live. Configuring and
+operating this path is the subject of a companion paper.*
+
 ### 2.2 Labels
 
 **Cascade labels.** For each item we query Claude Haiku 4.5, Sonnet 4.6 and
@@ -197,11 +205,12 @@ strong-model calls than the router (57.5% vs 58.0%). The router's advantage is
 confined to aggressive savings. It recovers half the gap with 24.5% of calls,
 where length needs 31.5%.
 
-![Threshold sweep on the RouteLLM hold-out](../results/reports/threshold-sweep.png)
+![Threshold sweep on the RouteLLM hold-out](figures/fig2-threshold-sweep.png)
 
-*Figure 1. Quality recovered against strong-model call rate (left) and cost per
-1,000 requests (right), priced as Haiku → Opus. The learned router and prompt
-length cross near 57% of calls.*
+*Figure 2. Quality recovered against the share of requests sent to the strong
+model (left) and against cost per 1,000 requests (right), priced as Haiku → Opus.
+The learned router leads at low call rates; the two curves meet near 57% of
+calls, and prompt length reaches 80% of the gap marginally sooner.*
 
 ### 3.2 The diagnostic suite
 
@@ -231,6 +240,13 @@ compare the router against the group-rate oracle.
 
 *Table 1. Linear probe on Titan features. Every bootstrap interval spans zero.
 No router is distinguishable from knowing the group base rate.*
+
+![In-distribution, shuffled and held-out-group AUC](figures/fig3-what-routers-learn.png)
+
+*Figure 3. The same router scored three ways. Shuffling labels within each group
+destroys all within-group signal yet barely moves the in-distribution score;
+holding out whole groups collapses it toward chance. The dotted line is the
+ceiling the labels permit (§3.3).*
 
 On BBH the result is unambiguous. Escalation rates across tasks run from 0%
 (`object_counting`) to 83% (`tracking_shuffled_objects_three_objects`), and the
@@ -319,6 +335,12 @@ questions and GPT-4 judgements, we label each (question, turn)
 | extraction | 40.0% | | roleplay | 20.0% |
 | reasoning | 35.0% | | humanities | 10.0% |
 
+![MT-Bench strong-needed rate by category](figures/fig4-mtbench-categories.png)
+
+*Figure 4. RouteLLM's MT-Bench evaluation set, labelled from the published
+GPT-4 judgements. The base rate of "GPT-4 needed" varies more across
+categories than any router's advantage over it.*
+
 Across categories the base rate spans 55 points. **Category identity alone
 reaches AUC 0.693 [0.612, 0.781]** on the published label. A router fitted to
 MT-Bench and evaluated one held-out category at a time averages 0.522 over seven
@@ -354,6 +376,12 @@ the same L2 logistic model and evaluate it exactly as in §3.
 
 *Table 3. Deferral survives leave-one-group-out where prompt-only routing does
 not, except on BBH.*
+
+![Deferral vs prompt-only by held-out MATH subject](figures/fig5-deferral-math.png)
+
+*Figure 5. Each MATH subject held out in turn. Deferral beats prompt-only routing
+on five of seven subjects, by as much as 0.37 AUC (number theory), and loses
+narrowly on the other two (algebra by 0.014, prealgebra by 0.031).*
 
 Output token count carries nearly all of the signal. A cheap model that is
 struggling writes more: it restarts, second-guesses and recounts. Recognising
@@ -431,7 +459,8 @@ from per-call agreement.
 - **End-to-end gateway runs.** The interceptor, calibrated thresholds and
   metrics are deployed and tested. The routing results above are offline
   evaluations on stored labels and cached embeddings, not live A/B runs through
-  the gateway.
+  the gateway. Live runs, including a deferral RESPONSE interceptor, and the
+  configuration they need are left to a companion paper.
 - **Pricing.** Dollar figures use on-demand list prices and fixed token
   averages. Measured per-item token counts differ by tier and benchmark.
 
