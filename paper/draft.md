@@ -129,8 +129,9 @@ matters.
 | BBH, all 27 tasks | 2,430 | 27 tasks | 27.7% | 67.6 / 14.2 / 13.5 / 4.7 |
 | MATH, levels 1–5 | 2,520 | 7 subjects | 7.8% | 87.4 / 6.0 / 1.7 / 4.8 |
 
-On MATH, escalation is monotone in human-assigned difficulty level: 2.7%, 2.4%,
-5.6%, 6.8% and 16.0% for levels 1–5.
+On MATH, escalation rises with human-assigned difficulty level: 2.7%, 2.4%,
+5.6%, 6.8% and 16.0% for levels 1–5, flat across the first two and steep at
+the top.
 
 **Preference labels.** We also use RouteLLM's released `gpt4_judge_battles`
 (109,101 battles) and `mmlu_battles` (1,531). All are for the single pair
@@ -458,7 +459,7 @@ second failed on answers the model had formatted: `Answer: **6**`,
 `\boxed{6}`, `45^\circ`. The cheap model formats its final answers more readily
 than the expensive one, so this defect was correlated with tier. It did not
 add noise. It manufactured escalation. Correcting it halved MATH escalation
-(15.6% → 7.8%) and exposed the monotone relation with difficulty level. A
+(15.6% → 7.8%) and exposed the relation with difficulty level. A
 grader whose error correlates with the quantity being measured does not degrade
 a result gracefully. It invents one.
 
