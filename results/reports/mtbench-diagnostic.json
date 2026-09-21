@@ -1,0 +1,52 @@
+{
+  "n": 160,
+  "strong_needed_rate": 0.3312,
+  "rate_by_category": {
+    "coding": 0.65,
+    "extraction": 0.4,
+    "humanities": 0.1,
+    "math": 0.45,
+    "reasoning": 0.35,
+    "roleplay": 0.2,
+    "stem": 0.25,
+    "writing": 0.25
+  },
+  "category_spread": 0.55,
+  "category_oracle_auc": 0.693,
+  "category_oracle_ci95": [
+    0.612,
+    0.781
+  ],
+  "transferred_110k_router_auc": 0.627,
+  "prompt_length_auc": 0.472,
+  "loco": [
+    {
+      "category": "coding",
+      "auc": 0.527
+    },
+    {
+      "category": "extraction",
+      "auc": 0.427
+    },
+    {
+      "category": "math",
+      "auc": 0.596
+    },
+    {
+      "category": "reasoning",
+      "auc": 0.659
+    },
+    {
+      "category": "roleplay",
+      "auc": 0.391
+    },
+    {
+      "category": "stem",
+      "auc": 0.48
+    },
+    {
+      "category": "writing",
+      "auc": 0.573
+    }
+  ]
+}
