@@ -143,4 +143,12 @@ re-scoring is not permitted.
 
 ## Amendments
 
-_(none yet)_
+**2026-09-21 — baseline calibration on the full prompt set.** The first dev-split run
+(qwen3-235b vs qwen3-32b, 20 prompts) decided only 8 of 20 pairs, with a win-rate CI of
+0–75%: too under-powered to resolve anything, and the pair's 31% price gap caps what any
+router could show. Baseline arms are therefore re-measured on all 80 prompts with a wider
+pair (mistral-large-3-675b vs ministral-3-3b). No router and no threshold tuning is
+involved, so nothing is fitted to these prompts; the final router comparison still
+re-runs every arm, and held-out numbers remain the reported result. Judge changed to
+`qwen.qwen3-235b-a22b-2507` because the previous judge (mistral-large-3) is now a
+candidate and cannot grade itself.

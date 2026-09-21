@@ -1,0 +1,29 @@
+{
+  "run_id": "20260921T033505Z-mistral-gap-mistral-wide-always_strong-all",
+  "experiment": "mistral-gap",
+  "experiment_file": "experiments/mistral-gap.json",
+  "arm": "always_strong",
+  "split": "all",
+  "pair": {
+    "name": "mistral-wide",
+    "strong": "mistral.mistral-large-3-675b-instruct",
+    "weak": "mistral.ministral-3-3b-instruct",
+    "note": "~225x parameter gap; 15x output price ratio."
+  },
+  "stack": "routingstudyalwaysstrong",
+  "gateway_url": "https://routingstudyalwaysstrong-ow1fzt9duc.gateway.bedrock-agentcore.us-east-1.amazonaws.com",
+  "request": {
+    "max_tokens": 512,
+    "temperature": 0.0,
+    "path": "/inference/v1/chat/completions"
+  },
+  "prompts_file": "experiments/prompts/mt_bench.jsonl",
+  "prompt_count": 80,
+  "succeeded": 80,
+  "failed": 0,
+  "git_sha": "325bc8ef088ed72407186e04d287cb88adaf724f-dirty",
+  "region": "us-east-1",
+  "started_utc": "2026-09-21T03:35:05+00:00",
+  "finished_utc": "2026-09-21T03:38:15+00:00",
+  "prices_version": "2026-09-20"
+}

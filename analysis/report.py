@@ -131,7 +131,11 @@ def main() -> int:
           f"the ceiling on what any router can save on this pair, achieved only by "
           f"giving up whatever quality the strong model adds.")
         w("")
-    w("_Dev-split calibration run. Not a held-out result; no router involved._")
+    split_note = {"dev": "Dev-split", "heldout": "Held-out", "all": "Full-set"}.get(
+        b_man["split"], b_man["split"])
+    router = "no router involved" if b_man["arm"].startswith("always") and \
+        c_man["arm"].startswith("always") else "router arm included"
+    w(f"_{split_note} calibration run ({router})._")
 
     text = "\n".join(lines) + "\n"
     out = ROOT / (args.out or f"results/reports/{jdir.name}.md")

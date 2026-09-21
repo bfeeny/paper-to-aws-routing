@@ -1,0 +1,33 @@
+{
+  "name": "mistral-gap",
+  "description": "Wide capability gap, full 80-prompt set. Baseline arms only (no router yet): measures whether the method can resolve a real gap.",
+  "prompts": "experiments/prompts/mt_bench.jsonl",
+  "split": {
+    "seed": 20260920,
+    "dev_fraction": 0.25,
+    "note": "Seeded shuffle. Held-out prompts are scored once per arm, after thresholds are fixed."
+  },
+  "pair": {
+    "name": "mistral-wide",
+    "strong": "mistral.mistral-large-3-675b-instruct",
+    "weak": "mistral.ministral-3-3b-instruct",
+    "note": "~225x parameter gap; 15x output price ratio."
+  },
+  "arms": [
+    "always_strong",
+    "always_weak",
+    "length",
+    "routellm"
+  ],
+  "request": {
+    "max_tokens": 512,
+    "temperature": 0.0,
+    "path": "/inference/v1/chat/completions"
+  },
+  "judge": {
+    "model": "qwen.qwen3-235b-a22b-2507",
+    "note": "Different vendor from both candidates \u2014 mistral-large-3 cannot judge itself.",
+    "max_tokens": 256,
+    "dual_ordering": true
+  }
+}

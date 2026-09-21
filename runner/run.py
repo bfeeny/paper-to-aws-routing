@@ -50,6 +50,8 @@ def load_prompts(cfg: dict, split: str) -> list[dict]:
     rng = random.Random(cfg["split"]["seed"])
     order = list(range(len(rows)))
     rng.shuffle(order)
+    if split == "all":
+        return rows
     cut = int(len(rows) * cfg["split"]["dev_fraction"])
     keep = set(order[:cut]) if split == "dev" else set(order[cut:])
     return [r for i, r in enumerate(rows) if i in keep]
@@ -131,7 +133,7 @@ def main() -> int:
     ap.add_argument("--experiment", required=True)
     ap.add_argument("--arm", required=True)
     ap.add_argument("--stack", required=True)
-    ap.add_argument("--split", choices=["dev", "heldout"], default="dev")
+    ap.add_argument("--split", choices=["dev", "heldout", "all"], default="dev")
     ap.add_argument("--limit", type=int, default=0, help="0 = all prompts in the split")
     ap.add_argument("--profile", default="personal")
     ap.add_argument("--region", default="us-east-1")

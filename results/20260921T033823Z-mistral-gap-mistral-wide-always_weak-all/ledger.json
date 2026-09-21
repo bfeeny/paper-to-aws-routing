@@ -1,0 +1,21 @@
+{
+  "per_model": {
+    "mistral.ministral-3-3b-instruct": {
+      "requests": 80,
+      "input_tokens": 5762,
+      "output_tokens": 30762,
+      "quota_tokens": 46722,
+      "usd": 0.003652,
+      "priced": true
+    }
+  },
+  "totals": {
+    "requests": 80,
+    "input_tokens": 5762,
+    "output_tokens": 30762,
+    "quota_tokens": 46722,
+    "usd": 0.003652,
+    "fully_priced": true
+  },
+  "note": "usd is omitted-as-zero where prices.json has nulls; check fully_priced"
+}

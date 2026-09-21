@@ -1,0 +1,21 @@
+{
+  "baseline_run": "20260921T033505Z-mistral-gap-mistral-wide-always_strong-all",
+  "baseline_arm": "always_strong",
+  "candidate_run": "20260921T033823Z-mistral-gap-mistral-wide-always_weak-all",
+  "candidate_arm": "always_weak",
+  "judge_model": "qwen.qwen3-235b-a22b-2507",
+  "judge_prompt_sha256": "ad7e1c93de42e98d",
+  "dual_ordering": true,
+  "pairs": 80,
+  "tally": {
+    "candidate_win": 5,
+    "baseline_win": 34,
+    "tie": 12,
+    "inconsistent": 29,
+    "error": 0
+  },
+  "win_rate_vs_baseline": 0.1282051282051282,
+  "inconsistency_rate": 0.3625,
+  "judged_utc": "2026-09-21T03:41:37+00:00",
+  "note": "win_rate counts only pairs where both orderings agreed on a winner; ties and inconsistent pairs are excluded from the denominator."
+}
