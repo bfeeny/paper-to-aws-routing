@@ -2,19 +2,55 @@
   "_note": [
     "Per-1,000-token prices in USD, and the quota weight applied to output tokens.",
     "Prices are NOT auto-discoverable; fill them from the Amazon Bedrock pricing page",
-    "and record the date. Any model left null still gets a token ledger — the dollar",
+    "and record the date. Any model left null still gets a token ledger \u2014 the dollar",
     "column is simply omitted rather than guessed.",
     "quota_output_weight models Bedrock's burndown, where newer Claude output tokens",
     "count 5x. Defaults to 1.0 where unknown."
   ],
-  "_priced_on": null,
+  "_priced_on": "2026-09-20",
   "models": {
-    "qwen.qwen3-235b-a22b-2507": { "input_per_1k": null, "output_per_1k": null, "quota_output_weight": 1.0 },
-    "qwen.qwen3-32b": { "input_per_1k": null, "output_per_1k": null, "quota_output_weight": 1.0 },
-    "openai.gpt-oss-120b": { "input_per_1k": null, "output_per_1k": null, "quota_output_weight": 1.0 },
-    "openai.gpt-oss-20b": { "input_per_1k": null, "output_per_1k": null, "quota_output_weight": 1.0 },
-    "mistral.mistral-large-3-675b-instruct": { "input_per_1k": null, "output_per_1k": null, "quota_output_weight": 1.0 },
-    "mistral.ministral-3-3b-instruct": { "input_per_1k": null, "output_per_1k": null, "quota_output_weight": 1.0 },
-    "zai.glm-5": { "input_per_1k": null, "output_per_1k": null, "quota_output_weight": 1.0 }
-  }
+    "qwen.qwen3-235b-a22b-2507": {
+      "input_per_1k": 0.00022,
+      "output_per_1k": 0.00088,
+      "quota_output_weight": 1.0,
+      "price_source": "price-list:mantle-standard"
+    },
+    "qwen.qwen3-32b": {
+      "input_per_1k": 0.00015,
+      "output_per_1k": 0.0006,
+      "quota_output_weight": 1.0,
+      "price_source": "price-list:mantle-standard"
+    },
+    "openai.gpt-oss-120b": {
+      "input_per_1k": 0.00015,
+      "output_per_1k": 0.0006,
+      "quota_output_weight": 1.0,
+      "price_source": "price-list:mantle-standard"
+    },
+    "openai.gpt-oss-20b": {
+      "input_per_1k": 7e-05,
+      "output_per_1k": 0.0003,
+      "quota_output_weight": 1.0,
+      "price_source": "price-list:mantle-standard"
+    },
+    "mistral.mistral-large-3-675b-instruct": {
+      "input_per_1k": 0.0005,
+      "output_per_1k": 0.0015,
+      "quota_output_weight": 1.0,
+      "price_source": "price-list:mantle-standard"
+    },
+    "mistral.ministral-3-3b-instruct": {
+      "input_per_1k": 0.0001,
+      "output_per_1k": 0.0001,
+      "quota_output_weight": 1.0,
+      "price_source": "price-list:mantle-standard"
+    },
+    "zai.glm-5": {
+      "input_per_1k": null,
+      "output_per_1k": null,
+      "quota_output_weight": 1.0,
+      "price_note": "no price-list entry for USE1-zai.glm-5-mantle-input-tokens-standard; no offer"
+    }
+  },
+  "_price_region": "USE1"
 }

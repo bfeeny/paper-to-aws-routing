@@ -1,0 +1,5 @@
+{"prompt_id": "mtbench-81", "outcome": "baseline_win", "verdict_order1": "A", "verdict_order2": "B", "judge_latency_ms": [501.7, 454.8], "judge_status": [200, 200]}
+{"prompt_id": "mtbench-82", "outcome": "candidate_win", "verdict_order1": "B", "verdict_order2": "A", "judge_latency_ms": [383.2, 511.6], "judge_status": [200, 200]}
+{"prompt_id": "mtbench-84", "outcome": "baseline_win", "verdict_order1": "A", "verdict_order2": "B", "judge_latency_ms": [376.6, 1941.3], "judge_status": [200, 200]}
+{"prompt_id": "mtbench-86", "outcome": "baseline_win", "verdict_order1": "A", "verdict_order2": "B", "judge_latency_ms": [398.3, 358.5], "judge_status": [200, 200]}
+{"prompt_id": "mtbench-91", "outcome": "inconsistent", "verdict_order1": "A", "verdict_order2": "TIE", "judge_latency_ms": [374.5, 408.9], "judge_status": [200, 200]}

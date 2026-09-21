@@ -35,6 +35,21 @@ results/       committed raw outputs, one directory per run
 paper/         manuscript, figures built from results/
 ```
 
+## Tracking and teardown
+
+Every AWS resource this study creates is named `routingstudy*` and tagged
+`Project=paper-to-aws-routing`. To see what exists and what it would take to remove
+it — including things CloudFormation doesn't own, like the packaging bucket and
+orphaned log groups:
+
+```bash
+make inventory
+```
+
+`make down-all` removes every arm's stack plus the bucket. Bedrock model agreements
+are account-level, cost nothing idle, and are deliberately *not* torn down by this
+project.
+
 ## Usage
 
 ```bash
@@ -43,6 +58,14 @@ make smoke                       # one request end-to-end
 make outputs                     # gateway URL and identifiers
 make down ARM=always_strong      # remove it
 make down-all                    # remove everything, including the artifact bucket
+make inventory                   # what exists right now, and how to delete it
+make prices                      # refresh prices from the AWS Price List API
+```
+
+Scoring a run against a baseline:
+
+```bash
+python3 analysis/judge.py --baseline results/<strong-run> --candidate results/<arm-run>
 ```
 
 Each arm is its own stack, so arms cannot contaminate each other, and an
@@ -70,9 +93,19 @@ So a router cannot treat model discovery as a capability list, and cross-family
 routing changes the request schema rather than just the model string. Raw data:
 `results/model-availability/2026-09-20.jsonl`.
 
+## Pricing
+
+`make prices` fills `experiments/prices.json` from the **AWS Price List API**, keyed on
+the exact usage type (`USE1-<model-id>-mantle-input-tokens-standard`), falling back to
+the Marketplace offer rate card. No prices are transcribed by hand, and a model that
+can't be resolved keeps `null` — the ledger still counts tokens but won't claim dollars
+it can't source.
+
 ## Status
 
-Scaffolding plus the availability probe. No routing runs yet; no results to cite.
+Harness complete and validated end to end: infrastructure, run harness with dual cost
+ledger, API-sourced prices, and a dual-ordering judge. Pilot runs so far are pipeline
+validation only (5 prompts) and are marked as such. No results to cite yet.
 
 ## License
 
