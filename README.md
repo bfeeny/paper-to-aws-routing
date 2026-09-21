@@ -117,11 +117,28 @@ the Marketplace offer rate card. No prices are transcribed by hand, and a model 
 can't be resolved keeps `null` — the ledger still counts tokens but won't claim dollars
 it can't source.
 
+## Results so far
+
+- **The method resolves a real capability gap.** `mistral-large-3-675b` vs
+  `ministral-3-3b` over 80 prompts: weak win rate 12.8% (95% CI 2.9–24.3%), interval
+  excluding 50%. A narrower pair (qwen3-235b vs qwen3-32b, 20 prompts) produced a CI of
+  0–75% and resolved nothing — pair choice and sample size dominate everything else.
+- **Position bias is large and grows with the gap.** 25% of pairs flipped when the
+  answers were swapped on the narrow pair; **36%** on the wide one. Single-ordering
+  judging silently absorbs that.
+- **The trained router collapsed.** With 13 usable training labels it learned the base
+  rate, scored every prompt within 0.075 of every other, and routed 100% to the strong
+  model — while adding ~110 ms p50. See
+  [results/reports/router-arm-2026-09-21.md](results/reports/router-arm-2026-09-21.md).
+- **Quota burndown runs 1.28–1.37× actual tokens** on models with no output weighting,
+  so cost measured in dollars and cost measured against quota are not the same number.
+
 ## Status
 
-Harness complete and validated end to end: infrastructure, run harness with dual cost
-ledger, API-sourced prices, and a dual-ordering judge. Pilot runs so far are pipeline
-validation only (5 prompts) and are marked as such. No results to cite yet.
+Harness complete and validated: infrastructure, run harness with dual cost ledger,
+API-sourced prices, dual-ordering judge, AgentCore Evaluations as a second opinion, and
+bootstrap intervals on every rate. The next step is real preference data — the current
+router is label-starved, not mis-engineered.
 
 ## License
 

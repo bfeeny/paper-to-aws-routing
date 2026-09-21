@@ -1,0 +1,21 @@
+{
+  "per_model": {
+    "mistral.mistral-large-3-675b-instruct": {
+      "requests": 60,
+      "input_tokens": 4788,
+      "output_tokens": 21057,
+      "quota_tokens": 35508,
+      "usd": 0.033979,
+      "priced": true
+    }
+  },
+  "totals": {
+    "requests": 60,
+    "input_tokens": 4788,
+    "output_tokens": 21057,
+    "quota_tokens": 35508,
+    "usd": 0.033979,
+    "fully_priced": true
+  },
+  "note": "usd is omitted-as-zero where prices.json has nulls; check fully_priced"
+}

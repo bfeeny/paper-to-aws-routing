@@ -51,6 +51,15 @@ Resources:
             Action: sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: embed-for-routing
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              # the trained router embeds each prompt before scoring it
+              - Effect: Allow
+                Action: bedrock:InvokeModel
+                Resource: !Sub "arn:aws:bedrock:${AWS::Region}::foundation-model/amazon.titan-embed-text-v2:0" 
 
   InterceptorLogGroup:
     Type: AWS::Logs::LogGroup
