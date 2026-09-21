@@ -1,0 +1,22 @@
+{
+  "eval": "bbh",
+  "per_query_ms_vectorised": 0.72,
+  "results": [
+    {
+      "name": "SW-ranking (Titan features)",
+      "auc": 0.46,
+      "ci95": [
+        0.436,
+        0.485
+      ]
+    },
+    {
+      "name": "prompt length",
+      "auc": 0.551,
+      "ci95": [
+        0.528,
+        0.574
+      ]
+    }
+  ]
+}
