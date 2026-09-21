@@ -27,7 +27,7 @@ Parameters:
   LengthThresholdChars:
     Type: Number
     Default: 2000
-    Description: Used by the `length` arm — AWS's published heuristic, reimplemented as a baseline.
+    Description: Used by the `length` arm. Default 2000 matches SONNET_THRESHOLD in the AgentCore interceptor docs routing example.
 
   RouterThreshold:
     Type: Number

@@ -8,7 +8,10 @@ Arms:
   passthrough   leave the request alone (control: measures interceptor overhead only)
   always_strong pin every request to the strong model (quality ceiling)
   always_weak   pin every request to the weak model (cost floor)
-  length        input-size threshold — AWS's published heuristic, as a baseline
+  length        input-size threshold, copied from the routing example in the
+                AgentCore interceptor docs (SONNET_THRESHOLD = 2000 chars).
+                A docs example, not an AWS recommendation — which is exactly
+                why it is the baseline: it is what a developer would paste in.
   routellm      preference-trained router scored against ROUTER_THRESHOLD
 
 Every decision is emitted as a CloudWatch EMF record so an experiment run can be
