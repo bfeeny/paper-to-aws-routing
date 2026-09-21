@@ -1,0 +1,108 @@
+{
+  "labels": "experiments/routellm_labels.jsonl",
+  "holdout_n": 16595,
+  "strong_needed_rate": 0.0937,
+  "priced_as": {
+    "strong": "claude-opus-4-5",
+    "weak": "claude-haiku-4-5",
+    "avg_in_tokens": 140,
+    "avg_out_tokens": 280,
+    "prices_usd_per_1m": {
+      "claude-haiku-4-5": {
+        "in": 1.0,
+        "out": 5.0
+      },
+      "claude-sonnet-4-6": {
+        "in": 3.0,
+        "out": 15.0
+      },
+      "claude-opus-4-5": {
+        "in": 5.0,
+        "out": 25.0
+      }
+    }
+  },
+  "results": [
+    {
+      "router": "router",
+      "apgr": 0.6867,
+      "cpt_50": 0.245,
+      "cpt_80": 0.58,
+      "cpt_90": 0.73,
+      "operating_points": [
+        {
+          "pgr_target": 0.5,
+          "call_rate": 0.245,
+          "cost_per_1k_requests": 3.049,
+          "saving_vs_always_strong": 0.604
+        },
+        {
+          "pgr_target": 0.8,
+          "call_rate": 0.58,
+          "cost_per_1k_requests": 5.113,
+          "saving_vs_always_strong": 0.336
+        },
+        {
+          "pgr_target": 0.9,
+          "call_rate": 0.73,
+          "cost_per_1k_requests": 6.037,
+          "saving_vs_always_strong": 0.216
+        }
+      ]
+    },
+    {
+      "router": "prompt length",
+      "apgr": 0.6448,
+      "cpt_50": 0.315,
+      "cpt_80": 0.5750000000000001,
+      "cpt_90": 0.785,
+      "operating_points": [
+        {
+          "pgr_target": 0.5,
+          "call_rate": 0.315,
+          "cost_per_1k_requests": 3.48,
+          "saving_vs_always_strong": 0.548
+        },
+        {
+          "pgr_target": 0.8,
+          "call_rate": 0.575,
+          "cost_per_1k_requests": 5.082,
+          "saving_vs_always_strong": 0.34
+        },
+        {
+          "pgr_target": 0.9,
+          "call_rate": 0.785,
+          "cost_per_1k_requests": 6.376,
+          "saving_vs_always_strong": 0.172
+        }
+      ]
+    },
+    {
+      "router": "random",
+      "apgr": 0.5063,
+      "cpt_50": 0.495,
+      "cpt_80": 0.81,
+      "cpt_90": 0.91,
+      "operating_points": [
+        {
+          "pgr_target": 0.5,
+          "call_rate": 0.495,
+          "cost_per_1k_requests": 4.589,
+          "saving_vs_always_strong": 0.404
+        },
+        {
+          "pgr_target": 0.8,
+          "call_rate": 0.81,
+          "cost_per_1k_requests": 6.53,
+          "saving_vs_always_strong": 0.152
+        },
+        {
+          "pgr_target": 0.9,
+          "call_rate": 0.91,
+          "cost_per_1k_requests": 7.146,
+          "saving_vs_always_strong": 0.072
+        }
+      ]
+    }
+  ]
+}
