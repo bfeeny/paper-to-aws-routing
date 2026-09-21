@@ -1,0 +1,43 @@
+{
+  "labels": "experiments/math_labels.jsonl",
+  "n": 2520,
+  "escalation_rate": 0.0778,
+  "random_split": [
+    {
+      "arm": "deferral (response features)",
+      "auc": 0.846,
+      "ci95": [
+        0.776,
+        0.906
+      ],
+      "note": ""
+    },
+    {
+      "arm": "  out_tokens alone",
+      "auc": 0.84,
+      "ci95": [
+        0.767,
+        0.902
+      ],
+      "note": ""
+    },
+    {
+      "arm": "prompt-only router (Titan)",
+      "auc": 0.674,
+      "ci95": [
+        0.602,
+        0.747
+      ],
+      "note": ""
+    }
+  ],
+  "within_group_shuffle": {
+    "real": 0.846,
+    "shuffled": 0.84
+  },
+  "loto_mean": {
+    "deferral": 0.752,
+    "prompt_only": 0.6,
+    "out_tokens_alone": 0.757
+  }
+}

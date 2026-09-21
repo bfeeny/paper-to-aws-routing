@@ -1,0 +1,43 @@
+{
+  "labels": "experiments/cascade_labels.jsonl",
+  "n": 2709,
+  "escalation_rate": 0.1222,
+  "random_split": [
+    {
+      "arm": "deferral (response features)",
+      "auc": 0.685,
+      "ci95": [
+        0.627,
+        0.743
+      ],
+      "note": ""
+    },
+    {
+      "arm": "  out_tokens alone",
+      "auc": 0.635,
+      "ci95": [
+        0.577,
+        0.693
+      ],
+      "note": ""
+    },
+    {
+      "arm": "prompt-only router (Titan)",
+      "auc": 0.744,
+      "ci95": [
+        0.694,
+        0.794
+      ],
+      "note": ""
+    }
+  ],
+  "within_group_shuffle": {
+    "real": 0.685,
+    "shuffled": 0.611
+  },
+  "loto_mean": {
+    "deferral": 0.67,
+    "prompt_only": 0.558,
+    "out_tokens_alone": 0.682
+  }
+}
