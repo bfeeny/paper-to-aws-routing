@@ -1,0 +1,21 @@
+{
+  "per_model": {
+    "qwen.qwen3-235b-a22b-2507": {
+      "requests": 20,
+      "input_tokens": 1061,
+      "output_tokens": 7170,
+      "quota_tokens": 11301,
+      "usd": 0.006543,
+      "priced": true
+    }
+  },
+  "totals": {
+    "requests": 20,
+    "input_tokens": 1061,
+    "output_tokens": 7170,
+    "quota_tokens": 11301,
+    "usd": 0.006543,
+    "fully_priced": true
+  },
+  "note": "usd is omitted-as-zero where prices.json has nulls; check fully_priced"
+}

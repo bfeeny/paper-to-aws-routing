@@ -1,0 +1,21 @@
+{
+  "baseline_run": "20260921T014939Z-pilot-qwen-7x-always_strong-dev-calib",
+  "baseline_arm": "always_strong",
+  "candidate_run": "20260921T015058Z-pilot-qwen-7x-always_weak-dev-calib",
+  "candidate_arm": "always_weak",
+  "judge_model": "mistral.mistral-large-3-675b-instruct",
+  "judge_prompt_sha256": "ad7e1c93de42e98d",
+  "dual_ordering": true,
+  "pairs": 20,
+  "tally": {
+    "candidate_win": 3,
+    "baseline_win": 5,
+    "tie": 7,
+    "inconsistent": 5,
+    "error": 0
+  },
+  "win_rate_vs_baseline": 0.375,
+  "inconsistency_rate": 0.25,
+  "judged_utc": "2026-09-21T01:52:19+00:00",
+  "note": "win_rate counts only pairs where both orderings agreed on a winner; ties and inconsistent pairs are excluded from the denominator."
+}

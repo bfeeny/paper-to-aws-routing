@@ -1,0 +1,21 @@
+{
+  "per_model": {
+    "qwen.qwen3-32b": {
+      "requests": 20,
+      "input_tokens": 1141,
+      "output_tokens": 7230,
+      "quota_tokens": 11381,
+      "usd": 0.004509,
+      "priced": true
+    }
+  },
+  "totals": {
+    "requests": 20,
+    "input_tokens": 1141,
+    "output_tokens": 7230,
+    "quota_tokens": 11381,
+    "usd": 0.004509,
+    "fully_priced": true
+  },
+  "note": "usd is omitted-as-zero where prices.json has nulls; check fully_priced"
+}
