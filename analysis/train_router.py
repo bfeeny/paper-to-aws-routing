@@ -20,10 +20,13 @@ Embeddings are cached by content hash, so re-fitting costs nothing.
 import argparse
 import concurrent.futures as cf
 import hashlib
+import http.client
 import json
 import pathlib
-import urllib.error
-import urllib.request
+import shutil
+import ssl
+import threading
+import time
 
 import botocore.session
 import numpy as np
@@ -35,52 +38,110 @@ EMBED_MODEL = "amazon.titan-embed-text-v2:0"
 DIMS = 256  # overridable with --dims; Titan v2 supports 256/512/1024
 CACHE_DIR = ROOT / "experiments" / "cache"
 
+# One TLS context for the process, one kept-alive connection per worker thread.
+#
+# urlopen() opens a fresh HTTPS connection per call, so embedding 110k prompts
+# meant 110k TLS handshakes. Past a few threads the cost is not the handshake
+# itself but contention on OpenSSL's provider lock: measured at 4.5 embeddings
+# per second with sixteen threads pinned at 1500% CPU, nearly all of it inside
+# ossl_lib_ctx_get_data. Keep-alive takes the handshake off the hot path.
+_SSL_CTX = ssl.create_default_context()
+_TLS = threading.local()
+
+
+def _conn(region: str) -> http.client.HTTPSConnection:
+    c = getattr(_TLS, "conn", None)
+    if c is None:
+        c = http.client.HTTPSConnection(f"bedrock-runtime.{region}.amazonaws.com",
+                                        context=_SSL_CTX, timeout=60)
+        _TLS.conn = c
+    return c
+
+
+def _drop_conn() -> None:
+    c = getattr(_TLS, "conn", None)
+    if c is not None:
+        try:
+            c.close()
+        except Exception:  # noqa: BLE001 — a failed close tells us nothing useful
+            pass
+    _TLS.conn = None
+
 
 def _embed_one(creds, region, text, dims, attempts=5):
-    url = f"https://bedrock-runtime.{region}.amazonaws.com/model/{EMBED_MODEL}/invoke"
+    host = f"bedrock-runtime.{region}.amazonaws.com"
+    path = f"/model/{EMBED_MODEL}/invoke"
     body = json.dumps({"inputText": text[:8000], "dimensions": dims,
                        "normalize": True}).encode()
     for attempt in range(attempts):
-        req = AWSRequest(method="POST", url=url, data=body,
-                         headers={"Content-Type": "application/json"})
+        req = AWSRequest(method="POST", url=f"https://{host}{path}", data=body,
+                         headers={"Content-Type": "application/json", "Host": host})
         SigV4Auth(creds, "bedrock", region).add_auth(req)
         try:
-            with urllib.request.urlopen(
-                urllib.request.Request(url, data=body, headers=dict(req.headers)),
-                timeout=60,
-            ) as r:
-                return json.load(r)["embedding"]
-        except urllib.error.HTTPError as e:
-            if e.code in (429, 503) and attempt < attempts - 1:
-                import time
+            c = _conn(region)
+            c.request("POST", path, body=body, headers=dict(req.headers))
+            resp = c.getresponse()
+            payload = resp.read()  # must drain, or the connection can't be reused
+            if resp.status == 200:
+                return json.loads(payload)["embedding"]
+            if resp.status in (429, 503) and attempt < attempts - 1:
                 time.sleep(1.5 * (attempt + 1))  # throttling: back off and retry
+                continue
+            raise RuntimeError(f"embed HTTP {resp.status}: {payload[:200]!r}")
+        except (http.client.HTTPException, OSError):
+            _drop_conn()  # far end hung up on a pooled connection; rebuild it
+            if attempt < attempts - 1:
+                time.sleep(0.5 * (attempt + 1))
                 continue
             raise
     raise RuntimeError("embedding failed after retries")
 
 
-def embed(texts: list[str], profile: str, region: str, dims: int = DIMS,
-          workers: int = 8) -> np.ndarray:
-    key = hashlib.sha256(("|".join(texts)).encode()).hexdigest()[:16]
-    cache = CACHE_DIR / f"emb-{EMBED_MODEL.replace(':', '_')}-{dims}-{key}.npy"
-    if cache.exists():
-        print(f"  embeddings from cache ({cache.name})")
-        return np.load(cache)
-
-    creds = botocore.session.Session(profile=profile).get_credentials().get_frozen_credentials()
+def _embed_chunk(creds, region, texts, dims, workers) -> np.ndarray:
     out: list[list[float] | None] = [None] * len(texts)
-    done = 0
     with cf.ThreadPoolExecutor(max_workers=workers) as ex:
         futures = {ex.submit(_embed_one, creds, region, t, dims): i
                    for i, t in enumerate(texts)}
         for fut in cf.as_completed(futures):
             out[futures[fut]] = fut.result()
-            done += 1
-            if done % 500 == 0:
-                print(f"  embedded {done}/{len(texts)}")
-    arr = np.array(out, dtype=float)
-    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    return np.array(out, dtype=float)
+
+
+def embed(texts: list[str], profile: str, region: str, dims: int = DIMS,
+          workers: int = 8, chunk: int = 2000) -> np.ndarray:
+    """Embed in chunks, saving each one, so an interrupted run resumes.
+
+    The whole-array cache is the fast path on a re-fit. The per-chunk parts are
+    insurance: at 110k prompts a single failure near the end used to discard
+    every embedding bought up to that point.
+    """
+    key = hashlib.sha256(("|".join(texts)).encode()).hexdigest()[:16]
+    stem = f"emb-{EMBED_MODEL.replace(':', '_')}-{dims}-{key}"
+    cache = CACHE_DIR / f"{stem}.npy"
+    if cache.exists():
+        print(f"  embeddings from cache ({cache.name})", flush=True)
+        return np.load(cache)
+
+    parts_dir = CACHE_DIR / f"{stem}.parts"
+    parts_dir.mkdir(parents=True, exist_ok=True)
+    creds = botocore.session.Session(profile=profile).get_credentials().get_frozen_credentials()
+
+    parts, started = [], time.perf_counter()
+    for start in range(0, len(texts), chunk):
+        part = parts_dir / f"{start:08d}.npy"
+        if part.exists():
+            parts.append(np.load(part))
+            continue
+        arr = _embed_chunk(creds, region, texts[start:start + chunk], dims, workers)
+        np.save(part, arr)
+        parts.append(arr)
+        done = start + len(arr)
+        rate = done / max(time.perf_counter() - started, 1e-9)
+        print(f"  embedded {done}/{len(texts)}  ({rate:.0f}/s)", flush=True)
+
+    arr = np.concatenate(parts) if parts else np.zeros((0, dims))
     np.save(cache, arr)
+    shutil.rmtree(parts_dir, ignore_errors=True)
     return arr
 
 
