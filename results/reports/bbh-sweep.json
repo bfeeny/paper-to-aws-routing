@@ -1,0 +1,105 @@
+{
+  "labels": "experiments/bbh_labels.jsonl",
+  "n": 2430,
+  "escalation_rate": 0.2905,
+  "priced_as": {
+    "strong": "claude-opus-4-5",
+    "weak": "claude-haiku-4-5",
+    "avg_in_tokens": 140,
+    "avg_out_tokens": 280
+  },
+  "results": [
+    {
+      "router": "transfer (110k GPT-4/Mixtral)",
+      "n": 2430,
+      "positives": 706,
+      "auc": 0.435,
+      "auc_ci95": [
+        0.41,
+        0.459
+      ],
+      "apgr": 0.4537,
+      "cpt_50": 0.5750000000000001,
+      "cpt_80": 0.8300000000000001,
+      "note": "full cascade set, never trained on it"
+    },
+    {
+      "router": "prompt length",
+      "n": 2430,
+      "positives": 706,
+      "auc": 0.561,
+      "auc_ci95": [
+        0.538,
+        0.584
+      ],
+      "apgr": 0.5433,
+      "cpt_50": 0.445,
+      "cpt_80": 0.7000000000000001,
+      "note": "free baseline, full set"
+    },
+    {
+      "router": "in-distribution (cascade)",
+      "n": 729,
+      "positives": 215,
+      "auc": 0.833,
+      "auc_ci95": [
+        0.802,
+        0.863
+      ],
+      "apgr": 0.7347,
+      "cpt_50": 0.23,
+      "cpt_80": 0.41500000000000004,
+      "note": "trained on 1701, scored on 729 held out"
+    },
+    {
+      "router": "prompt length (same hold-out)",
+      "n": 729,
+      "positives": 215,
+      "auc": 0.55,
+      "auc_ci95": [
+        0.505,
+        0.592
+      ],
+      "apgr": 0.5352,
+      "cpt_50": 0.455,
+      "cpt_80": 0.675,
+      "note": "comparable to the row above"
+    },
+    {
+      "router": "transfer, alt coding",
+      "n": 2430,
+      "positives": 824,
+      "auc": 0.436,
+      "auc_ci95": [
+        0.412,
+        0.46
+      ],
+      "apgr": 0.4574,
+      "cpt_50": 0.5650000000000001,
+      "cpt_80": 0.835,
+      "note": "unanswerable counted as positive"
+    }
+  ],
+  "confound_benchmark_identity": {
+    "oracle_auc": 0.466,
+    "oracle_ci95": [
+      0.455,
+      0.546
+    ],
+    "escalation_rate_by_benchmark": {
+      "bbh": 0.2887
+    },
+    "within_benchmark": [
+      {
+        "benchmark": "bbh",
+        "n": 729,
+        "positives": 215,
+        "auc": 0.833,
+        "auc_ci95": [
+          0.802,
+          0.863
+        ]
+      }
+    ]
+  }
+}

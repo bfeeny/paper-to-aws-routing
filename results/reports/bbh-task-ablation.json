@@ -1,0 +1,62 @@
+{
+  "random_split": {
+    "router_auc": 0.833,
+    "task_identity_oracle_auc": 0.843,
+    "oracle_ci95": [
+      0.813,
+      0.874
+    ],
+    "escalation_rate_by_task": {
+      "tracking_shuffled_objects_three_objects": 0.831,
+      "dyck_languages": 0.825,
+      "reasoning_about_colored_objects": 0.688,
+      "disambiguation_qa": 0.672,
+      "date_understanding": 0.667,
+      "sports_understanding": 0.557,
+      "tracking_shuffled_objects_five_objects": 0.525,
+      "tracking_shuffled_objects_seven_objects": 0.515,
+      "geometric_shapes": 0.479,
+      "temporal_sequences": 0.466,
+      "causal_judgement": 0.348,
+      "penguins_in_a_table": 0.309,
+      "movie_recommendation": 0.219,
+      "ruin_names": 0.138,
+      "logical_deduction_seven_objects": 0.121,
+      "word_sorting": 0.121,
+      "snarks": 0.103,
+      "logical_deduction_three_objects": 0.092,
+      "web_of_lies": 0.079,
+      "salient_translation_error_detection": 0.07,
+      "formal_fallacies": 0.055,
+      "hyperbaton": 0.046,
+      "boolean_expressions": 0.043,
+      "logical_deduction_five_objects": 0.015,
+      "multistep_arithmetic_two": 0.0,
+      "navigate": 0.0,
+      "object_counting": 0.0
+    }
+  },
+  "held_out_tasks": {
+    "tasks": [
+      "disambiguation_qa",
+      "dyck_languages",
+      "multistep_arithmetic_two",
+      "navigate",
+      "object_counting",
+      "ruin_names",
+      "web_of_lies"
+    ],
+    "n": 630,
+    "positives": 152,
+    "router_auc": 0.512,
+    "router_ci95": [
+      0.466,
+      0.56
+    ],
+    "prompt_length_auc": 0.656,
+    "prompt_length_ci95": [
+      0.604,
+      0.706
+    ]
+  }
+}
