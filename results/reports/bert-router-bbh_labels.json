@@ -1,0 +1,45 @@
+{
+  "model": "BAAI/bge-small-en-v1.5",
+  "labels": "experiments/bbh_labels.jsonl",
+  "random_split": {
+    "auc": 0.865,
+    "ci95": [
+      0.837,
+      0.892
+    ]
+  },
+  "loto": [
+    {
+      "group": "tracking_shuffled_objects_seven_objects",
+      "n": 90,
+      "bert": 0.456,
+      "length": 0.561
+    },
+    {
+      "group": "tracking_shuffled_objects_five_objects",
+      "n": 90,
+      "bert": 0.521,
+      "length": 0.465
+    },
+    {
+      "group": "sports_understanding",
+      "n": 90,
+      "bert": 0.5,
+      "length": 0.587
+    },
+    {
+      "group": "disambiguation_qa",
+      "n": 90,
+      "bert": 0.704,
+      "length": 0.468
+    },
+    {
+      "group": "tracking_shuffled_objects_three_objects",
+      "n": 90,
+      "bert": 0.554,
+      "length": 0.525
+    }
+  ],
+  "loto_mean_bert": 0.547,
+  "loto_mean_length": 0.521
+}
