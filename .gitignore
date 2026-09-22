@@ -34,3 +34,8 @@ experiments/cache/
 
 # data-prep venv (pyarrow/matplotlib); runtime stays stdlib-only
 .venv/
+
+# Rebuilt from routellm/gpt4_judge_battles by experiments/fetch_routellm_data.py.
+# Not redistributed: the source prompts contain credentials that third parties
+# pasted into chatbots, and GitHub secret scanning flags them.
+experiments/routellm_labels.jsonl

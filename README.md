@@ -15,6 +15,12 @@ evaluation they fall to 0.52–0.60 against a label ceiling of 0.912, while a
 deferral rule on the cheap model's own output reaches 0.75 at no extra inference
 cost. The diagnostic suite is in [analysis/confound_suite.py](analysis/confound_suite.py).
 
+**Data not in the repo.** RouteLLM's 110k preference labels are rebuilt from the
+public `routellm/gpt4_judge_battles` dataset with
+`python3 experiments/fetch_routellm_data.py` rather than redistributed here: the
+source prompts contain API keys and tokens that third parties pasted into
+chatbots.
+
 [PREREGISTRATION.md](PREREGISTRATION.md) records the original plan for the
 gateway A/B arms. The analysis reported in the paper went beyond it once the
 first results came in; the paper says where.
