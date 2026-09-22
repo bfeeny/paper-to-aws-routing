@@ -477,6 +477,10 @@ from per-call agreement.
   configuration they need are left to a companion paper.
 - **Pricing.** Dollar figures use on-demand list prices and fixed token
   averages. Measured per-item token counts differ by tier and benchmark.
+- **Exploratory analysis.** The repository's preregistration covers the gateway
+  A/B arms planned at the outset. The cascade labels, the diagnostic suite, the
+  stability study and the deferral analysis were designed after the first
+  results came in, and should be read as exploratory rather than confirmatory.
 
 ---
 
