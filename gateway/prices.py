@@ -13,8 +13,14 @@ _TABLE = None
 def _table() -> dict:
     global _TABLE
     if _TABLE is None:
-        p = pathlib.Path(__file__).with_name("prices.json")
-        _TABLE = json.loads(p.read_text())["models"] if p.exists() else {}
+        here = pathlib.Path(__file__)
+        # packaged copy in the Lambda; the repo's shared table when run from source
+        for p in (here.with_name("prices.json"), here.parents[1] / "experiments" / "prices.json"):
+            if p.exists():
+                _TABLE = json.loads(p.read_text())["models"]
+                break
+        else:
+            _TABLE = {}
     return _TABLE
 
 

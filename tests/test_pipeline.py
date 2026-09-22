@@ -10,17 +10,24 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
 from gateway import pipeline as P  # noqa: E402
 from gateway import plugins  # noqa: E402,F401  (registers plugins)
-from gateway.plugins import budget as B, guardrail as G  # noqa: E402
+from gateway.plugins import guardrail as G  # noqa: E402
+from gateway import state as S  # noqa: E402
 
 WEAK, STRONG = "mistral.ministral-3-3b-instruct", "mistral.mistral-large-3-675b-instruct"
 
 
-class FakeTable:
-    def __init__(self): self.items = {}
-    def get_item(self, Key): return {"Item": self.items[Key["pk"]]} if Key["pk"] in self.items else {}
-    def update_item(self, Key, ExpressionAttributeValues, **_):
-        it = self.items.setdefault(Key["pk"], {"spend_usd": 0})
-        it["spend_usd"] = float(it["spend_usd"]) + float(ExpressionAttributeValues[":c"])
+class FakeStore:
+    """In-memory stand-in for state.DynamoStore, same interface and idempotency."""
+    def __init__(self): self.spend, self.reqs, self.settled = {}, {}, set()
+    def spend_today(self, tenant): return self.spend.get(tenant, 0.0)
+    def remember(self, rid, data): self.reqs[rid] = dict(data)
+    def recall(self, rid): return self.reqs.get(rid, {})
+    def settle(self, rid, tenant, cost):
+        if rid in self.settled:
+            return False
+        self.settled.add(rid)
+        self.spend[tenant] = self.spend.get(tenant, 0.0) + cost
+        return True
 
 
 class FakeBedrock:
@@ -40,7 +47,7 @@ CHAIN = [
     ("max_tokens", {"default": 1024}),
     ("router", {"strategy": "length", "threshold": 40, "strong": STRONG, "weak": WEAK}),
     ("model_policy", {"allow": {"globex": ["mistral.ministral-*"], "*": ["*"]}}),
-    ("budget", {"table": "t", "daily_usd": {"*": 0.01}}),
+    ("budget", {"daily_usd": {"*": 0.01}}),
     ("guardrail", {"guardrail_id": "g"}),
     ("metering", {}),
 ]
@@ -61,7 +68,7 @@ def call(tenant="acme", text="hi", model="auto", max_tokens=None):
     return P.Call(body=body, headers={"x-tenant-id": tenant} if tenant else {})
 
 
-B._table = FakeTable()
+S.set_store(FakeStore())
 G._client = FakeBedrock()
 p = pipe(*CHAIN)
 
@@ -89,10 +96,18 @@ check("guardrail ran last among checks, after budget", list(tr.timings_ms)[-1] =
 
 # spend: settle a response that costs more than the $0.01 budget, then get refused
 c = call(text="x" * 60)
+c.request_id = "r1"
 p.run_request(c)
 c.response = {"usage": {"prompt_tokens": 20000, "completion_tokens": 20000}}
-p.run_response(c)
+tr = p.run_response(c)
+check("response unwinds in reverse: metering before budget",
+      list(tr.timings_ms).index("metering") < list(tr.timings_ms).index("budget"))
 check("metering computed cost", c.attrs.get("cost_usd", 0) > 0.01)
+check("budget settled the call", c.attrs.get("budget_settled") is True)
+before = S.store().spend_today("acme")
+p.run_response(c)
+check("retried response does not bill twice", S.store().spend_today("acme") == before
+      and c.attrs.get("budget_settled") is False)
 rej, tr = p.run_request(call(text="again"))
 check("budget exhausted -> 429", rej and rej.status == 429 and tr.rejected_by == "budget")
 check("rejected before the guardrail was paid for", "guardrail" not in tr.timings_ms)
@@ -102,7 +117,7 @@ class Boom(P.Plugin):
     name = "boom"
     def on_request(self, call): raise RuntimeError("bug")
 P.REGISTRY["boom"] = Boom
-B._table = FakeTable()
+S.set_store(FakeStore())
 ok = P.Pipeline.from_config({"plugins": [{"plugin": "boom"}, {"plugin": "tenant"}]})
 rej, tr = ok.run_request(call())
 check("fail-open: plugin error recorded, request continues", rej is None and "boom" in tr.errors)
@@ -122,6 +137,47 @@ check("weighted split is sticky per prompt", c1.model == c2.model)
 c = call(model=f"mantle/{WEAK}")
 pipe(("router", {"strategy": "pinned", "model": STRONG})).run_request(c)
 check("explicit model passes through the router", c.model == f"mantle/{WEAK}")
+
+# ---------------------------------------------------------------- handler contract
+import base64, json, os  # noqa: E401,E402
+from types import SimpleNamespace  # noqa: E402
+from gateway import handler as H, pipeline as PP  # noqa: E402
+
+os.environ["PIPELINE_CONFIG"] = json.dumps({"plugins": [{"plugin": n, "params": p} for n, p in CHAIN]})
+PP._cache.update(at=0.0, pipeline=None, raw=None)
+H.TABLE = "t"
+S.set_store(FakeStore())
+enc = lambda o: base64.b64encode(json.dumps(o).encode()).decode()  # noqa: E731
+ctx = lambda rid: SimpleNamespace(client_context=SimpleNamespace(custom={"REQUEST_ID": rid}),  # noqa: E731
+                                  aws_request_id="lambda-" + rid)
+
+req_event = {"interceptorInputVersion": "1.0", "http": {"gatewayRequest": {
+    "path": "/inference/v1/chat/completions", "httpMethod": "POST",
+    "headers": {"X-Tenant-Id": "acme", "Authorization": "secret"},
+    "body": enc({"model": "auto", "messages": [{"role": "user", "content": "hello"}]})}}}
+out = H.lambda_handler(req_event, ctx("abc"))
+fwd = json.loads(base64.b64decode(out["http"]["transformedGatewayRequest"]["body"]))
+check("handler forwards a rewritten body", fwd["model"] == f"mantle/{WEAK}"
+      and out["interceptorOutputVersion"] == "1.0")
+check("request phase remembered the tenant for the response", S.store().recall("abc").get("tenant") == "acme")
+
+resp_event = {"interceptorInputVersion": "1.0", "http": {"gatewayRequest": None, "gatewayResponse": {
+    "statusCode": 200, "headers": None, "contentType": "application/json",
+    "body": enc({"model": WEAK, "usage": {"prompt_tokens": 12, "completion_tokens": 40}})}}}
+out = H.lambda_handler(resp_event, ctx("abc"))
+hdr = out["http"]["transformedGatewayResponse"]["headers"]
+check("response phase recovers tenant and reports cost header", "x-gateway-cost-usd" in hdr
+      and S.store().spend_today("acme") > 0)
+check("response body left untouched", "body" not in out["http"]["transformedGatewayResponse"])
+
+bad = json.loads(json.dumps(req_event)); bad["http"]["gatewayRequest"]["headers"]["X-Tenant-Id"] = "initech"
+out = H.lambda_handler(bad, ctx("def"))
+short = out["http"]["transformedGatewayResponse"]
+check("rejection short-circuits with status and error body", short["statusCode"] == 403
+      and json.loads(base64.b64decode(short["body"]))["error"]["code"] == "unknown_tenant"
+      and "transformedGatewayRequest" not in out["http"])
+check("handler never raises on garbage", H.lambda_handler({"http": {"gatewayRequest": {"body": "!!"}}}, ctx("x"))
+      == H.PASS)
 
 print(f"\n{'FAILED' if failures else 'all passed'}: {len(failures)} failure(s)")
 sys.exit(1 if failures else 0)

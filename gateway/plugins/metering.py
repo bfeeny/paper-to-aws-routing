@@ -20,6 +20,7 @@ from ..prices import bare, cost_usd
 @register
 class Metering(Plugin):
     name = "metering"
+    needs_response = True
 
     def on_response(self, call: Call) -> None:
         usage = (call.response or {}).get("usage") or {}

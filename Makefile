@@ -66,3 +66,37 @@ down-all: ## Delete every arm's stack and the artifact bucket
 	-aws s3 rb s3://$(ARTIFACTS) --force
 
 .PHONY: help bucket up outputs inventory prices smoke down down-all
+
+# ---------- inference-time customization pipeline (infra/pipeline.yaml) ----------
+PIPE_STACK    ?= gwpipeline
+PIPE_ARTIFACT ?= $(PIPE_STACK)-artifacts-$(shell aws sts get-caller-identity --query Account --output text 2>/dev/null)
+
+pipeline-build: ## Assemble the interceptor package (gateway/ + router scorer and weights)
+	rm -rf .build/pipeline && mkdir -p .build/pipeline
+	cp -R gateway .build/pipeline/gateway
+	cp router/routellm_scorer.py .build/pipeline/gateway/
+	cp -R router/artifacts .build/pipeline/gateway/artifacts
+	cp experiments/prices.json .build/pipeline/gateway/prices.json
+	find .build/pipeline -name __pycache__ -prune -exec rm -rf {} +
+
+pipeline-up: pipeline-build ## Deploy the plugin-pipeline gateway
+	@aws s3api head-bucket --bucket $(PIPE_ARTIFACT) 2>/dev/null || { \
+		aws s3 mb s3://$(PIPE_ARTIFACT) && aws s3api put-bucket-tagging --bucket $(PIPE_ARTIFACT) \
+			--tagging 'TagSet=[{Key=Project,Value=$(PROJECT)}]'; }
+	aws cloudformation package --template-file infra/pipeline.yaml \
+		--s3-bucket $(PIPE_ARTIFACT) --output-template-file .packaged-pipeline.yaml
+	aws cloudformation deploy --template-file .packaged-pipeline.yaml --stack-name $(PIPE_STACK) \
+		--capabilities CAPABILITY_IAM --tags Project=$(PROJECT) Component=pipeline ManagedBy=cloudformation \
+		--parameter-overrides StackPrefix=$(PIPE_STACK)
+	@aws cloudformation describe-stacks --stack-name $(PIPE_STACK) \
+		--query 'Stacks[0].Outputs[].[OutputKey,OutputValue]' --output table
+
+pipeline-bench: ## Measure per-plugin latency through the live gateway
+	python3 runner/pipeline_bench.py --stack $(PIPE_STACK)
+
+pipeline-down: ## Delete the pipeline stack and its artifact bucket
+	aws cloudformation delete-stack --stack-name $(PIPE_STACK)
+	aws cloudformation wait stack-delete-complete --stack-name $(PIPE_STACK)
+	-aws s3 rb s3://$(PIPE_ARTIFACT) --force
+
+.PHONY: pipeline-build pipeline-up pipeline-bench pipeline-down

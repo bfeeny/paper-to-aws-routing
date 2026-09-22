@@ -1,0 +1,237 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Inference-time customization on Amazon Bedrock AgentCore Gateway: one
+  interceptor Lambda serving both phases, running a configurable chain of
+  plugins (tenant, max_tokens, router, model policy, budget, guardrail,
+  metering). The chain lives in SSM Parameter Store and changes without a
+  deploy. Everything here is disposable; delete the stack to remove it.
+
+Parameters:
+  StackPrefix:
+    Type: String
+    Default: gwpipeline
+    AllowedPattern: "^[a-zA-Z0-9]{1,24}$"
+    Description: Alphanumeric only; AgentCore gateway and target names disallow hyphens.
+  StrongModel:
+    Type: String
+    Default: mistral.mistral-large-3-675b-instruct
+  WeakModel:
+    Type: String
+    Default: mistral.ministral-3-3b-instruct
+  DailyBudgetUsd:
+    Type: Number
+    Default: 1
+    Description: Default per-tenant daily spend limit enforced by the budget plugin.
+  LogRetentionDays:
+    Type: Number
+    Default: 14
+
+Resources:
+
+  # ---------- State: spend ledger and request/response correlation ----------
+  StateTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "${StackPrefix}-state"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - { AttributeName: pk, AttributeType: S }
+      KeySchema:
+        - { AttributeName: pk, KeyType: HASH }
+      TimeToLiveSpecification:
+        AttributeName: expires_at
+        Enabled: true
+
+  # ---------- Guardrail used by the guardrail plugin ----------
+  Guardrail:
+    Type: AWS::Bedrock::Guardrail
+    Properties:
+      Name: !Sub "${StackPrefix}-input"
+      Description: Screens prompts before any model is called.
+      BlockedInputMessaging: "This request was blocked by the gateway's content policy."
+      BlockedOutputsMessaging: "The response was blocked by the gateway's content policy."
+      ContentPolicyConfig:
+        FiltersConfig:
+          - { Type: HATE, InputStrength: MEDIUM, OutputStrength: NONE }
+          - { Type: VIOLENCE, InputStrength: MEDIUM, OutputStrength: NONE }
+          - { Type: MISCONDUCT, InputStrength: MEDIUM, OutputStrength: NONE }
+          - { Type: PROMPT_ATTACK, InputStrength: HIGH, OutputStrength: NONE }
+      SensitiveInformationPolicyConfig:
+        PiiEntitiesConfig:
+          - { Type: US_SOCIAL_SECURITY_NUMBER, Action: BLOCK }
+          - { Type: CREDIT_DEBIT_CARD_NUMBER, Action: BLOCK }
+
+  GuardrailVersion:
+    Type: AWS::Bedrock::GuardrailVersion
+    Properties:
+      GuardrailIdentifier: !GetAtt Guardrail.GuardrailId
+      Description: Pinned version the pipeline references.
+
+  # ---------- The plugin chain, editable at runtime ----------
+  PipelineConfig:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/${StackPrefix}/pipeline"
+      Type: String
+      Description: Ordered plugin chain. Edit to add, remove or reorder plugins; picked up within CONFIG_TTL seconds.
+      Value: !Sub |
+        {
+          "fail_open": true,
+          "plugins": [
+            {"plugin": "tenant", "params": {"header": "x-tenant-id", "default": "anonymous"}},
+            {"plugin": "max_tokens", "params": {"default": 1024}},
+            {"plugin": "router", "params": {"strategy": "length", "threshold": 2000,
+                                            "strong": "${StrongModel}", "weak": "${WeakModel}"}},
+            {"plugin": "model_policy", "params": {"allow": {"*": ["*"]}}},
+            {"plugin": "budget", "params": {"daily_usd": {"*": ${DailyBudgetUsd}}}},
+            {"plugin": "guardrail", "params": {"guardrail_id": "${Guardrail.GuardrailId}",
+                                               "version": "${GuardrailVersion.Version}"}},
+            {"plugin": "metering", "params": {}}
+          ]
+        }
+
+  # ---------- Interceptor ----------
+  PipelineRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: { Service: lambda.amazonaws.com }
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: pipeline
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: ssm:GetParameter
+                Resource: !Sub "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${StackPrefix}/pipeline"
+              - Effect: Allow   # TransactWriteItems is authorized per item action
+                Action: [dynamodb:GetItem, dynamodb:PutItem, dynamodb:UpdateItem]
+                Resource: !GetAtt StateTable.Arn
+              - Effect: Allow
+                Action: bedrock:ApplyGuardrail
+                Resource: !GetAtt Guardrail.GuardrailArn
+              - Effect: Allow   # only the `learned` router strategy uses this
+                Action: bedrock:InvokeModel
+                Resource: !Sub "arn:aws:bedrock:${AWS::Region}::foundation-model/amazon.titan-embed-text-v2:0"
+
+  PipelineLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${StackPrefix}-interceptor"
+      RetentionInDays: !Ref LogRetentionDays
+
+  PipelineFunction:
+    Type: AWS::Lambda::Function
+    DependsOn: PipelineLogGroup
+    Properties:
+      FunctionName: !Sub "${StackPrefix}-interceptor"
+      Runtime: python3.13
+      Architectures: [arm64]
+      Handler: gateway.handler.lambda_handler
+      Role: !GetAtt PipelineRole.Arn
+      Timeout: 10
+      MemorySize: 512
+      # `make pipeline-up` assembles this directory and uploads it with `aws cloudformation package`.
+      Code: ../.build/pipeline/
+      Environment:
+        Variables:
+          PIPELINE_CONFIG_PARAM: !Ref PipelineConfig
+          STATE_TABLE: !Ref StateTable
+          METRIC_NAMESPACE: !Sub "${StackPrefix}/Pipeline"
+          CONFIG_TTL: "30"
+
+  PipelineInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt PipelineFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: bedrock-agentcore.amazonaws.com
+      SourceAccount: !Ref AWS::AccountId
+
+  # ---------- Gateway ----------
+  GatewayRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: { Service: bedrock-agentcore.amazonaws.com }
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+      Policies:
+        - PolicyName: mantle-inference
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: bedrock-mantle:CreateInference
+                Resource: !Sub "arn:aws:bedrock-mantle:${AWS::Region}:${AWS::AccountId}:project/*"
+              - Effect: Allow
+                Action: [bedrock-mantle:Get*, bedrock-mantle:List*]
+                Resource: "*"
+        - PolicyName: invoke-interceptor
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: !GetAtt PipelineFunction.Arn
+
+  Gateway:
+    Type: AWS::BedrockAgentCore::Gateway
+    Properties:
+      Name: !Ref StackPrefix
+      RoleArn: !GetAtt GatewayRole.Arn
+      AuthorizerType: AWS_IAM
+      Description: Inference gateway with a plugin-pipeline interceptor
+      InterceptorConfigurations:
+        - InterceptionPoints: [REQUEST, RESPONSE]
+          Interceptor:
+            Lambda:
+              Arn: !GetAtt PipelineFunction.Arn
+          InputConfiguration:
+            # The tenant plugin reads a header. The interceptor then sees every
+            # header, Authorization included, so it must never log them.
+            PassRequestHeaders: true
+
+  MantleTarget:
+    Type: AWS::BedrockAgentCore::GatewayTarget
+    Properties:
+      GatewayIdentifier: !Ref Gateway
+      Name: mantle
+      Description: Bedrock OpenAI-compatible endpoint (all models behind one target)
+      TargetConfiguration:
+        Inference:
+          Connector:
+            Source:
+              ConnectorId: bedrock-mantle
+      CredentialProviderConfigurations:
+        - CredentialProviderType: GATEWAY_IAM_ROLE
+
+Outputs:
+  GatewayUrl:
+    Description: Base URL; clients append /inference/v1/chat/completions
+    Value: !GetAtt Gateway.GatewayUrl
+  GatewayIdentifier:
+    Value: !Ref Gateway
+  InterceptorFunction:
+    Value: !Ref PipelineFunction
+  PipelineConfigParameter:
+    Value: !Ref PipelineConfig
+  StateTable:
+    Value: !Ref StateTable
+  GuardrailId:
+    Value: !GetAtt Guardrail.GuardrailId
+  GuardrailVersion:
+    Value: !GetAtt GuardrailVersion.Version
+  MetricNamespace:
+    Value: !Sub "${StackPrefix}/Pipeline"

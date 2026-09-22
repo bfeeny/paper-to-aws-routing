@@ -39,3 +39,6 @@ experiments/cache/
 # Not redistributed: the source prompts contain credentials that third parties
 # pasted into chatbots, and GitHub secret scanning flags them.
 experiments/routellm_labels.jsonl
+.build/
+.packaged-pipeline.yaml
+gateway/prices.json

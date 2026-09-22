@@ -3,6 +3,9 @@
 The demo stack reads a request header. In production the tenant should come
 from the authorizer -- a claim in a validated JWT -- never from a header the
 caller can set; this plugin is the single place that decision lives.
+
+Request phase only. The response interceptor receives no request headers, so
+the handler restores the tenant from the correlation record instead.
 """
 from ..pipeline import Call, Plugin, Reject, register
 
@@ -24,4 +27,3 @@ class Tenant(Plugin):
         call.tenant = value
         return None
 
-    on_response = on_request  # the response phase needs the same identity

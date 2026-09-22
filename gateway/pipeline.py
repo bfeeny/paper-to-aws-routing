@@ -17,6 +17,10 @@ Contract:
     The first rejection wins; no later plugin runs.
   * `on_response` sees the provider's response and may record, rewrite or
     annotate it. It cannot reject: by then the tokens are already spent.
+  * Responses unwind the chain in reverse, as middleware does: the plugin that
+    ran last on the way in runs first on the way out. Metering sits at the end
+    of the request chain so that it has priced the call before the budget
+    plugin, earlier in the chain, settles it.
   * Every plugin is timed. One EMF record per call carries the per-plugin
     latency, which is how the overhead of each customization is measured.
 """
@@ -36,6 +40,7 @@ class Call:
     headers: dict = field(default_factory=dict)
     path: str = ""
     tenant: str = "anonymous"
+    request_id: str = ""                  # the gateway's REQUEST_ID, shared by both phases
     attrs: dict = field(default_factory=dict)
     response: dict | None = None          # set for the RESPONSE phase
 
@@ -74,6 +79,7 @@ class Plugin:
     """Base class. Override `on_request` and/or `on_response`."""
 
     name = "plugin"
+    needs_response = False   # True if on_response needs state from the request phase
 
     def __init__(self, **params):
         self.params = params
@@ -127,7 +133,8 @@ class Pipeline:
 
     def _run(self, phase: str, call: Call, step: Callable[[Plugin], Reject | None]):
         trace = Trace(phase)
-        for plugin in self.plugins:
+        order = self.plugins if phase == "request" else list(reversed(self.plugins))
+        for plugin in order:
             t0 = time.perf_counter()
             try:
                 verdict = step(plugin)
