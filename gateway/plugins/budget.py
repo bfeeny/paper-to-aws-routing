@@ -10,13 +10,6 @@ RESPONSE phase: charge the actual cost from the provider's reported usage.
 Settlement is idempotent per REQUEST_ID (see state.py), because the gateway may
 retry an interceptor and a retried charge must not bill twice.
 
-Streamed calls never reach the RESPONSE interceptor (observed: the gateway
-passes the event stream straight through), so they can never be settled after
-the fact. For `stream: true` the plugin charges a worst-case estimate up front
--- the prompt at roughly four characters per token plus the full max_tokens --
-through the same idempotent settle. It overcharges by design; the alternative
-is streams that are never charged at all.
-
 Between check and settlement, concurrent calls can each pass the check and
 together overshoot by up to (concurrency x one call). That is the usual price
 of not serializing traffic through a lock; reservations are the alternative.
@@ -24,7 +17,7 @@ of not serializing traffic through a lock; reservations are the alternative.
 import os
 
 from ..pipeline import Call, Plugin, Reject, register
-from ..prices import input_price_per_1k, output_price_per_1k
+from ..prices import output_price_per_1k
 from ..state import store
 
 
@@ -51,13 +44,6 @@ class Budget(Plugin):
                 return Reject(429, "budget_would_exceed",
                               f"this request could cost ${worst:.4f}; "
                               f"${limit - spent:.4f} of today's budget remains")
-        if call.body.get("stream") and call.request_id:
-            est = ((input_price_per_1k(call.model) or 0) * len(call.prompt_text()) / 4
-                   + (output_price_per_1k(call.model) or 0) * int(call.body.get("max_tokens") or 0)) / 1000
-            if est:
-                store(self.params.get("table") or os.environ.get("STATE_TABLE")).settle(
-                    call.request_id, call.tenant, est)
-                call.attrs["budget_prepaid_stream_usd"] = round(est, 8)
         return None
 
     def on_response(self, call: Call) -> None:

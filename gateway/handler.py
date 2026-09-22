@@ -48,6 +48,37 @@ def _b64json(s):
     return json.loads(base64.b64decode(s)) if s else None
 
 
+def _parse_body(b64: str | None):
+    """A JSON response, or a buffered event stream reduced to {model, usage}.
+
+    With a RESPONSE interceptor attached the gateway buffers a streamed response
+    and delivers it whole as server-sent events rather than JSON. Returns
+    (response_dict, streamed).
+    """
+    if not b64:
+        return {}, False
+    raw = base64.b64decode(b64).decode("utf-8", errors="replace")
+    try:
+        return json.loads(raw), False
+    except ValueError:
+        pass
+    model, usage = "", None
+    for line in raw.splitlines():
+        if not line.startswith("data:"):
+            continue
+        data = line[5:].strip()
+        if not data or data == "[DONE]":
+            continue
+        try:
+            chunk = json.loads(data)
+        except ValueError:
+            continue
+        model = chunk.get("model") or model
+        if chunk.get("usage"):
+            usage = chunk["usage"]
+    return {"model": model, "usage": usage or {}}, True
+
+
 def _enc(obj) -> str:
     return base64.b64encode(json.dumps(obj).encode()).decode()
 
@@ -107,12 +138,15 @@ def _on_response(resp: dict, rid: str):
         # for it (observed, contrary to the documentation); there is nothing to
         # meter or settle.
         return PASS
-    body = _b64json(resp.get("body")) or {}
+    body, streamed = _parse_body(resp.get("body"))
     call = Call(body={"model": seen.get("model") or body.get("model", "")},
                 tenant=seen.get("tenant", "anonymous"), request_id=rid,
                 response=body if isinstance(body, dict) else {})
+    call.attrs["streamed"] = streamed
     trace = pipeline.run_response(call)
     emit(trace, call, NAMESPACE, f"status_{resp.get('statusCode')}")
+    if streamed:
+        return PASS          # never rewrite an event stream
 
     if "cost_usd" not in call.attrs or ANNOTATE == "none":
         return PASS

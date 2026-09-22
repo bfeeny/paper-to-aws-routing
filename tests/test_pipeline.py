@@ -112,14 +112,11 @@ rej, tr = p.run_request(call(text="again"))
 check("budget exhausted -> 429", rej and rej.status == 429 and tr.rejected_by == "budget")
 check("rejected before the guardrail was paid for", "guardrail" not in tr.timings_ms)
 
-# streamed calls get no RESPONSE phase, so budget pre-charges the worst case
+# streams: metering asks for usage on the way in
 S.set_store(FakeStore())
-c = call(text="stream me", max_tokens=500); c.body["stream"] = True; c.request_id = "s1"
+c = call(text="stream me", max_tokens=500); c.body["stream"] = True
 p.run_request(c)
-pre = S.store().spend_today("acme")
-check("streamed call pre-charged at request time", pre > 0 and c.attrs.get("budget_prepaid_stream_usd") == round(pre, 8))
-c.request_id = "s1"; p.run_request(c)
-check("retried streamed request not pre-charged twice", S.store().spend_today("acme") == pre)
+check("streamed request asks the provider for usage", c.body.get("stream_options", {}).get("include_usage") is True)
 
 # a broken plugin: fail-open continues, fail-closed refuses
 class Boom(P.Plugin):
@@ -186,6 +183,16 @@ short = out["http"]["transformedGatewayResponse"]
 check("rejection short-circuits with status and error body", short["statusCode"] == 403
       and json.loads(base64.b64decode(short["body"]))["error"]["code"] == "unknown_tenant"
       and "transformedGatewayRequest" not in out["http"])
+sse = ("data: " + json.dumps({"model": WEAK, "choices": [{"delta": {"content": "hi"}}]}) + "\n\n"
+       "data: " + json.dumps({"model": WEAK, "choices": [], "usage": {"prompt_tokens": 10, "completion_tokens": 90}}) + "\n\n"
+       "data: [DONE]\n\n")
+S.store().remember("strm", {"tenant": "acme", "model": f"mantle/{WEAK}"})
+before = S.store().spend_today("acme")
+sse_event = {"http": {"gatewayRequest": None, "gatewayResponse": {"statusCode": 200,
+             "contentType": "text/event-stream", "body": base64.b64encode(sse.encode()).decode()}}}
+out = H.lambda_handler(sse_event, ctx("strm"))
+check("buffered stream metered from its final chunk and settled", S.store().spend_today("acme") > before)
+check("event stream passed through unmodified", out == H.PASS)
 check("handler never raises on garbage", H.lambda_handler({"http": {"gatewayRequest": {"body": "!!"}}}, ctx("x"))
       == H.PASS)
 

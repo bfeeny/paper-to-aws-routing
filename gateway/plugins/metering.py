@@ -5,6 +5,12 @@ ones Bedrock bills, not an estimate from the prompt. Emits them as CloudWatch
 metrics dimensioned by tenant and model, which is enough to build a per-tenant
 chargeback view without a separate ledger.
 
+Streams: attaching a RESPONSE interceptor makes the gateway buffer a streamed
+response and hand it over whole, as server-sent events. An OpenAI-compatible
+stream carries token usage only if the request asked for it, so on the way in
+this plugin sets `stream_options.include_usage` on streamed chat completions;
+the handler then reads usage from the stream's final chunk.
+
 High-cardinality tenant IDs make for expensive custom metrics; beyond a few
 hundred tenants, keep tenant in the log record and aggregate with Logs
 Insights instead of as a metric dimension.
@@ -21,6 +27,14 @@ from ..prices import bare, cost_usd
 class Metering(Plugin):
     name = "metering"
     needs_response = True
+
+    def on_request(self, call: Call):
+        if call.body.get("stream") and "messages" in call.body:
+            opts = call.body.setdefault("stream_options", {})
+            if not opts.get("include_usage"):
+                opts["include_usage"] = True
+                call.attrs["usage_requested"] = True
+        return None
 
     def on_response(self, call: Call) -> None:
         usage = (call.response or {}).get("usage") or {}
