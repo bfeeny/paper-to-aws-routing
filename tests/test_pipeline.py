@@ -112,6 +112,15 @@ rej, tr = p.run_request(call(text="again"))
 check("budget exhausted -> 429", rej and rej.status == 429 and tr.rejected_by == "budget")
 check("rejected before the guardrail was paid for", "guardrail" not in tr.timings_ms)
 
+# streamed calls get no RESPONSE phase, so budget pre-charges the worst case
+S.set_store(FakeStore())
+c = call(text="stream me", max_tokens=500); c.body["stream"] = True; c.request_id = "s1"
+p.run_request(c)
+pre = S.store().spend_today("acme")
+check("streamed call pre-charged at request time", pre > 0 and c.attrs.get("budget_prepaid_stream_usd") == round(pre, 8))
+c.request_id = "s1"; p.run_request(c)
+check("retried streamed request not pre-charged twice", S.store().spend_today("acme") == pre)
+
 # a broken plugin: fail-open continues, fail-closed refuses
 class Boom(P.Plugin):
     name = "boom"
@@ -165,10 +174,11 @@ resp_event = {"interceptorInputVersion": "1.0", "http": {"gatewayRequest": None,
     "statusCode": 200, "headers": None, "contentType": "application/json",
     "body": enc({"model": WEAK, "usage": {"prompt_tokens": 12, "completion_tokens": 40}})}}}
 out = H.lambda_handler(resp_event, ctx("abc"))
-hdr = out["http"]["transformedGatewayResponse"]["headers"]
-check("response phase recovers tenant and reports cost header", "x-gateway-cost-usd" in hdr
-      and S.store().spend_today("acme") > 0)
-check("response body left untouched", "body" not in out["http"]["transformedGatewayResponse"])
+annotated = json.loads(base64.b64decode(out["http"]["transformedGatewayResponse"]["body"]))
+check("response phase recovers tenant and annotates cost", annotated["x_gateway"]["tenant"] == "acme"
+      and annotated["x_gateway"]["cost_usd"] > 0 and S.store().spend_today("acme") > 0)
+check("provider fields preserved in annotated body", annotated["usage"]["completion_tokens"] == 40)
+check("response for a rejected request is a no-op", H.lambda_handler(resp_event, ctx("never-forwarded")) == H.PASS)
 
 bad = json.loads(json.dumps(req_event)); bad["http"]["gatewayRequest"]["headers"]["X-Tenant-Id"] = "initech"
 out = H.lambda_handler(bad, ctx("def"))

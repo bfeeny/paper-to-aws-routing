@@ -39,3 +39,8 @@ def cost_usd(model: str, input_tokens: int, output_tokens: int) -> float | None:
 def output_price_per_1k(model: str) -> float | None:
     p = _table().get(bare(model))
     return p.get("output_per_1k") if p else None
+
+
+def input_price_per_1k(model: str) -> float | None:
+    p = _table().get(bare(model))
+    return p.get("input_per_1k") if p else None

@@ -32,6 +32,16 @@ log.setLevel(logging.INFO)
 NAMESPACE = os.environ.get("METRIC_NAMESPACE", "gateway/Pipeline")
 TABLE = os.environ.get("STATE_TABLE")
 PASS = {"interceptorOutputVersion": "1.0", "http": {}}
+# Where to tell the caller what a call cost. The gateway drops headers set by a
+# RESPONSE interceptor on inference responses (observed, not documented), so
+# "body" adds a top-level field that OpenAI-compatible clients ignore.
+ANNOTATE = os.environ.get("RESPONSE_ANNOTATE", "body")
+
+# Open the state store before any plugin runs. Opening it lazily meant the
+# first request in each new container reached the budget plugin with no store,
+# raised, and -- the pipeline being fail-open -- skipped the budget check.
+if TABLE:
+    store(TABLE)
 
 
 def _b64json(s):
@@ -90,19 +100,28 @@ def _on_response(resp: dict, rid: str):
     pipeline = load_pipeline()
     if not any(p.needs_response for p in pipeline.plugins):
         return PASS
-    body = _b64json(resp.get("body")) or {}
     seen = store(TABLE).recall(rid) if TABLE else {}
+    if not seen:
+        # Nothing was forwarded under this REQUEST_ID -- typically a request this
+        # pipeline rejected. The gateway still invokes the RESPONSE interceptor
+        # for it (observed, contrary to the documentation); there is nothing to
+        # meter or settle.
+        return PASS
+    body = _b64json(resp.get("body")) or {}
     call = Call(body={"model": seen.get("model") or body.get("model", "")},
                 tenant=seen.get("tenant", "anonymous"), request_id=rid,
                 response=body if isinstance(body, dict) else {})
     trace = pipeline.run_response(call)
     emit(trace, call, NAMESPACE, f"status_{resp.get('statusCode')}")
 
-    # Tell the caller what the call cost, without touching the body.
-    headers = {}
-    if "cost_usd" in call.attrs:
-        headers["x-gateway-cost-usd"] = f"{call.attrs['cost_usd']:.8f}"
-    if headers:
-        return {"interceptorOutputVersion": "1.0",
-                "http": {"transformedGatewayResponse": {"headers": headers}}}
+    if "cost_usd" not in call.attrs or ANNOTATE == "none":
+        return PASS
+    note = {"cost_usd": call.attrs["cost_usd"], "tenant": call.tenant}
+    if ANNOTATE == "headers":
+        return {"interceptorOutputVersion": "1.0", "http": {"transformedGatewayResponse": {
+            "headers": {"x-gateway-cost-usd": f"{note['cost_usd']:.8f}"}}}}
+    if isinstance(body, dict) and body:
+        body["x_gateway"] = note
+        return {"interceptorOutputVersion": "1.0", "http": {"transformedGatewayResponse": {
+            "body": _enc(body)}}}
     return PASS

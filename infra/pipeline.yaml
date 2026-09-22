@@ -25,6 +25,14 @@ Parameters:
   LogRetentionDays:
     Type: Number
     Default: 14
+  InterceptorEnabled:
+    Type: String
+    Default: "true"
+    AllowedValues: ["true", "false"]
+    Description: Set false to measure the bare gateway hop with no interceptor attached.
+
+Conditions:
+  WithInterceptor: !Equals [!Ref InterceptorEnabled, "true"]
 
 Resources:
 
@@ -55,7 +63,10 @@ Resources:
           - { Type: HATE, InputStrength: MEDIUM, OutputStrength: NONE }
           - { Type: VIOLENCE, InputStrength: MEDIUM, OutputStrength: NONE }
           - { Type: MISCONDUCT, InputStrength: MEDIUM, OutputStrength: NONE }
-          - { Type: PROMPT_ATTACK, InputStrength: HIGH, OutputStrength: NONE }
+          # Strength sets the lowest confidence that blocks. HIGH blocked "Reply
+          # with the single word: ok." as a LOW-confidence prompt attack; MEDIUM
+          # still blocks a real injection, which scores HIGH confidence.
+          - { Type: PROMPT_ATTACK, InputStrength: MEDIUM, OutputStrength: NONE }
       SensitiveInformationPolicyConfig:
         PiiEntitiesConfig:
           - { Type: US_SOCIAL_SECURITY_NUMBER, Action: BLOCK }
@@ -65,7 +76,7 @@ Resources:
     Type: AWS::Bedrock::GuardrailVersion
     Properties:
       GuardrailIdentifier: !GetAtt Guardrail.GuardrailId
-      Description: Pinned version the pipeline references.
+      Description: Pinned version the pipeline references (v2 - PROMPT_ATTACK at MEDIUM).
 
   # ---------- The plugin chain, editable at runtime ----------
   PipelineConfig:
@@ -193,15 +204,17 @@ Resources:
       RoleArn: !GetAtt GatewayRole.Arn
       AuthorizerType: AWS_IAM
       Description: Inference gateway with a plugin-pipeline interceptor
-      InterceptorConfigurations:
-        - InterceptionPoints: [REQUEST, RESPONSE]
-          Interceptor:
-            Lambda:
-              Arn: !GetAtt PipelineFunction.Arn
-          InputConfiguration:
-            # The tenant plugin reads a header. The interceptor then sees every
-            # header, Authorization included, so it must never log them.
-            PassRequestHeaders: true
+      InterceptorConfigurations: !If
+        - WithInterceptor
+        - - InterceptionPoints: [REQUEST, RESPONSE]
+            Interceptor:
+              Lambda:
+                Arn: !GetAtt PipelineFunction.Arn
+            InputConfiguration:
+              # The tenant plugin reads a header. The interceptor then sees every
+              # header, Authorization included, so it must never log them.
+              PassRequestHeaders: true
+        - !Ref AWS::NoValue
 
   MantleTarget:
     Type: AWS::BedrockAgentCore::GatewayTarget

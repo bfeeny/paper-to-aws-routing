@@ -1,0 +1,103 @@
+{
+  "none": {
+    "n": 60,
+    "median_overhead_ms": 36.3,
+    "ci95": [
+      16.8,
+      54.7
+    ],
+    "p90_ms": 286.8,
+    "direct_median_ms": 289.6
+  },
+  "empty": {
+    "n": 60,
+    "median_overhead_ms": 120.1,
+    "ci95": [
+      74.0,
+      134.8
+    ],
+    "p90_ms": 270.3,
+    "direct_median_ms": 381.2,
+    "interceptor": {
+      "request": {
+        "calls": 65.0,
+        "pipeline_p50": 0.0,
+        "tenant": 0.0,
+        "max_tokens": 0.0,
+        "router": 0.0,
+        "model_policy": 0.0,
+        "budget": 0.0,
+        "guardrail": 0.0,
+        "metering": 0.0
+      }
+    }
+  },
+  "no_guardrail": {
+    "n": 60,
+    "median_overhead_ms": 165.8,
+    "ci95": [
+      145.8,
+      175.2
+    ],
+    "p90_ms": 277.4,
+    "direct_median_ms": 281.6,
+    "interceptor": {
+      "response": {
+        "calls": 65.0,
+        "pipeline_p50": 18.765,
+        "tenant": 0.001,
+        "max_tokens": 0.001,
+        "router": 0.001,
+        "model_policy": 0.002,
+        "budget": 18.658,
+        "guardrail": 0.0,
+        "metering": 0.107
+      },
+      "request": {
+        "calls": 65.0,
+        "pipeline_p50": 3.556,
+        "tenant": 0.005,
+        "max_tokens": 0.012,
+        "router": 0.002,
+        "model_policy": 0.015,
+        "budget": 3.513,
+        "guardrail": 0.0,
+        "metering": 0.001
+      }
+    }
+  },
+  "full": {
+    "n": 60,
+    "median_overhead_ms": 348.7,
+    "ci95": [
+      333.5,
+      359.9
+    ],
+    "p90_ms": 430.2,
+    "direct_median_ms": 276.7,
+    "interceptor": {
+      "response": {
+        "calls": 65.0,
+        "pipeline_p50": 20.807,
+        "tenant": 0.001,
+        "max_tokens": 0.001,
+        "router": 0.001,
+        "model_policy": 0.002,
+        "budget": 20.7,
+        "guardrail": 0.001,
+        "metering": 0.106
+      },
+      "request": {
+        "calls": 65.0,
+        "pipeline_p50": 193.239,
+        "tenant": 0.005,
+        "max_tokens": 0.012,
+        "router": 0.002,
+        "model_policy": 0.015,
+        "budget": 3.399,
+        "guardrail": 189.763,
+        "metering": 0.002
+      }
+    }
+  }
+}

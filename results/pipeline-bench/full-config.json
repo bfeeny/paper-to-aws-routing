@@ -1,0 +1,14 @@
+{
+  "fail_open": true,
+  "plugins": [
+    {"plugin": "tenant", "params": {"header": "x-tenant-id", "default": "anonymous"}},
+    {"plugin": "max_tokens", "params": {"default": 1024}},
+    {"plugin": "router", "params": {"strategy": "length", "threshold": 2000,
+                                    "strong": "mistral.mistral-large-3-675b-instruct", "weak": "mistral.ministral-3-3b-instruct"}},
+    {"plugin": "model_policy", "params": {"allow": {"*": ["*"]}}},
+    {"plugin": "budget", "params": {"daily_usd": {"*": 1}}},
+    {"plugin": "guardrail", "params": {"guardrail_id": "nc6ax78kgky1",
+                                       "version": "2"}},
+    {"plugin": "metering", "params": {}}
+  ]
+}

@@ -69,6 +69,7 @@ down-all: ## Delete every arm's stack and the artifact bucket
 
 # ---------- inference-time customization pipeline (infra/pipeline.yaml) ----------
 PIPE_STACK    ?= gwpipeline
+INTERCEPTOR   ?= true
 PIPE_ARTIFACT ?= $(PIPE_STACK)-artifacts-$(shell aws sts get-caller-identity --query Account --output text 2>/dev/null)
 
 pipeline-build: ## Assemble the interceptor package (gateway/ + router scorer and weights)
@@ -87,7 +88,7 @@ pipeline-up: pipeline-build ## Deploy the plugin-pipeline gateway
 		--s3-bucket $(PIPE_ARTIFACT) --output-template-file .packaged-pipeline.yaml
 	aws cloudformation deploy --template-file .packaged-pipeline.yaml --stack-name $(PIPE_STACK) \
 		--capabilities CAPABILITY_IAM --tags Project=$(PROJECT) Component=pipeline ManagedBy=cloudformation \
-		--parameter-overrides StackPrefix=$(PIPE_STACK)
+		--parameter-overrides StackPrefix=$(PIPE_STACK) InterceptorEnabled=$(INTERCEPTOR)
 	@aws cloudformation describe-stacks --stack-name $(PIPE_STACK) \
 		--query 'Stacks[0].Outputs[].[OutputKey,OutputValue]' --output table
 
