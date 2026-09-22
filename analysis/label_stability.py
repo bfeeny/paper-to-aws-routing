@@ -10,7 +10,7 @@ the ceiling the labels permit.
 
 Two temperatures, because they answer different questions:
 
-  T=0  test-retest of the labelling procedure as actually run. Disagreement
+  T=0  test-retest of the labeling procedure as actually run. Disagreement
        here is pure instrument noise.
   T=1  the model's own answer distribution, which gives a soft label
        P(correct) instead of a coin flip, and an attenuation ceiling.
@@ -98,7 +98,7 @@ def main() -> int:
     ap.add_argument("--out", default="experiments/stability_raw.jsonl")
     args = ap.parse_args()
 
-    # stratify by (benchmark, labelled tier) so every cell of the label is tested
+    # stratify by (benchmark, labeled tier) so every cell of the label is tested
     items, labels = {}, {}
     for lab_f, item_f in SOURCES:
         lp, ip = ROOT / lab_f, ROOT / item_f

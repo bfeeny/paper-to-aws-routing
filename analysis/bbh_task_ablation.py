@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Does the BBH router predict difficulty, or just recognise the task?
+"""Does the BBH router predict difficulty, or just recognize the task?
 
 The mixed-benchmark result was confounded by corpus style. Restricting to BBH
 removes that, and the in-distribution AUC rises to 0.833. This asks the same
@@ -53,7 +53,7 @@ def main() -> int:
         "escalation_rate_by_task": {k: round(v, 3) for k, v in
                                     sorted(rate.items(), key=lambda kv: -kv[1])}}}
 
-    # held-out tasks: the only split that asks whether difficulty generalises
+    # held-out tasks: the only split that asks whether difficulty generalizes
     ts = sorted(set(task))
     rng2 = np.random.default_rng(7)
     rng2.shuffle(ts)

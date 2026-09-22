@@ -13,7 +13,7 @@ Arena preferences.
 
 Evaluated exactly like the others -- random split for reference, then
 leave-one-task-out, which is the only split that asks whether difficulty
-generalises rather than whether the task was memorised.
+generalizes rather than whether the task was memorized.
 
     .venv/bin/python analysis/bert_router.py --epochs 3
 """

@@ -3,12 +3,12 @@
 
 MT-Bench is where the paper's headline gains live, and it is stratified by
 construction: 8 categories, 10 questions each, with very different strong-win
-rates. A router that recognises "this is a coding question" and recalls that
-category's base rate will post gains without modelling difficulty at all.
+rates. A router that recognizes "this is a coding question" and recalls that
+category's base rate will post gains without modeling difficulty at all.
 
 The paper evaluates on item-level splits. It does not report a category
 ablation, so the question has not been asked. It is cheap to ask: both the
-questions (with categories) and the GPT-4 judgements are published in the repo.
+questions (with categories) and the GPT-4 judgments are published in the repo.
 
 The label is theirs: for each (question, turn), strong-needed = the judge gave
 GPT-4 a higher score than Mixtral.
@@ -16,7 +16,7 @@ GPT-4 a higher score than Mixtral.
 This does not re-run their router -- the released checkpoints consume OpenAI
 text-embedding-3-small features. It asks the prior question: how much signal
 is available from category identity alone? Whatever that is, it is an upper
-bound on what "recognises the traffic mix" could be worth here.
+bound on what "recognizes the traffic mix" could be worth here.
 
     .venv/bin/python analysis/mtbench_diagnostic.py
 """
@@ -72,7 +72,7 @@ def main() -> int:
     orc = np.array([rate[c] for c in cat])
     lo, hi = auc_ci(y, orc)
     print(f"\nCATEGORY-IDENTITY ORACLE: AUC {auc(y, orc):.3f}  [{lo:.3f}, {hi:.3f}]")
-    print("  A router that only recognises the category reaches this, knowing")
+    print("  A router that only recognizes the category reaches this, knowing")
     print("  nothing about difficulty. It is the bar their gains must clear.")
 
     X = embed([r["prompt"] for r in rows], "personal", "us-east-1", 256, workers=16)

@@ -3,7 +3,7 @@
 
 The mixed benchmark set produced an AUC that turned out to be mostly
 benchmark-style detection: escalation rates run from 1.9% on GSM8K to 25.2% on
-BBH, so a model that merely recognises which corpus a prompt came from scores
+BBH, so a model that merely recognizes which corpus a prompt came from scores
 well without knowing anything about difficulty. A deployment sees one traffic
 distribution, so the honest test is within a single corpus.
 

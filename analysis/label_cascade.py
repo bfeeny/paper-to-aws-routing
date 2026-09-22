@@ -6,7 +6,7 @@
     Opus    correct -> tier 2   only the top tier gets it
     none    correct -> tier 3   nobody gets it; routing up buys nothing
 
-This is the ordinal generalisation of RouteLLM's binary label, and it is what a
+This is the ordinal generalization of RouteLLM's binary label, and it is what a
 three-tier router actually needs. Each tier is called only when the cheaper one
 failed, so cost scales with difficulty rather than with the number of tiers.
 
@@ -70,11 +70,11 @@ def converse(creds, model_id: str, prompt: str, max_tokens: int, attempts: int =
 
 
 def _norm_math(s: str) -> str:
-    """Normalise a LaTeX-ish final answer enough to compare two spellings of it.
+    """Normalize a LaTeX-ish final answer enough to compare two spellings of it.
 
     Deliberately conservative: it collapses formatting the model chooses freely
     (\\left, \\!, $, whitespace, a trailing period) and nothing that could change
-    the value. Anything it cannot normalise stays unequal rather than guessing.
+    the value. Anything it cannot normalize stays unequal rather than guessing.
     """
     s = s.strip().strip("$").strip()
     s = re.sub(r"\\(?:left|right|!|,|;|:|\s)", "", s)
@@ -174,7 +174,7 @@ def main() -> int:
         items = items[: args.limit]
     creds = botocore.session.Session(profile=args.profile).get_credentials().get_frozen_credentials()
 
-    print(f"labelling {len(items)} items through {len(TIERS)} tiers (cheapest first)")
+    print(f"labeling {len(items)} items through {len(TIERS)} tiers (cheapest first)")
     out_path = ROOT / args.out
     recs = []
     with cf.ThreadPoolExecutor(max_workers=args.workers) as ex, out_path.open("w") as fh:
@@ -199,7 +199,7 @@ def main() -> int:
     for idx, name in enumerate(names):
         n = dist.get(idx, 0)
         print(f"  {name:6} {n:4}  ({n / max(len(recs), 1):.1%})")
-    print("\nmodel usage (what the labelling itself cost):")
+    print("\nmodel usage (what the labeling itself cost):")
     for name, (calls, tin, tout) in tokens.items():
         print(f"  {name:6} {calls:4} calls  in={tin:7}  out={tout:7}")
     errs = sum(1 for r in recs for t in r["tiers"].values() if t.get("error"))

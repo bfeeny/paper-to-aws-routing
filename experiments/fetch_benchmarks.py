@@ -12,7 +12,7 @@ from "a small model should handle this" to "this needs real reasoning":
     mmlu_pro    10-way, reasoning-heavy            hard
     math        competition maths, levels 4-5      hardest
 
-Everything here grades exactly — number, letter, or normalised final answer — so
+Everything here grades exactly — number, letter, or normalized final answer — so
 no judge is involved and none of its inconsistency enters the labels.
 
 Uses the Hugging Face datasets-server JSON API: stdlib only, no parquet reader.

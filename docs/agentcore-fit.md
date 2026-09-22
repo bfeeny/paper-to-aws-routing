@@ -22,7 +22,7 @@ impedance mismatch rather than adding one.
 | **Browser** | **No** | No web interaction in the task set. |
 | **Web Search** | **No** — deliberately | Live search injects non-determinism and makes runs unreproducible. A benchmark must be frozen. |
 | **Optimization** (Insights / Recommendations / A-B tests) | **Evaluate later** | Native A/B testing overlaps with what the run harness does. Worth comparing once the harness produces stable numbers — if the managed version subsumes our arms, that's worth reporting. |
-| **Agent Registry** | **No** | One experiment, no agent fleet to catalogue. |
+| **Agent Registry** | **No** | One experiment, no agent fleet to catalog. |
 | **Payments** | **No** | Out of scope. |
 
 ## Constraints found while integrating Evaluations

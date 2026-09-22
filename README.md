@@ -96,7 +96,7 @@ The study is designed to run for tens of dollars: gateway invocations are billed
 Lambda provisioned concurrency is deliberately **not** used — it would cost more per
 month than the experiment, and the honest cold-start latency is itself a result.
 
-## Early result: catalogue vs entitlement
+## Early result: catalog vs entitlement
 
 Before any routing experiment, `runner/probe_models.py` measured what the endpoint
 will actually serve. On 2026-09-20, `/v1/models` listed **55** models of which

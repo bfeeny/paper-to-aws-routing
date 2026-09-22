@@ -14,7 +14,7 @@ these very prompts also fails, the problem is the features, not the mismatch.
 
 The target is decision-theoretic rather than descriptive: positive means
 "escalating above the cheap tier changes the outcome". Items no tier answers
-are labelled 0, because paying for Opus when Opus also fails is not a win --
+are labeled 0, because paying for Opus when Opus also fails is not a win --
 the alternative coding is reported alongside so the choice is visible.
 
     .venv/bin/python analysis/cascade_sweep.py
@@ -142,7 +142,7 @@ def main() -> int:
     # --- confound check -------------------------------------------------
     #
     # The benchmarks differ enormously in how often escalation helps (GSM8K
-    # 1.9%, BBH 25.2%). A model that only learns to recognise *which benchmark
+    # 1.9%, BBH 25.2%). A model that only learns to recognize *which benchmark
     # a prompt came from* would post a strong AUC while knowing nothing about
     # difficulty. Deployments see one traffic distribution, not five, so that
     # skill would not survive contact with production.

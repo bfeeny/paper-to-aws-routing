@@ -10,7 +10,7 @@ and the authors published it:
 Using their labels with our features isolates one variable. If a router trained on
 this data works, the earlier null result was about label scale. If it still fails,
 the limitation is the representation — Titan embeddings plus a linear model versus
-their matrix-factorisation / BERT / causal-LLM architectures. Either answer is
+their matrix-factorization / BERT / causal-LLM architectures. Either answer is
 worth having, and it costs one experiment instead of a week of label manufacture.
 
 Note the portability gap this exposes: their released routers cannot be dropped

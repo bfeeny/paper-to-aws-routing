@@ -68,7 +68,7 @@ class Mantle:
             blocks = data.get("content") or []
             text = "".join(b.get("text", "") for b in blocks if isinstance(b, dict))
             usage = data.get("usage") or {}
-            # normalise to the OpenAI-style names the ledger expects
+            # normalize to the OpenAI-style names the ledger expects
             return status, text, {
                 "prompt_tokens": usage.get("input_tokens"),
                 "completion_tokens": usage.get("output_tokens"),

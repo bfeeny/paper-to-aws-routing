@@ -27,9 +27,9 @@ which group a prompt came from. A within-group label shuffle keeps 99.5% of the
 AUC on BBH (0.838 vs 0.842). A paired cluster bootstrap cannot separate any
 router from a group-base-rate oracle on any of three datasets. Under
 leave-one-group-out evaluation, both a linear probe on frozen embeddings
-(equivalent to RouteLLM's matrix-factorisation router for a fixed pair) and a
+(equivalent to RouteLLM's matrix-factorization router for a fixed pair) and a
 fine-tuned encoder fall to 0.52–0.60. Similarity-weighted ranking scores below
-chance even in-distribution. The shortfall is not a measurement artefact. The labels
+chance even in-distribution. The shortfall is not a measurement artifact. The labels
 are reproducible (per-tier test–retest κ = 0.88–0.97) and support an AUC
 ceiling of 0.912. The frozen embedding does encode human-assigned difficulty
 (probe AUC 0.57–0.78 within subject). We apply the same diagnostic to
@@ -62,7 +62,7 @@ is possible:
 
 > On every dataset we tested, including the MT-Bench set on which the original
 > gains are reported, the in-distribution performance of prompt-only routers is
-> predominantly explained by recognising which group (benchmark, task, subject,
+> predominantly explained by recognizing which group (benchmark, task, subject,
 > or category) a prompt belongs to, and recalling that group's escalation rate.
 > This is a legitimate router for a fixed traffic mix and a useless one under
 > drift. Standard item-level evaluation cannot tell the two apart.
@@ -146,7 +146,7 @@ the top.
 
 **Preference labels.** We also use RouteLLM's released `gpt4_judge_battles`
 (109,101 battles) and `mmlu_battles` (1,531). All are for the single pair
-GPT-4-1106-preview vs Mixtral-8x7B-Instruct, binarised as *GPT-4 won outright*
+GPT-4-1106-preview vs Mixtral-8x7B-Instruct, binarized as *GPT-4 won outright*
 (9.4% positive).
 
 ### 2.3 Routers
@@ -160,7 +160,7 @@ GPT-4-1106-preview vs Mixtral-8x7B-Instruct, binarised as *GPT-4 won outright*
 | Group oracle | training-set escalation rate of the item's group |
 | Deferral | features of the cheap model's response (§6) |
 
-**On matrix factorisation.** For a fixed model pair, RouteLLM's MF router is
+**On matrix factorization.** For a fixed model pair, RouteLLM's MF router is
 already covered by the linear probe. MF scores a prompt embedding $e_q$ against
 learned model vectors $v_s, v_w$ as
 
@@ -270,7 +270,7 @@ LOGO is the diagnostic to trust.
 
 ### 3.3 Are the labels good enough to learn from?
 
-A failure to generalise could simply mean the target is noise. We resampled 181
+A failure to generalize could simply mean the target is noise. We resampled 181
 items, stratified across every (benchmark, tier) cell. For each item we drew
 four replicates per tier at temperature 0 and four at temperature 1, for 4,344
 calls.
@@ -334,7 +334,7 @@ From the prompt alone, the models learn *where a request came from* rather than
 
 MT-Bench is where RouteLLM reports its headline gains. It is stratified by
 construction: 80 questions in 8 categories, two turns each. Using the published
-questions and GPT-4 judgements, we label each (question, turn)
+questions and GPT-4 judgments, we label each (question, turn)
 *strong-needed* when the judge scored GPT-4-1106-preview above Mixtral-8x7B.
 
 | category | strong-needed | | category | strong-needed |
@@ -349,8 +349,8 @@ questions and GPT-4 judgements, we label each (question, turn)
   <img alt="MT-Bench strong-needed rate by category" src="figures/fig4-mtbench-categories.png">
 </picture>
 
-*Figure 4. RouteLLM's MT-Bench evaluation set, labelled from the published
-GPT-4 judgements. The base rate of "GPT-4 needed" varies more across
+*Figure 4. RouteLLM's MT-Bench evaluation set, labeled from the published
+GPT-4 judgments. The base rate of "GPT-4 needed" varies more across
 categories than any router's advantage over it.*
 
 Across categories the base rate spans 55 points. **Category identity alone
@@ -361,7 +361,7 @@ folds.
 We did not re-run RouteLLM's released routers, because their checkpoints
 consume OpenAI `text-embedding-3-small` features. We therefore do not claim
 their gains are spurious. We claim only that a predictor knowing nothing about
-difficulty reaches 0.693 on this set. Separating difficulty modelling from
+difficulty reaches 0.693 on this set. Separating difficulty modeling from
 category recognition requires a category-held-out evaluation, which the
 original evaluation does not report and which the published data make cheap to
 run.
@@ -399,7 +399,7 @@ on five of seven subjects, by as much as 0.37 AUC (number theory), and loses
 narrowly on the other two (algebra by 0.014, prealgebra by 0.031).*
 
 Output token count carries nearly all of the signal. A cheap model that is
-struggling writes more: it restarts, second-guesses and recounts. Recognising
+struggling writes more: it restarts, second-guesses and recounts. Recognizing
 that requires no understanding of the answer. BBH is the exception that fits the
 mechanism. Its templated puzzles produce answers of uniform length, so there is
 nothing to read. Self-consistency, meaning a second temperature-1 Haiku sample
@@ -442,9 +442,9 @@ explains the in-distribution gains which do appear, together with evidence that
 the benchmark on which the positive results rest is heavily stratified.
 
 **A router that learns the traffic mix is not worthless.** If production traffic
-is a stable mixture of request types, "recognise the type, recall its rate" is a
+is a stable mixture of request types, "recognize the type, recall its rate" is a
 legitimate policy, and group-oracle AUCs of 0.69–0.84 are real money. The
-failure is in the claim, not the artefact. It is a traffic-mix prior with the
+failure is in the claim, not the artifact. It is a traffic-mix prior with the
 shelf life of the traffic mix, and item-level evaluation reports it as
 difficulty prediction.
 
@@ -509,7 +509,7 @@ a result gracefully. It invents one.
 
 **A.2 Identical-response battles.** In `routellm/gpt4_judge_battles`, 1,313 of
 109,101 battles have byte-identical responses from both models. 1,312 of those
-are labelled a win for model B (Mixtral) and one a win for model A. None is a
+are labeled a win for model B (Mixtral) and one a win for model A. None is a
 tie. Across the whole set, labels are 9.3% GPT-4 win, 68.5% Mixtral win and
 22.2% tie.
 

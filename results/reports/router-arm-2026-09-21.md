@@ -79,7 +79,7 @@ deploying — and this one earned nothing.
 3. **A cheaper feature than an embedding call** if the latency budget is tight — the
    `length` heuristic costs nothing and is the honest baseline to beat.
 
-Item 1 is the real fix. The other two are optimisations of a model that currently has
-nothing to optimise.
+Item 1 is the real fix. The other two are optimizations of a model that currently has
+nothing to optimize.
 
 _Held-out run, router arm. Negative result, reported as run._

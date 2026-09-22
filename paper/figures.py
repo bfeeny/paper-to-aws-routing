@@ -7,7 +7,7 @@ cached embeddings, so a figure cannot drift from the analysis it illustrates.
 Palette: the first three slots of a validated categorical order (blue, orange,
 aqua), which pass the colour-vision-deficiency and normal-vision separation
 checks for all pairs. Aqua sits below 3:1 contrast on the page, so its values
-are labelled on the figure or tabulated in the text.
+are labeled on the figure or tabulated in the text.
 
     .venv/bin/python paper/figures.py
 """
@@ -28,7 +28,7 @@ REP = ROOT / "results" / "reports"
 
 # Two selected themes, not one inverted: each is the same three hues stepped
 # for its own surface and validated against it. A transparent background would
-# not work -- the ink colours are chosen for one ground and vanish on the other.
+# not work -- the ink colors are chosen for one ground and vanish on the other.
 THEMES = {
     "light": dict(SURFACE="#fcfcfb", INK="#0b0b0b", INK2="#52514e", GRID="#e4e3df",
                   BLUE="#2a78d6", ORANGE="#eb6834", AQUA="#1baf7a", REF="#9a9994"),

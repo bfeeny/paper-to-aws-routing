@@ -3,7 +3,7 @@
 
 This is why label_cascade.py keeps `reply_tail`: a grader defect found after
 the fact costs a few seconds of CPU instead of thousands of dollars of
-re-labelling. Truncated replies are recorded as `truncated` rather than wrong,
+re-labeling. Truncated replies are recorded as `truncated` rather than wrong,
 because "ran out of tokens" is missing data, not a capability ceiling.
 
     python3 analysis/regrade_offline.py experiments/bbh_labels.jsonl

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Map which models the mantle endpoint *lists* vs which it will actually serve.
 
-`/v1/models` advertises the catalogue; an account may be entitled to only part of
+`/v1/models` advertises the catalog; an account may be entitled to only part of
 it, and the API surface differs by family (OpenAI-compatible chat/completions for
 most, the Anthropic messages API for Claude). This probe records, per model, the
 status of a minimal call on each supported path.
@@ -94,7 +94,7 @@ def main() -> int:
     session = boto3.Session(profile_name=args.profile, region_name=args.region)
     creds = session.get_credentials().get_frozen_credentials()
 
-    # Catalogue
+    # Catalog
     listing_url = base + "/v1/models"
     req = AWSRequest(method="GET", url=listing_url, headers={})
     SigV4Auth(creds, SERVICE, args.region).add_auth(req)

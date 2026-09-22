@@ -71,7 +71,7 @@ def main() -> int:
     g = np.array([str(items[r["id"]].get(args.group)) for r in recs])
     y = np.isin([r["tier_needed"] for r in recs], [1, 2]).astype(float)
     F = np.array([features(r) for r in recs], dtype=float)
-    # standardise; the raw scales differ by three orders of magnitude
+    # standardize; the raw scales differ by three orders of magnitude
     F = (F - F.mean(0)) / np.where(F.std(0) > 0, F.std(0), 1.0)
     P = embed([r["prompt"] for r in recs], "personal", "us-east-1", 256, workers=24)
     print(f"n={len(recs)} groups={len(set(g))} escalation={y.mean():.1%}")

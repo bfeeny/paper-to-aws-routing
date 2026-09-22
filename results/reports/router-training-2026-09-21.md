@@ -13,7 +13,7 @@ winner, a strong win means "this prompt needed the strong model."
 - 57,477 battles, 64 models → **12,412 cross-tier battles**, sampled to 8,000
 - **47.6% strong-needed** — nearly balanced, unlike our MT-Bench-derived labels (63/37)
 - Source pinned by SHA-256; tier map is explicit in the script, because it is the most
-  consequential judgement in the pipeline
+  consequential judgment in the pipeline
 
 ## Every lever, and what it bought
 
@@ -32,10 +32,10 @@ Chance is 0.500.
 
 Read the last row against the others. **A single scalar — how long the prompt is —
 matches or beats every learned model we fitted.** More dimensions, more capacity, a
-homogeneous model pairing, three orders of magnitude of regularisation: each one
+homogeneous model pairing, three orders of magnitude of regularization: each one
 improves the *training* fit and none moves hold-out performance off chance.
 
-That pattern is diagnostic. When capacity increases fit but never generalisation, the
+That pattern is diagnostic. When capacity increases fit but never generalization, the
 features do not contain the signal. This is not a tuning problem.
 
 ## What this does and doesn't say

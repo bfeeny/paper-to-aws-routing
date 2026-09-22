@@ -21,7 +21,7 @@ empirical win rate. So steps 3-5 collapse to
 
     score = sum(w_i * y_i) / sum(w_i)
 
-which is faithful to their method on this data and vectorises to one matmul.
+which is faithful to their method on this data and vectorizes to one matmul.
 Nothing is approximated; the general-case MLE is simply unnecessary here.
 
     .venv/bin/python analysis/sw_ranking.py --eval routellm
@@ -47,7 +47,7 @@ def sw_scores(Q: np.ndarray, B: np.ndarray, y_b: np.ndarray,
               chunk: int = 256, tau: float = 1.0) -> tuple[np.ndarray, float]:
     """Similarity-weighted win rate for each row of Q against battle set B.
 
-    Embeddings are L2-normalised at source (Titan `normalize: true`), so a dot
+    Embeddings are L2-normalized at source (Titan `normalize: true`), so a dot
     product is already the cosine. Weighting follows their get_weightings:
     10 * 10**(sim/max_sim), where max_sim is per-query.
     """

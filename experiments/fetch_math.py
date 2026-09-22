@@ -3,7 +3,7 @@
 
 BBH failed the held-out-task split because each of its 27 tasks has a visually
 distinct template, so a model can name the task and look up its escalation
-rate without ever modelling difficulty. MATH removes that affordance: every
+rate without ever modeling difficulty. MATH removes that affordance: every
 item is "solve this competition problem", one template, and the difficulty is
 latent in the problem rather than announced by its format.
 

@@ -68,7 +68,7 @@ scales with the capability gap.
 `openai.gpt-oss-*` is the only family callable on both `/v1/chat/completions` and
 `/v1/responses`, so it also serves as the control for API-shape effects.
 
-### 4a. Catalogue vs entitlement (measured 2026-09-20)
+### 4a. Catalog vs entitlement (measured 2026-09-20)
 
 `/v1/models` lists **55** models; **38** are callable and **17** return
 `permission_error: not available for this account`. The unavailable set is exactly
@@ -85,7 +85,7 @@ access. Pairs are config: adding them later is a config change plus an amendment
 
 Two consequences for any router built on this endpoint:
 1. **Model discovery cannot be trusted as a capability list.** A router that builds
-   its catalogue from `/v1/models` will route to models that 403 at call time.
+   its catalog from `/v1/models` will route to models that 403 at call time.
 2. **The API surface varies by family.** Claude is served from
    `/anthropic/v1/messages`, not `/v1/chat/completions`; `/v1/responses` is
    supported by only a subset. Cross-family routing therefore changes the request

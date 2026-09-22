@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Train the routing scorer on Chatbot Arena preference data.
 
-Features are Titan v2 embeddings (256-d) of the prompt; the model is L2-regularised
+Features are Titan v2 embeddings (256-d) of the prompt; the model is L2-regularized
 logistic regression fitted by gradient descent and shipped as JSON weights, so the
 interceptor needs no numpy and no container image.
 

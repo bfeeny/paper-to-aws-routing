@@ -10,7 +10,7 @@ the strong model's win says "this prompt needed the strong model."
 
 Only battles between a model in the strong tier and one in the weak tier are used;
 same-tier battles carry no routing signal. The tier map below is explicit on
-purpose — it is the single most consequential judgement in this pipeline, and it
+purpose — it is the single most consequential judgment in this pipeline, and it
 should be arguable rather than buried.
 
     python3 experiments/fetch_arena.py [--limit 8000]
@@ -77,7 +77,7 @@ def first_turn(prompt_field: str) -> str | None:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=8000,
-                    help="cap on labelled examples (seeded sample)")
+                    help="cap on labeled examples (seeded sample)")
     ap.add_argument("--seed", type=int, default=20260921)
     ap.add_argument("--min-chars", type=int, default=12)
     args = ap.parse_args()

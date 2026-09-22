@@ -96,7 +96,7 @@ def cost_per_1k(call_rate: float, strong: str, weak: str,
     return 1000 * (call_rate * unit(strong) + (1 - call_rate) * unit(weak))
 
 
-def summarise(name, y, score, strong, weak, in_tok, out_tok) -> dict:
+def summarize(name, y, score, strong, weak, in_tok, out_tok) -> dict:
     rates, pgr = pgr_curve(y, score)
     apgr = float(np.trapezoid(pgr, rates))
     row = {
@@ -203,7 +203,7 @@ def main() -> int:
 
     report, curves = [], {}
     for name, s in candidates.items():
-        row, rates, pgr = summarise(name, yte, s, args.strong, args.weak,
+        row, rates, pgr = summarize(name, yte, s, args.strong, args.weak,
                                     args.in_tokens, args.out_tokens)
         report.append(row)
         curves[name] = (rates, pgr)

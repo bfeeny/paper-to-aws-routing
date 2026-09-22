@@ -74,9 +74,9 @@ def metered():
                 continue
             rec = json.loads(line)
             for tier, t in rec.get("tiers", {}).items():
-                out[f"claude-{tier} (labelling)"]["calls"] += 1
-                out[f"claude-{tier} (labelling)"]["in"] += t.get("in") or 0
-                out[f"claude-{tier} (labelling)"]["out"] += t.get("out") or 0
+                out[f"claude-{tier} (labeling)"]["calls"] += 1
+                out[f"claude-{tier} (labeling)"]["in"] += t.get("in") or 0
+                out[f"claude-{tier} (labeling)"]["out"] += t.get("out") or 0
     return dict(out)
 
 
