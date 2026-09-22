@@ -92,8 +92,9 @@ pipeline-up: pipeline-build ## Deploy the plugin-pipeline gateway
 	@aws cloudformation describe-stacks --stack-name $(PIPE_STACK) \
 		--query 'Stacks[0].Outputs[].[OutputKey,OutputValue]' --output table
 
-pipeline-bench: ## Measure per-plugin latency through the live gateway
-	python3 runner/pipeline_bench.py --stack $(PIPE_STACK)
+pipeline-bench: ## Measure each layer's latency through the live gateway (INTERCEPTOR=false stack for "none")
+	for c in empty no_guardrail full; do python3 runner/pipeline_bench.py --stack $(PIPE_STACK) --condition $$c; done
+	python3 analysis/pipeline_overhead.py
 
 pipeline-down: ## Delete the pipeline stack and its artifact bucket
 	aws cloudformation delete-stack --stack-name $(PIPE_STACK)
