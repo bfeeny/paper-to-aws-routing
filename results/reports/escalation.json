@@ -1,0 +1,12 @@
+{
+  "note": "Live gateway, mantle connector. Weak ministral-3-3b, strong mistral-large-3. n=5 per condition.",
+  "normal_median_ms": 484,
+  "escalated_median_ms": 1234,
+  "example": {
+    "reason": "truncated",
+    "from": "mistral.ministral-3-3b-instruct",
+    "to": "mistral.mistral-large-3-675b-instruct",
+    "cost_usd_normal": 1.5e-06,
+    "cost_usd_escalated": 4.68e-05
+  }
+}

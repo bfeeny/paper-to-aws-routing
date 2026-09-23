@@ -1,0 +1,14 @@
+{
+  "dynamodb": {
+    "hits": 30,
+    "median_ms": 266.6,
+    "p10_ms": 241.2,
+    "in_lambda_p50_ms": 4.51
+  },
+  "valkey": {
+    "hits": 30,
+    "median_ms": 270.8,
+    "p10_ms": 258.0,
+    "in_lambda_p50_ms": 2.26
+  }
+}

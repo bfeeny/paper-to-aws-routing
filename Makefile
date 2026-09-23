@@ -70,6 +70,7 @@ down-all: ## Delete every arm's stack and the artifact bucket
 # ---------- inference-time customization pipeline (infra/pipeline.yaml) ----------
 PIPE_STACK    ?= gwpipeline
 INTERCEPTOR   ?= true
+BACKEND       ?= dynamodb
 PIPE_ARTIFACT ?= $(PIPE_STACK)-artifacts-$(shell aws sts get-caller-identity --query Account --output text 2>/dev/null)
 
 pipeline-build: ## Assemble the interceptor package (gateway/ + router scorer and weights)
@@ -78,7 +79,8 @@ pipeline-build: ## Assemble the interceptor package (gateway/ + router scorer an
 	cp router/routellm_scorer.py .build/pipeline/gateway/
 	cp -R router/artifacts .build/pipeline/gateway/artifacts
 	cp experiments/prices.json .build/pipeline/gateway/prices.json
-	find .build/pipeline -name __pycache__ -prune -exec rm -rf {} +
+	python3 -m pip install -q --target .build/pipeline --upgrade redis   # ElastiCache (Valkey) client
+	find .build/pipeline \( -name __pycache__ -o -name "*.dist-info" -o -name "tests" \) -prune -exec rm -rf {} +
 
 pipeline-up: pipeline-build ## Deploy the plugin-pipeline gateway
 	@aws s3api head-bucket --bucket $(PIPE_ARTIFACT) 2>/dev/null || { \
@@ -88,7 +90,7 @@ pipeline-up: pipeline-build ## Deploy the plugin-pipeline gateway
 		--s3-bucket $(PIPE_ARTIFACT) --output-template-file .packaged-pipeline.yaml
 	aws cloudformation deploy --template-file .packaged-pipeline.yaml --stack-name $(PIPE_STACK) \
 		--capabilities CAPABILITY_IAM --tags Project=$(PROJECT) Component=pipeline ManagedBy=cloudformation \
-		--parameter-overrides StackPrefix=$(PIPE_STACK) InterceptorEnabled=$(INTERCEPTOR)
+		--parameter-overrides StackPrefix=$(PIPE_STACK) InterceptorEnabled=$(INTERCEPTOR) CacheBackend=$(BACKEND)
 	@aws cloudformation describe-stacks --stack-name $(PIPE_STACK) \
 		--query 'Stacks[0].Outputs[].[OutputKey,OutputValue]' --output table
 

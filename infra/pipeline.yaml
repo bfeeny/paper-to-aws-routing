@@ -25,6 +25,15 @@ Parameters:
   LogRetentionDays:
     Type: Number
     Default: 14
+  CacheBackend:
+    Type: String
+    Default: dynamodb
+    AllowedValues: [dynamodb, valkey]
+    Description: >
+      dynamodb keeps the interceptor outside any VPC. valkey adds a private VPC,
+      an ElastiCache Serverless (Valkey) cache and interface endpoints for the
+      services the interceptor calls, so it needs no NAT gateway.
+
   InterceptorEnabled:
     Type: String
     Default: "true"
@@ -33,6 +42,7 @@ Parameters:
 
 Conditions:
   WithInterceptor: !Equals [!Ref InterceptorEnabled, "true"]
+  WithValkey: !Equals [!Ref CacheBackend, valkey]
 
 Resources:
 
@@ -103,6 +113,145 @@ Resources:
           ]
         }
 
+
+  # ---------- Private network, only when the cache is ElastiCache ----------
+  #
+  # No NAT gateway: every service the interceptor calls has a VPC endpoint, so
+  # the subnets stay private and egress-free. DynamoDB uses a gateway endpoint,
+  # which costs nothing.
+  Vpc:
+    Condition: WithValkey
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.20.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags: [{ Key: Name, Value: !Sub "${StackPrefix}-vpc" }]
+
+  SubnetA:
+    Condition: WithValkey
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Vpc
+      CidrBlock: 10.20.1.0/24
+      AvailabilityZone: !Select [0, !GetAZs ""]
+  SubnetB:
+    Condition: WithValkey
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref Vpc
+      CidrBlock: 10.20.2.0/24
+      AvailabilityZone: !Select [1, !GetAZs ""]
+
+  RouteTable:
+    Condition: WithValkey
+    Type: AWS::EC2::RouteTable
+    Properties: { VpcId: !Ref Vpc }
+  RouteA:
+    Condition: WithValkey
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: { RouteTableId: !Ref RouteTable, SubnetId: !Ref SubnetA }
+  RouteB:
+    Condition: WithValkey
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties: { RouteTableId: !Ref RouteTable, SubnetId: !Ref SubnetB }
+
+  LambdaSg:
+    Condition: WithValkey
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Interceptor Lambda
+      VpcId: !Ref Vpc
+      SecurityGroupEgress:
+        # 443 to anywhere looks broad and is not: the subnets have no NAT and no
+        # internet gateway, so the only reachable destinations are the interface
+        # endpoints and the DynamoDB gateway endpoint. Scoping this to the VPC
+        # CIDR silently breaks DynamoDB, whose gateway endpoint routes to public
+        # AWS ranges through a prefix list rather than to an address in the VPC.
+        - { IpProtocol: tcp, FromPort: 443, ToPort: 443, CidrIp: 0.0.0.0/0, Description: VPC and gateway endpoints }
+        - { IpProtocol: tcp, FromPort: 6379, ToPort: 6379, CidrIp: 10.20.0.0/16, Description: Valkey }
+
+  CacheSg:
+    Condition: WithValkey
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: ElastiCache Serverless
+      VpcId: !Ref Vpc
+      SecurityGroupIngress:
+        - { IpProtocol: tcp, FromPort: 6379, ToPort: 6379, SourceSecurityGroupId: !Ref LambdaSg }
+
+  EndpointSg:
+    Condition: WithValkey
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Interface VPC endpoints
+      VpcId: !Ref Vpc
+      SecurityGroupIngress:
+        - { IpProtocol: tcp, FromPort: 443, ToPort: 443, SourceSecurityGroupId: !Ref LambdaSg }
+
+  DynamoEndpoint:
+    Condition: WithValkey
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref Vpc
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.dynamodb"
+      VpcEndpointType: Gateway
+      RouteTableIds: [!Ref RouteTable]
+
+  MantleEndpoint:
+    Condition: WithValkey
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref Vpc
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.bedrock-mantle"
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds: [!Ref SubnetA, !Ref SubnetB]
+      SecurityGroupIds: [!Ref EndpointSg]
+
+  BedrockRuntimeEndpoint:
+    Condition: WithValkey
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref Vpc
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.bedrock-runtime"
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds: [!Ref SubnetA, !Ref SubnetB]
+      SecurityGroupIds: [!Ref EndpointSg]
+
+  SsmEndpoint:
+    Condition: WithValkey
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref Vpc
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.ssm"
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds: [!Ref SubnetA, !Ref SubnetB]
+      SecurityGroupIds: [!Ref EndpointSg]
+
+  LogsEndpoint:
+    Condition: WithValkey
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref Vpc
+      ServiceName: !Sub "com.amazonaws.${AWS::Region}.logs"
+      VpcEndpointType: Interface
+      PrivateDnsEnabled: true
+      SubnetIds: [!Ref SubnetA, !Ref SubnetB]
+      SecurityGroupIds: [!Ref EndpointSg]
+
+  ValkeyCache:
+    Condition: WithValkey
+    Type: AWS::ElastiCache::ServerlessCache
+    Properties:
+      ServerlessCacheName: !Sub "${StackPrefix}-valkey"
+      Engine: valkey
+      Description: Response cache for the gateway interceptor
+      SubnetIds: [!Ref SubnetA, !Ref SubnetB]
+      SecurityGroupIds: [!Ref CacheSg]
+
   # ---------- Interceptor ----------
   PipelineRole:
     Type: AWS::IAM::Role
@@ -115,6 +264,7 @@ Resources:
             Action: sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - !If [WithValkey, arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole, !Ref AWS::NoValue]
       Policies:
         - PolicyName: pipeline
           PolicyDocument:
@@ -158,8 +308,15 @@ Resources:
       MemorySize: 512
       # `make pipeline-up` assembles this directory and uploads it with `aws cloudformation package`.
       Code: ../.build/pipeline/
+      VpcConfig: !If
+        - WithValkey
+        - SubnetIds: [!Ref SubnetA, !Ref SubnetB]
+          SecurityGroupIds: [!Ref LambdaSg]
+        - !Ref AWS::NoValue
       Environment:
         Variables:
+          CACHE_BACKEND: !Ref CacheBackend
+          VALKEY_ENDPOINT: !If [WithValkey, !GetAtt ValkeyCache.Endpoint.Address, ""]
           PIPELINE_CONFIG_PARAM: !Ref PipelineConfig
           STATE_TABLE: !Ref StateTable
           METRIC_NAMESPACE: !Sub "${StackPrefix}/Pipeline"
@@ -256,3 +413,8 @@ Outputs:
     Value: !GetAtt GuardrailVersion.Version
   MetricNamespace:
     Value: !Sub "${StackPrefix}/Pipeline"
+  CacheBackend:
+    Value: !Ref CacheBackend
+  ValkeyEndpoint:
+    Condition: WithValkey
+    Value: !GetAtt ValkeyCache.Endpoint.Address
