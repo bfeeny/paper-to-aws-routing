@@ -126,9 +126,14 @@ cp = pipe(("tenant", {}), ("cache", {}), ("router", {"strategy": "pinned", "mode
 c = call(text="what is 2+2")
 v, tr = cp.run_request(c)
 check("cache miss forwards", v is None and c.attrs["cache"] == "miss")
-c.response = {"choices": [{"message": {"content": "4"}, "finish_reason": "stop"}],
-              "usage": {"prompt_tokens": 5, "completion_tokens": 1}}
-cp.run_response(c)
+check("cache key is remembered for the response phase", "cache_key" in c.attrs.get("remember", {}))
+resp_call = P.Call(body={"model": WEAK}, tenant=c.tenant, request_id=c.request_id,
+                   response={"choices": [{"message": {"content": "4"}, "finish_reason": "stop"}],
+                             "usage": {"prompt_tokens": 5, "completion_tokens": 1}})
+# the handler hands the response phase only what the request phase remembered
+resp_call.attrs["recalled"] = c.attrs.get("remember", {})
+resp_call.response = resp_call.response
+cp.run_response(resp_call)
 c2 = call(text="what is 2+2")
 v2, tr2 = cp.run_request(c2)
 check("cache hit answers from the interceptor", isinstance(v2, P.Serve)

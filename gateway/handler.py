@@ -148,6 +148,10 @@ def _on_response(resp: dict, rid: str):
     call = Call(body={"model": seen.get("model") or body.get("model", "")},
                 tenant=seen.get("tenant", "anonymous"), request_id=rid,
                 response=body if isinstance(body, dict) else {})
+    # Whatever the request phase chose to remember is what the response phase
+    # knows: the tenant and model above, plus per-plugin fields such as the
+    # cache key and the prompt an escalation needs.
+    call.attrs["recalled"] = seen
     call.attrs["streamed"] = streamed
     trace = pipeline.run_response(call)
     emit(trace, call, NAMESPACE, f"status_{resp.get('statusCode')}")

@@ -90,7 +90,8 @@ class Escalate(Plugin):
         call.attrs["escalation_reason"] = reason or "none"
         if not reason:
             return
-        seen = store(self.params.get("table") or os.environ.get("STATE_TABLE")).recall(call.request_id)
+        seen = call.attrs.get("recalled") or store(
+            self.params.get("table") or os.environ.get("STATE_TABLE")).recall(call.request_id)
         if not seen.get("messages"):
             call.attrs["escalation_reason"] = "prompt_not_remembered"
             return

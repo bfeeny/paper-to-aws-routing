@@ -44,6 +44,8 @@ class Cache(Plugin):
             return None                      # a cached body is not an event stream
         key = self._key(call)
         call.attrs["cache_key"] = key
+        # The response phase receives no request, so hand the key forward.
+        call.attrs.setdefault("remember", {})["cache_key"] = key
         hit = store(self.params.get("table") or os.environ.get("STATE_TABLE")).get_cached(key)
         if hit is None:
             call.attrs["cache"] = "miss"
@@ -53,7 +55,7 @@ class Cache(Plugin):
         return Serve(body=hit)
 
     def on_response(self, call: Call) -> None:
-        key = call.attrs.get("cache_key")
+        key = call.attrs.get("cache_key") or call.attrs.get("recalled", {}).get("cache_key")
         body = call.attrs.get("replacement_body") or call.response
         if not key or not body or call.attrs.get("streamed") or not body.get("choices"):
             return
