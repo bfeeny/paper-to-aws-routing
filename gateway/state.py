@@ -13,7 +13,14 @@ Two facts about AgentCore Gateway interceptors force this module to exist:
     DynamoDB transaction, and a retry finds the marker and changes nothing.
 
 One on-demand table holds every kind of item, told apart by key prefix:
-`spend#`, `req#` and `cache#`.
+`spend#`, `req#`, `cache#` and `vec#`.
+
+The `vec#` items carry an embedding and are the only ones the table's vector
+index sees: DynamoDB indexes an item only if it has the vector attribute, so
+the spend ledger and the response cache sit in the same table without being
+searched. That is the reason the semantic cache needs no second datastore --
+recall, the cached answer and the spend ledger share one table, one IAM policy
+and one TTL sweeper.
 """
 import datetime as dt
 import json
@@ -62,6 +69,44 @@ class DynamoStore:
             "payload": {"S": json.dumps(body)},
             "expires_at": {"N": str(int(time.time()) + ttl_s)},
         })
+
+    # ---------------------------------------------------------------- vectors
+    #
+    # DynamoDB stores an embedding as a list of numbers and searches it with
+    # SearchVectors against a vector index declared on the table. The index is
+    # partitioned by `tenant` (its HASH search-schema element), so a search
+    # never crosses a tenant boundary and never scans the whole corpus.
+
+    def put_vector(self, key: str, tenant: str, vec: list[float], prompt: str,
+                   ttl_s: int, index_key: str | None = None) -> None:
+        self.ddb.put_item(TableName=self.table, Item={
+            "pk": {"S": f"vec#{tenant}#{index_key or key}"},
+            "tenant": {"S": tenant},
+            # float32 in, float32 out: eight decimals is past the point where
+            # more digits survive the round trip.
+            "embedding": {"L": [{"N": f"{x:.8f}"} for x in vec]},
+            "cache_key": {"S": key},
+            "prompt": {"S": prompt[:2000]},
+            "expires_at": {"N": str(int(time.time()) + ttl_s)},
+        })
+
+    def nearest(self, index: str, tenant: str, vec: list[float], top_k: int = 1) -> list[dict]:
+        """Nearest stored prompts, closest first, as {similarity, cache_key, prompt}."""
+        r = self.ddb.search_vectors(
+            TableName=self.table, IndexName=index, TopK=top_k,
+            SearchVector=[{"N": f"{x:.8f}"} for x in vec],
+            SearchConditionExpression="tenant = :t",
+            ExpressionAttributeValues={":t": {"S": tenant}})
+        out = []
+        for m in r.get("SearchResults", []):
+            item = m.get("Item", {})
+            out.append({
+                # COSINE scores are distances: 0 is identical, 2 is opposite.
+                "similarity": 1.0 - float(m.get("Score", 2.0)),
+                "cache_key": item.get("cache_key", {}).get("S", ""),
+                "prompt": item.get("prompt", {}).get("S", ""),
+            })
+        return out
 
     def settle(self, request_id: str, tenant: str, cost: float) -> bool:
         """Charge once per request. Returns False if this request was already settled."""

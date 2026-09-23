@@ -65,20 +65,29 @@ def _put(key: str, body: dict, ttl_s: int, params=None) -> None:
         store(os.environ.get("STATE_TABLE")).put_cached(key, body, ttl_s=ttl_s)
 
 
+def cache_key(call: Call, per_tenant: bool = True) -> str:
+    """The identity of an answer: the request as the client sent it.
+
+    Shared with the semantic cache so that both write into the same entries --
+    whichever plugin stores an answer, the other can serve it.
+    """
+    material = json.dumps({
+        "model": call.model,
+        "messages": call.body.get("messages") or call.body.get("input"),
+        "temperature": call.body.get("temperature"),
+        "max_tokens": call.body.get("max_tokens"),
+        "tenant": call.tenant if per_tenant else "*",
+    }, sort_keys=True, default=str)
+    return hashlib.sha256(material.encode()).hexdigest()[:32]
+
+
 @register
 class Cache(Plugin):
     name = "cache"
     needs_response = True
 
     def _key(self, call: Call) -> str:
-        material = json.dumps({
-            "model": call.model,
-            "messages": call.body.get("messages") or call.body.get("input"),
-            "temperature": call.body.get("temperature"),
-            "max_tokens": call.body.get("max_tokens"),
-            "tenant": call.tenant if self.params.get("per_tenant", True) else "*",
-        }, sort_keys=True, default=str)
-        return hashlib.sha256(material.encode()).hexdigest()[:32]
+        return cache_key(call, self.params.get("per_tenant", True))
 
     def on_request(self, call: Call) -> Serve | None:
         if call.body.get("stream"):

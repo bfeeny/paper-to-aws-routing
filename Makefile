@@ -80,6 +80,8 @@ pipeline-build: ## Assemble the interceptor package (gateway/ + router scorer an
 	cp -R router/artifacts .build/pipeline/gateway/artifacts
 	cp experiments/prices.json .build/pipeline/gateway/prices.json
 	python3 -m pip install -q --target .build/pipeline --upgrade redis   # ElastiCache (Valkey) client
+	# The runtime's bundled boto3 predates DynamoDB SearchVectors; ship our own.
+	python3 -m pip install -q --target .build/pipeline --upgrade 'boto3>=1.40.100'
 	find .build/pipeline \( -name __pycache__ -o -name "*.dist-info" -o -name "tests" \) -prune -exec rm -rf {} +
 
 pipeline-up: pipeline-build ## Deploy the plugin-pipeline gateway

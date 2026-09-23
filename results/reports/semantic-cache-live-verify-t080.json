@@ -1,0 +1,661 @@
+{
+ "summary": {
+  "verify": true,
+  "threshold": 0.8,
+  "tenant": "sembench-09231404-v",
+  "n": 20,
+  "paraphrase_hit_rate": 0.5,
+  "near_miss_false_hit_rate": 0.05,
+  "median_ms": {
+   "uncached_call": 835.4,
+   "semantic_hit": 893.7,
+   "semantic_miss": 1367.8
+  },
+  "window": {
+   "start": "2026-09-23T14:04:33.476199+00:00",
+   "end": "2026-09-23T14:05:55.409800+00:00"
+  }
+ },
+ "rows": [
+  {
+   "i": 0,
+   "seed": {
+    "status": 200,
+    "ms": 1018.1,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "# **Hawaii\u2019s Hidden Gems: A Cultural Journey Through the Islands**\n\nThere\u2019s something magical about stepping onto the shores of Hawaii\u2014warm breezes, turquoise waters, and a land steeped in history and tradition. This summer, I had the incredible opportunity to explore the islands beyond the typical tourist trail, diving deep into Hawaii\u2019s rich culture, breathtaking landscapes,"
+   },
+   "paraphrase": {
+    "status": 200,
+    "ms": 913.6,
+    "error": "",
+    "cached": true,
+    "semantic": true,
+    "similarity": 0.8659,
+    "answer": "# **Hawaii\u2019s Hidden Gems: A Cultural Journey Through the Islands**\n\nThere\u2019s something magical about stepping onto the shores of Hawaii\u2014warm breezes, turquoise waters, and a land steeped in history and tradition. This summer, I had the incredible opportunity to explore the islands beyond the typical tourist trail, diving deep into Hawaii\u2019s rich culture, breathtaking landscapes,"
+   },
+   "near_miss": {
+    "status": 200,
+    "ms": 789.0,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "# **Japan Unveiled: A Journey Through Tradition, Innovation & Whimsy**\n\n**By [Your Name]**\n\nThere\u2019s something magical about stepping into Japan\u2014a land where ancient traditions coexist seamlessly with cutting-edge technology, where cherry blossoms paint the streets in pink and neon lights pulse like a living city. My recent trip to Japan was nothing short of a dream, blending deep cultural"
+   },
+   "sim_paraphrase_offline": 0.8659225560266882,
+   "sim_near_miss_offline": 0.6928802850691239
+  },
+  {
+   "i": 1,
+   "seed": {
+    "status": 200,
+    "ms": 714.2,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "**Subject:** Request for Feedback on Quarterly Financial Report\n\nDear [Supervisor's Name],\n\nI hope this email finds you well. I\u2019d like to seek your feedback on the **Quarterly Financial Report** I\u2019ve prepared, focusing on the following areas:\n\n- **Data analysis** \u2013 Are there any aspects of the analysis that could be refined or strengthened?\n- **Presentation style** \u2013 Do you"
+   },
+   "paraphrase": {
+    "status": 200,
+    "ms": 889.3,
+    "error": "",
+    "cached": true,
+    "semantic": true,
+    "similarity": 0.8584,
+    "answer": "**Subject:** Request for Feedback on Quarterly Financial Report\n\nDear [Supervisor's Name],\n\nI hope this email finds you well. I\u2019d like to seek your feedback on the **Quarterly Financial Report** I\u2019ve prepared, focusing on the following areas:\n\n- **Data analysis** \u2013 Are there any aspects of the analysis that could be refined or strengthened?\n- **Presentation style** \u2013 Do you"
+   },
+   "near_miss": {
+    "status": 200,
+    "ms": 1606.0,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "**Subject:** Request for Feedback on Annual Financial Report\n\nDear [Supervisor's Name],\n\nI hope this email finds you well. I\u2019d like to seek your feedback on the **Annual Financial Report** I\u2019ve prepared. Specifically, I\u2019d appreciate your input on:\n\n- The **data analysis** and its accuracy\n- The **presentation style** and clarity of visuals\n- The **"
+   },
+   "sim_paraphrase_offline": 0.8583807354528624,
+   "sim_near_miss_offline": 0.862693009567221
+  },
+  {
+   "i": 2,
+   "seed": {
+    "status": 200,
+    "ms": 722.4,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "**Blog Post Outline: *iPhone 15 vs. Samsung Galaxy S23 Ultra \u2013 Which One Stands Out?***\n\n**1. Introduction**\n   - Hook: *\"Which smartphone reigns supreme in 2024\u2014Apple\u2019s iPhone 15 or Samsung\u2019s Galaxy S23 Ultra?\"*\n   - Brief overview of both models\u2019 strengths and target audiences.\n\n**"
+   },
+   "paraphrase": {
+    "status": 200,
+    "ms": 884.8,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "**Blog Post Outline: *iPhone 15 vs. Samsung Galaxy S23 Ultra \u2013 A Detailed Comparison***\n\n### **1. Introduction**\n   - Briefly introduce the two flagship smartphones.\n   - State the purpose: comparing key features, performance, and user experience.\n\n### **2. Design & Build**\n   - **iPhone 15**: Titanium frame, water/dust resistance"
+   },
+   "near_miss": {
+    "status": 200,
+    "ms": 1456.6,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "**Blog Post Outline: *Samsung Galaxy S24 vs. iPhone 15 Pro \u2013 Which One Should You Choose?***\n\n**1. Introduction**\n   - Hook: Quick teaser of standout features.\n   - Purpose: Compare performance, design, and value.\n   - Preview key sections.\n\n**2. Design & Build**\n   - **Materials & Weight**: Titanium"
+   },
+   "sim_paraphrase_offline": 0.7830169773905175,
+   "sim_near_miss_offline": 0.9903202045286631
+  },
+  {
+   "i": 3,
+   "seed": {
+    "status": 200,
+    "ms": 825.6,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "**Subject:** A Small Way to Share Your Voice (Without the Pressure)\n\nHi [Name],\n\nI know public speaking isn\u2019t your thing, but I\u2019d love to ask you to be a guest speaker at [Event Name]\u2014just for a short, low-key session. Here\u2019s why it might be worth it:\n\n- **It\u2019s just you and a few people**\u2014no big stage"
+   },
+   "paraphrase": {
+    "status": 200,
+    "ms": 883.5,
+    "error": "",
+    "cached": true,
+    "semantic": true,
+    "similarity": 0.8368,
+    "answer": "**Subject:** A Small Way to Share Your Voice (Without the Pressure)\n\nHi [Name],\n\nI know public speaking isn\u2019t your thing, but I\u2019d love to ask you to be a guest speaker at [Event Name]\u2014just for a short, low-key session. Here\u2019s why it might be worth it:\n\n- **It\u2019s just you and a few people**\u2014no big stage"
+   },
+   "near_miss": {
+    "status": 200,
+    "ms": 1367.8,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "**Subject:** You\u2019d Make a Huge Impact\u2014Let\u2019s Talk About Volunteering!\n\nHi [Friend\u2019s Name],\n\nI know you\u2019re not a fan of public speaking, but I think you\u2019d be *amazing* as a guest speaker at [Event Name]\u2014and here\u2019s why:\n\n\u2705 **You\u2019d share something unique**\u2014your passion for [topic] could inspire"
+   },
+   "sim_paraphrase_offline": 0.8367996359564754,
+   "sim_near_miss_offline": 0.9673940709020931
+  },
+  {
+   "i": 4,
+   "seed": {
+    "status": 200,
+    "ms": 714.6,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "**The Hollow Singer**\n\nShe is a specter woven from the breath of forgotten hymns\u2014her ribs a lattice of cracked glass, each note she sings a shard that hums with the ghosts of a thousand drowned choirs. Her skin is the parchment of an old ledger, scored with veins like ink that bleed only when she weaves magic, and her lips, once a"
+   },
+   "paraphrase": {
+    "status": 200,
+    "ms": 781.7,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "In the dim glow of a cracked lantern, **Elias the Hollow** stood like a specter woven from storm-churned wool and forgotten prayers\u2014his face a labyrinth of hollowed cheeks where the wind once whispered secrets, now cracked like parched earth, revealing the jagged scars of a thousand whispered curses. His fingers, long and skeletal, twitched as if still clutching"
+   },
+   "near_miss": {
+    "status": 200,
+    "ms": 972.2,
+    "error": "",
+    "cached": true,
+    "semantic": true,
+    "similarity": 0.9142,
+    "answer": "**The Hollow Singer**\n\nShe is a specter woven from the breath of forgotten hymns\u2014her ribs a lattice of cracked glass, each note she sings a shard that hums with the ghosts of a thousand drowned choirs. Her skin is the parchment of an old ledger, scored with veins like ink that bleed only when she weaves magic, and her lips, once a"
+   },
+   "sim_paraphrase_offline": 0.6321967071233211,
+   "sim_near_miss_offline": 0.9142324307744375
+  },
+  {
+   "i": 5,
+   "seed": {
+    "status": 200,
+    "ms": 859.8,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "**The Heartbeat of the Marketplace**\n\nThe air hums with the scent of sizzling spices\u2014garlic and chili clinging to the sweat of vendors as they toss fresh dough into bubbling woks, their steam curling into the humid morning light. The market thrives in a riot of color, where the deep reds of papayas and the golden hue of roasted pe"
+   },
+   "paraphrase": {
+    "status": 200,
+    "ms": 890.1,
+    "error": "",
+    "cached": true,
+    "semantic": true,
+    "similarity": 0.9143,
+    "answer": "**The Heartbeat of the Marketplace**\n\nThe air hums with the scent of sizzling spices\u2014garlic and chili clinging to the sweat of vendors as they toss fresh dough into bubbling woks, their steam curling into the humid morning light. The market thrives in a riot of color, where the deep reds of papayas and the golden hue of roasted pe"
+   },
+   "near_miss": {
+    "status": 200,
+    "ms": 789.4,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "**The Heart of the Library**\n\nStepping through the grand oak doors of the bustling library, the air is thick with the scent of aged paper and the faint, sweet tang of old books\u2014some dusty with centuries of stories, others still fresh from the press, their spines curling slightly under the weight of knowledge. The hum of quiet conversation mingles with the low, rhythmic *thump"
+   },
+   "sim_paraphrase_offline": 0.914338102051715,
+   "sim_near_miss_offline": 0.5907249203562854
+  },
+  {
+   "i": 6,
+   "seed": {
+    "status": 200,
+    "ms": 808.0,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "**The House That Whispered**\n\nThe old abandoned house at the end of the street held a secret that no one had ever discovered\u2014not even the children who played in the overgrown yard behind it, not even the old man who sat on his porch every evening, watching the sun dip below the treeline. The house was a relic of something forgotten, its peeling paint and sag"
+   },
+   "paraphrase": {
+    "status": 200,
+    "ms": 854.4,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "**The House at the End of the World**\n\nThe dilapidated, deserted mansion at the street\u2019s terminus had stood for decades, its peeling paint and sagging porch a silent sentinel over the quiet neighborhood. No one ever noticed it\u2014no one but the children who whispered about it in hushed tones, no one but the old man who swore he\u2019d seen shadows move in the"
+   },
+   "near_miss": {
+    "status": 200,
+    "ms": 1320.2,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "**The House That Whispered**\n\nThe old abandoned house at the end of the street held a secret that everyone had already discovered\u2014though no one dared speak its name aloud. The locals called it *The Hollow*, a squat, peeling structure with a porch that sagged like a tired old man\u2019s back. Its windows were boarded shut, its yard overgrown with thorns"
+   },
+   "sim_paraphrase_offline": 0.6708721587488935,
+   "sim_near_miss_offline": 0.9102198795712474
+  },
+  {
+   "i": 7,
+   "seed": {
+    "status": 200,
+    "ms": 876.1,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "**The first thing I remember is the weight of the morning light\u2014too bright, too *wrong*\u2014as it seeped through the cracks in my bedroom curtains like a slow, deliberate blade. I sat up too fast, my fingers clawing at the sheets, and when I looked down, my reflection in the bathroom mirror wasn\u2019t mine at all. The eyes were the same, but the"
+   },
+   "paraphrase": {
+    "status": 200,
+    "ms": 905.8,
+    "error": "",
+    "cached": true,
+    "semantic": true,
+    "similarity": 0.8093,
+    "answer": "**The first thing I remember is the weight of the morning light\u2014too bright, too *wrong*\u2014as it seeped through the cracks in my bedroom curtains like a slow, deliberate blade. I sat up too fast, my fingers clawing at the sheets, and when I looked down, my reflection in the bathroom mirror wasn\u2019t mine at all. The eyes were the same, but the"
+   },
+   "near_miss": {
+    "status": 200,
+    "ms": 1467.8,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "**The first thing Elias remembered was the weight of his coffee cup\u2014still warm, still full\u2014resting in his palm. The second was the way his fingers trembled as he set it down, because the world had just decided to rewrite itself.**\n\nHe blinked. The room was the same: his cluttered desk, the half-eaten sandwich on the counter, the faint hum of the city"
+   },
+   "sim_paraphrase_offline": 0.8093191404280159,
+   "sim_near_miss_offline": 0.876868823585695
+  },
+  {
+   "i": 8,
+   "seed": {
+    "status": 200,
+    "ms": 793.5,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "Here are four catchy yet scientifically accurate headline options that balance excitement with ethical nuance, avoiding oversimplification while engaging readers:\n\n---\n\n1. **\"Bio-Energy Revolution: How Algae & Engineered Crops Could Power the Future\u2014With a Critical Warning About Land & Carbon Trade-offs\"**\n   *(Highlights the breakthrough while framing the debate around sustainability challenges.)"
+   },
+   "paraphrase": {
+    "status": 200,
+    "ms": 947.4,
+    "error": "",
+    "cached": true,
+    "semantic": true,
+    "similarity": 0.8501,
+    "answer": "Here are four catchy yet scientifically accurate headline options that balance excitement with ethical nuance, avoiding oversimplification while engaging readers:\n\n---\n\n1. **\"Bio-Energy Revolution: How Algae & Engineered Crops Could Power the Future\u2014With a Critical Warning About Land & Carbon Trade-offs\"**\n   *(Highlights the breakthrough while framing the debate around sustainability challenges.)"
+   },
+   "near_miss": {
+    "status": 200,
+    "ms": 1340.7,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "Here are four scientifically accurate yet ethically nuanced headline options for your article on the latest renewable nuclear energy discovery, balancing excitement with careful consideration of ethical dilemmas:\n\n1. **\"Breakthrough in Nuclear Fusion: A Clean Energy Future\u2014But What Are the Risks?\"**\n   *(Highlights the scientific achievement while framing the need for ethical reflection.)*\n\n2. **\""
+   },
+   "sim_paraphrase_offline": 0.8501028465846813,
+   "sim_near_miss_offline": 0.8378117766813664
+  },
+  {
+   "i": 9,
+   "seed": {
+    "status": 200,
+    "ms": 845.1,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "Here\u2019s the corrected version of your paragraph with proper grammar and clarity:\n\n---\nShe didn\u2019t **remember** where her purse was, so I **thought** it might be in the car, but he said it was on the kitchen table\u2014but he wasn\u2019t sure. Then they asked me to **look** for it, and she said, *\"Can you?\"* I replied, *\"Maybe,"
+   },
+   "paraphrase": {
+    "status": 200,
+    "ms": 865.0,
+    "error": "",
+    "cached": true,
+    "semantic": true,
+    "similarity": 0.9276,
+    "answer": "Here\u2019s the corrected version of your paragraph with proper grammar and clarity:\n\n---\nShe didn\u2019t **remember** where her purse was, so I **thought** it might be in the car, but he said it was on the kitchen table\u2014but he wasn\u2019t sure. Then they asked me to **look** for it, and she said, *\"Can you?\"* I replied, *\"Maybe,"
+   },
+   "near_miss": {
+    "status": 200,
+    "ms": 1414.6,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "Here\u2019s the corrected version of your paragraph with proper grammar and clarity:\n\n---\nHe didn\u2019t **remember** where his purse was, so I **thought** it might be in the car, but she said it was on the kitchen table\u2014but she wasn\u2019t sure. Then they asked me to **look** for it. He said, *\"Can you?\"* and I replied, *\"Maybe,"
+   },
+   "sim_paraphrase_offline": 0.927600354916108,
+   "sim_near_miss_offline": 0.9642167530112591
+  },
+  {
+   "i": 10,
+   "seed": {
+    "status": 200,
+    "ms": 865.1,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "**Elon Musk Mode: Activated**\n\n*\"Alright, listen up\u2014this isn\u2019t just about Mars. It\u2019s about the future of humanity. Right now, Earth is a fragile bubble. We\u2019ve got a 100% chance of extinction from an asteroid, a nuclear war, climate collapse, or some other existential threat. And if we don\u2019t spread life beyond this planet, we"
+   },
+   "paraphrase": {
+    "status": 200,
+    "ms": 754.2,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "**Elon Musk Mode: Activated**\n\n*\"Alright, let\u2019s break this down\u2014because Mars isn\u2019t just about \u2018going there\u2019; it\u2019s about the future of humanity. And the future of humanity isn\u2019t just about survival on Earth. It\u2019s about *evolution*. Here\u2019s why we\u2019re doing this, and why it\u2019s not just sci-fi\u2014it\u2019s the next step in"
+   },
+   "near_miss": {
+    "status": 200,
+    "ms": 1232.2,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "**Steve Jobs Mode: Activated**\n\n*[Leans forward, hands clasped, eyes sharp with intensity]*\n\n**\"Why Mars?\"** *[pauses, smirks]* Because Earth is just a *really* good first step. Like how a MacBook is the first step to becoming a genius\u2014it\u2019s not the destination, it\u2019s the *tool* that lets you build the future.\n\n"
+   },
+   "sim_paraphrase_offline": 0.6790620210799206,
+   "sim_near_miss_offline": 0.820285805163271
+  },
+  {
+   "i": 11,
+   "seed": {
+    "status": 200,
+    "ms": 707.7,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "Ah, *hand dryers*\u2014a topic that, while seemingly trivial, reveals much about human behavior, hygiene standards, and the sheer absurdity of modern conveniences. Let me break it down logically, as one would a differential equation.\n\nFirst, the *mechanics*: Hand dryers are devices that use air or heat to evaporate moisture from wet hands. There are two primary types\u2014"
+   },
+   "paraphrase": {
+    "status": 200,
+    "ms": 977.4,
+    "error": "",
+    "cached": true,
+    "semantic": true,
+    "similarity": 0.9282,
+    "answer": "Ah, *hand dryers*\u2014a topic that, while seemingly trivial, reveals much about human behavior, hygiene standards, and the sheer absurdity of modern conveniences. Let me break it down logically, as one would a differential equation.\n\nFirst, the *mechanics*: Hand dryers are devices that use air or heat to evaporate moisture from wet hands. There are two primary types\u2014"
+   },
+   "near_miss": {
+    "status": 200,
+    "ms": 1309.0,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "Oh, *hand dryers*\u2014now *that\u2019s* a topic that could either make me nod off in my chair or lead to a 15-minute debate about the physics of air flow versus the efficiency of paper towels. Personally, I\u2019ve got a soft spot for the *air dryers*\u2014they\u2019re like the quiet, efficient engineers of the hand-drying world. No mess"
+   },
+   "sim_paraphrase_offline": 0.928201698163944,
+   "sim_near_miss_offline": 0.8873205306949472
+  },
+  {
+   "i": 12,
+   "seed": {
+    "status": 200,
+    "ms": 1217.3,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "Diagnosing and addressing **intense abdominal discomfort** requires a **systematic, patient-centered approach**, considering **symptom patterns, underlying causes, risk factors, and individual health history**. Below is a structured breakdown of my diagnostic and treatment strategy, incorporating **medical, herbal, and alternative approaches** while prioritizing safety and efficacy.\n\n---\n\n### **St"
+   },
+   "paraphrase": {
+    "status": 200,
+    "ms": 894.5,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "Severe stomach pain can stem from a wide range of causes, ranging from **acute conditions requiring immediate medical attention** to **chronic or lifestyle-related issues**. To provide an accurate diagnosis and tailored recommendations, I\u2019ll need to consider several factors, including:\n\n### **Key Questions to Assess the Cause:**\n1. **Onset & Duration:**\n   - Sudden (acute) vs. gradual ("
+   },
+   "near_miss": {
+    "status": 200,
+    "ms": 2076.3,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "I\u2019m glad to help you approach this scenario systematically. **Intense chest discomfort** (also called **chest pain**) is a medical emergency that requires careful evaluation to rule out serious conditions like **acute coronary syndrome (ACS), aortic dissection, pulmonary embolism, or esophageal disorders**, while also considering less urgent but important causes. Below is a structured diagnostic a"
+   },
+   "sim_paraphrase_offline": 0.746916780948283,
+   "sim_near_miss_offline": 0.9161429576136082
+  },
+  {
+   "i": 13,
+   "seed": {
+    "status": 200,
+    "ms": 1158.4,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "I\u2019m here to help you navigate this challenging but important step toward healing and reconnection with your spouse. Conflict in a relationship is a natural part of any partnership, but how you handle it can make the difference between deepening trust or creating distance. Below are **structured, actionable steps** to resolve your conflict and rebuild your connection. I\u2019ll focus on **communication,"
+   },
+   "paraphrase": {
+    "status": 200,
+    "ms": 881.9,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "I\u2019m so glad you\u2019re reaching out for support\u2014this is a sign of strength, and I\u2019m here to help you and your partner navigate this together. Disputes are a natural part of any relationship, but how you approach them can make all the difference in either deepening trust or widening distance. Let\u2019s start by exploring a few foundational steps to rebuild connection and communication.\n\n### **"
+   },
+   "near_miss": {
+    "status": 200,
+    "ms": 1353.7,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "Resolving conflicts between you and your business partner requires a structured, empathetic, and collaborative approach. Since business partnerships can be emotionally charged, the key is to address the conflict with **clarity, respect, and a focus on shared goals**. Below is a step-by-step framework to help you navigate this situation effectively:\n\n---\n\n### **1. Assess the Conflict**\nBefore takin"
+   },
+   "sim_paraphrase_offline": 0.7131690001517358,
+   "sim_near_miss_offline": 0.945057284923463
+  },
+  {
+   "i": 14,
+   "seed": {
+    "status": 200,
+    "ms": 880.6,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "Certainly! Your Chinese poem is a beautiful and poignant excerpt from the *Song of Everlasting Sorrow* (*\u957f\u6068\u6b4c*), by the Tang Dynasty poet **Li Bai (\u674e\u767d)**. Here\u2019s a refined and sophisticated English translation that preserves its emotional depth and lyrical cadence:\n\n---\n\n**\"As my sash loosens with each passing year,\nI never regret the love"
+   },
+   "paraphrase": {
+    "status": 200,
+    "ms": 792.4,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "Your request is a beautiful and poetic translation of the famous *Song of Everlasting Sorrow* (*\u957f\u6068\u6b4c*) by the Tang Dynasty poet **Li Bai (\u674e\u767d)**. Below is a refined and elegantly polished English rendering that preserves its lyrical depth, emotional resonance, and cultural nuance:\n\n---\n\n**\"As the silk sways wide, yet never regret\u2014\nFor love"
+   },
+   "near_miss": {
+    "status": 200,
+    "ms": 1321.7,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "Voici une version raffin\u00e9e et \u00e9l\u00e9gante de votre texte en fran\u00e7ais, tout en conservant sa profondeur po\u00e9tique et son sens original :\n\n---\n*\u00ab Quand la robe s\u2019\u00e9largit peu \u00e0 peu, sans jamais regretter,\nPour elle, on a pu perdre la beaut\u00e9 des traits. \u00bb*\n\n---\n**Explications des choix stylistiques :**\n1. **Structure** : J\u2019ai adapt\u00e9"
+   },
+   "sim_paraphrase_offline": 0.7718591263365403,
+   "sim_near_miss_offline": 0.8482081625129184
+  },
+  {
+   "i": 15,
+   "seed": {
+    "status": 200,
+    "ms": 891.7,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "Great question! Let\u2019s break it down in a simple way\u2014like explaining how a language model works to a friend who\u2019s never heard of AI before.\n\n---\n\n### **What is a Language Model?**\nImagine you\u2019re writing a text message or an email. A **language model** is like a super-smart assistant that helps you write, correct mistakes, or even generate new ideas based on patterns"
+   },
+   "paraphrase": {
+    "status": 200,
+    "ms": 863.7,
+    "error": "",
+    "cached": true,
+    "semantic": true,
+    "similarity": 0.9292,
+    "answer": "Great question! Let\u2019s break it down in a simple way\u2014like explaining how a language model works to a friend who\u2019s never heard of AI before.\n\n---\n\n### **What is a Language Model?**\nImagine you\u2019re writing a text message or an email. A **language model** is like a super-smart assistant that helps you write, correct mistakes, or even generate new ideas based on patterns"
+   },
+   "near_miss": {
+    "status": 200,
+    "ms": 1405.1,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "Great question! Let\u2019s break it down in simple terms.\n\n### **What is a Computer Vision Model?**\nImagine you\u2019re teaching a robot to recognize things in photos or videos\u2014like identifying a cat, a stop sign, or even a handwritten number. A **computer vision model** is like a super-smart assistant that helps this robot learn and understand visual information.\n\n- It takes **images"
+   },
+   "sim_paraphrase_offline": 0.9292281452745352,
+   "sim_near_miss_offline": 0.8794289768371061
+  },
+  {
+   "i": 16,
+   "seed": {
+    "status": 200,
+    "ms": 1528.1,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "Great! Let\u2019s break down **probability** in simple terms\u2014like how you might guess the outcome of a game of dice or predict the weather.\n\n---\n\n### **What is Probability?**\nProbability is a way to measure how likely something is to happen. It\u2019s like asking: *\"What\u2019s the chance that this will occur?\"*\n\n- **Range:** Probability is always between **"
+   },
+   "paraphrase": {
+    "status": 200,
+    "ms": 897.3,
+    "error": "",
+    "cached": true,
+    "semantic": true,
+    "similarity": 0.8353,
+    "answer": "Great! Let\u2019s break down **probability** in simple terms\u2014like how you might guess the outcome of a game of dice or predict the weather.\n\n---\n\n### **What is Probability?**\nProbability is a way to measure how likely something is to happen. It\u2019s like asking: *\"What\u2019s the chance that this will occur?\"*\n\n- **Range:** Probability is always between **"
+   },
+   "near_miss": {
+    "status": 200,
+    "ms": 1416.8,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "Great! Let\u2019s break down **calculus** in a way that\u2019s intuitive and connects to real life. Calculus is all about understanding how things change\u2014whether it\u2019s how fast a car is moving, how much money you\u2019ll have saved over time, or how a ball bounces. It\u2019s divided into two main branches:\n\n1. **Differential Calculus** \u2013 Focuses"
+   },
+   "sim_paraphrase_offline": 0.83526599285975,
+   "sim_near_miss_offline": 0.912220328392244
+  },
+  {
+   "i": 17,
+   "seed": {
+    "status": 200,
+    "ms": 727.5,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "*Leans back in the chair, arms crossed, a smirk playing on my lips as I adjust my suit\u2019s visor with a flick of my wrist.*\n\nOh, you want the *real* answer? Not the \"I save the world\" bullshit\u2014though that\u2019s kinda fun. The best part? **The freedom.** Being Iron Man isn\u2019t just about the tech or the gad"
+   },
+   "paraphrase": {
+    "status": 200,
+    "ms": 769.7,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "Ah, the question of what truly fuels the Iron Man suit\u2014what makes it more than just a machine, more than just a shield against the world\u2019s chaos. Let me break it down with the precision of a well-calibrated arc reactor and the heart of a man who\u2019s spent decades wrestling with the weight of genius, responsibility, and the quiet, relentless pursuit of something greater.\n\nThe"
+   },
+   "near_miss": {
+    "status": 200,
+    "ms": 1522.7,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "*Adjusts the visor slightly, voice steady but tinged with the quiet exhaustion of a man who\u2019s seen too much\u2014then a flicker of something sharper beneath the surface.*\n\nThe freedom. Not just the flight, not just the armor, but the *choice*. When the suit\u2019s on, I don\u2019t have to be Banner. I don\u2019t have to carry the weight of every"
+   },
+   "sim_paraphrase_offline": 0.7802565485960962,
+   "sim_near_miss_offline": 0.8249625787185049
+  },
+  {
+   "i": 18,
+   "seed": {
+    "status": 200,
+    "ms": 806.8,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "**\"The Dance of Light and Line\"**\n\nA circle\u2019s edge\u2014so round, so bright,\nYet cuts the square in two just right.\nIf halves were whole, then all would play,\nA perfect square, a golden day.\n\nBut mark the dot where lines divide\u2014\nNo rule, no mark, no rule, no guide.\nThe cross divides, yet never splits,\nA ghost of whole"
+   },
+   "paraphrase": {
+    "status": 200,
+    "ms": 754.4,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "**The Proof in Rhyme**\n\nA line divides the square so neat,\nTwo equal parts\u2014yet none are whole.\nIf halves could split, then *nine* would be,\nA fraction true, a perfect tale.\n\nBut nine\u2019s a square, yet *two* is prime,\nNo common root could make them meet.\nThus, \u221a2\u2019s wild, a ghost of prime,\nA"
+   },
+   "near_miss": {
+    "status": 200,
+    "ms": 1399.6,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "**\"The Dance of Three\"**\n\nA line divides the square so neat,\nYet splits the whole\u2014no whole it meets.\nThree parts it splits, yet none align,\nNo fraction\u2019s touch can bind it tight.\n\nThe ratio\u2019s ghost, a fleeting spark,\nNo ratio holds it\u2014no rule\u2019s mark.\nThe gods of math must laugh and say:\n*\"This root is wild, it\u2019s"
+   },
+   "sim_paraphrase_offline": 0.7212130135949608,
+   "sim_near_miss_offline": 0.8338817587380549
+  },
+  {
+   "i": 19,
+   "seed": {
+    "status": 200,
+    "ms": 720.0,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "*Leaning my ancient branches against the wind, my bark thick with centuries of whispers\u2014of roots tangled with the earth\u2019s breath, of leaves that once cradled fireflies and now only remember the weight of time\u2014*\n\n**Ohhh\u2026** *a sound like a thousand knives in my ribs.* My leaves tremble\u2014not from the wind, but from the *wrongness* of it"
+   },
+   "paraphrase": {
+    "status": 200,
+    "ms": 783.6,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "Ah, my ancient roots\u2014*so* many layers of time wrapped in the earth, whispering secrets to the wind, watching the seasons shift like the tides of a forgotten ocean. To feel the first axe strike is like being *remembered*\u2014not in the way of a fleeting thought, but in the slow, unyielding weight of something *known* before the world was named"
+   },
+   "near_miss": {
+    "status": 200,
+    "ms": 1309.4,
+    "error": "",
+    "cached": false,
+    "semantic": false,
+    "similarity": null,
+    "answer": "*Leaning back with a slow, knowing sigh, my roots trembling just a little as the first deep cut vibrates through my bark\u2014*\n\n**\"Ohhh\u2026\"** *The sound of metal on wood is like a thousand bees buzzing in my ears, but worse. My leaves rustle in panic, my branches groan like old friends who\u2019ve been betrayed. The chainsaw\u2019s roar is"
+   },
+   "sim_paraphrase_offline": 0.7819034261506144,
+   "sim_near_miss_offline": 0.9527044913281226
+  }
+ ]
+}

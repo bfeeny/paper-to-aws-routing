@@ -54,11 +54,28 @@ Resources:
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - { AttributeName: pk, AttributeType: S }
+        # `tenant` is not part of the table's key -- it is the vector index's
+        # HASH search-schema element, and those must be declared here too.
+        - { AttributeName: tenant, AttributeType: S }
       KeySchema:
         - { AttributeName: pk, KeyType: HASH }
       TimeToLiveSpecification:
         AttributeName: expires_at
         Enabled: true
+      # Only items that carry `embedding` are indexed, so the spend ledger and
+      # the cached answers share this table without being searched. TTL removes
+      # an item from the index along with the item.
+      VectorIndexes:
+        - IndexName: semantic-cache
+          VectorAttribute:
+            AttributeName: embedding
+          Dimensions: 256
+          DistanceFunction: COSINE
+          SearchSchema:
+            - { AttributeName: tenant, SearchSchemaElementType: HASH }
+          Projection:
+            ProjectionType: INCLUDE
+            NonKeyAttributes: [cache_key, prompt]
 
   # ---------- Guardrail used by the guardrail plugin ----------
   Guardrail:
@@ -277,12 +294,18 @@ Resources:
                 Action: [dynamodb:GetItem, dynamodb:PutItem, dynamodb:UpdateItem]
                 Resource: !GetAtt StateTable.Arn
               - Effect: Allow   # semantic cache: recall candidates, then verify
+                # The index ARN alone is enough -- SearchVectors authorizes
+                # against the index, not the table it hangs off.
                 Action: [dynamodb:SearchVectors]
-                Resource: "*"
+                Resource: !Sub "${StateTable.Arn}/index/semantic-cache"
               - Effect: Allow
+                # A cross-region inference profile (the `us.` prefix) routes to
+                # foundation models in every region it spans, and authorizes
+                # against the model ARN in the region it lands on -- so the
+                # model grant cannot be pinned to this stack's region.
                 Action: bedrock:InvokeModel
                 Resource:
-                  - !Sub "arn:aws:bedrock:${AWS::Region}::foundation-model/*"
+                  - "arn:aws:bedrock:*::foundation-model/*"
                   - !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/*"
               - Effect: Allow
                 Action: bedrock:ApplyGuardrail
@@ -327,6 +350,7 @@ Resources:
           VALKEY_ENDPOINT: !If [WithValkey, !GetAtt ValkeyCache.Endpoint.Address, ""]
           PIPELINE_CONFIG_PARAM: !Ref PipelineConfig
           STATE_TABLE: !Ref StateTable
+          VECTOR_INDEX: semantic-cache
           METRIC_NAMESPACE: !Sub "${StackPrefix}/Pipeline"
           CONFIG_TTL: "30"
 

@@ -18,12 +18,22 @@ WEAK, STRONG = "mistral.ministral-3-3b-instruct", "mistral.mistral-large-3-675b-
 
 class FakeStore:
     """In-memory stand-in for state.DynamoStore, same interface and idempotency."""
-    def __init__(self): self.spend, self.reqs, self.settled, self.cache = {}, {}, set(), {}
+    def __init__(self): self.spend, self.reqs, self.settled, self.cache = {}, {}, set(), {}; self.vectors = []
     def get_cached(self, key): return self.cache.get(key)
     def put_cached(self, key, body, ttl_s=0): self.cache[key] = body
     def spend_today(self, tenant): return self.spend.get(tenant, 0.0)
     def remember(self, rid, data): self.reqs[rid] = dict(data)
     def recall(self, rid): return self.reqs.get(rid, {})
+    def put_vector(self, key, tenant, vec, prompt, ttl_s=0, index_key=None):
+        self.vectors.append({"key": key, "tenant": tenant, "vec": list(vec), "prompt": prompt})
+    def nearest(self, index, tenant, vec, top_k=1):
+        def cos(a, b):
+            num = sum(x * y for x, y in zip(a, b))
+            den = (sum(x * x for x in a) ** 0.5) * (sum(y * y for y in b) ** 0.5) or 1.0
+            return num / den
+        hits = [{"similarity": cos(vec, v["vec"]), "cache_key": v["key"], "prompt": v["prompt"]}
+                for v in self.vectors if v["tenant"] == tenant]
+        return sorted(hits, key=lambda h: -h["similarity"])[:top_k]
     def settle(self, rid, tenant, cost):
         if rid in self.settled:
             return False
@@ -142,6 +152,82 @@ check("cache hit ends the chain before the router", "router" not in tr2.timings_
 c3 = call(text="what is 2+2"); c3.body["stream"] = True
 v3, _ = cp.run_request(c3)
 check("streamed requests bypass the cache", v3 is None)
+
+# semantic cache: similarity recalls a candidate, a cheap model decides whether to serve it
+import gateway.plugins.semantic_cache as SC  # noqa: E402
+
+S.set_store(FakeStore())
+VECTORS = {                                   # stand-in embeddings, hand-placed
+    "what is the capital of france": [1.0, 0.0, 0.0],
+    "which city is the capital of france":  [0.97, 0.24, 0.0],   # paraphrase, same answer
+    "what is the capital of finland": [0.99, 0.10, 0.0],         # near-identical text, other answer
+    "explain tail latency": [0.0, 0.0, 1.0],                     # unrelated
+}
+SC._embed = lambda text, dims=256: VECTORS[text.strip().lower()]
+verifier_calls = []
+def fake_equivalent(model, a, b):
+    verifier_calls.append((a, b))
+    return {"france": "france", "finland": "finland"}.get(
+        a.split()[-1].lower()) == b.split()[-1].lower()
+SC._equivalent = fake_equivalent
+
+sp = pipe(("tenant", {}), ("semantic_cache", {"threshold": 0.80}),
+          ("router", {"strategy": "pinned", "model": WEAK}), ("metering", {}))
+
+def seed(text, answer):
+    c = call(text=text)
+    sp.run_request(c)
+    r = P.Call(body={"model": WEAK}, tenant=c.tenant, request_id=c.request_id,
+               response={"choices": [{"message": {"content": answer}, "finish_reason": "stop"}],
+                         "usage": {"prompt_tokens": 5, "completion_tokens": 1}})
+    r.attrs["recalled"] = c.attrs.get("remember", {})
+    sp.run_response(r)
+    return c
+
+first = seed("what is the capital of France", "Paris")
+check("first semantic request is a miss and stores nothing to serve", first.attrs["semantic_cache"] == "empty")
+check("the vector and prompt are remembered for the response phase",
+      {"sem_vec", "prompt"} <= set(first.attrs.get("remember", {})))
+check("the remembered vector is not named `embedding` -- that name is the "
+      "table's vector attribute and is reserved for every item in it",
+      "embedding" not in first.attrs.get("remember", {}))
+check("the response phase stores one vector", len(S.store().vectors) == 1)
+
+verifier_calls.clear()
+c = call(text="which city is the capital of France")
+v, tr = sp.run_request(c)
+check("a paraphrase is recalled and served", isinstance(v, P.Serve)
+      and v.body["choices"][0]["message"]["content"] == "Paris"
+      and v.body["x_gateway"]["semantic"] is True)
+check("a semantic hit ends the chain before the router", "router" not in tr.timings_ms)
+check("the verifier was asked exactly once", len(verifier_calls) == 1)
+
+verifier_calls.clear()
+c = call(text="what is the capital of Finland")
+v, _ = sp.run_request(c)
+check("a closer neighbour with a different answer is recalled but refused",
+      v is None and c.attrs["semantic_cache"] == "rejected_by_verifier")
+check("the refused neighbour was nearer than the served paraphrase",
+      c.attrs["semantic_similarity"] > 0.95 and len(verifier_calls) == 1)
+
+c = call(text="explain tail latency")
+v, _ = sp.run_request(c)
+check("an unrelated prompt never reaches the verifier",
+      v is None and c.attrs["semantic_cache"] == "below_threshold"
+      and c.attrs["semantic_verifier_calls"] == 0)
+
+S.store().cache.clear()                       # the answer expires, its vector does not
+c = call(text="which city is the capital of France")
+v, _ = sp.run_request(c)
+check("a vector outliving its answer is a miss, not a crash", v is None)
+
+nv = pipe(("tenant", {}), ("semantic_cache", {"threshold": 0.80, "verify": False}))
+S.set_store(FakeStore()); seed("what is the capital of France", "Paris")
+verifier_calls.clear()
+c = call(text="what is the capital of Finland")
+v, _ = nv.run_request(c)
+check("verify=false serves the wrong answer -- which is why it defaults on",
+      isinstance(v, P.Serve) and not verifier_calls)
 
 # escalation: a weak answer that hit the ceiling is replaced by the strong model
 import gateway.plugins.escalate as E  # noqa: E402

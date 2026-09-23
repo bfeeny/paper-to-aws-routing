@@ -9,14 +9,31 @@ from botocore.auth import SigV4Auth
 from botocore.awsrequest import AWSRequest
 
 
+def _session(profile: str | None, region: str) -> boto3.Session:
+    """The named profile if its credentials resolve, otherwise the default chain.
+
+    The AWS CLI keeps its own SSO token cache, so a profile the CLI can still
+    use may be unusable from botocore. Falling back keeps a long benchmark from
+    dying on an expired token when working credentials are right there.
+    """
+    if profile:
+        try:
+            s = boto3.Session(profile_name=profile, region_name=region)
+            s.client("sts").get_caller_identity()
+            return s
+        except Exception as exc:  # noqa: BLE001
+            print(f"profile {profile!r} unusable ({type(exc).__name__}); using default credentials")
+    return boto3.Session(region_name=region)
+
+
 class Client:
     def __init__(self, url: str, service: str, profile: str = "personal", region: str = "us-east-1"):
         self.url, self.service, self.region = url, service, region
-        self.session = boto3.Session(profile_name=profile, region_name=region)
+        self.session = _session(profile, region)
 
     @classmethod
     def for_stack(cls, stack: str, **kw):
-        s = boto3.Session(profile_name=kw.get("profile", "personal"), region_name=kw.get("region", "us-east-1"))
+        s = _session(kw.get("profile", "personal"), kw.get("region", "us-east-1"))
         out = {o["OutputKey"]: o["OutputValue"]
                for o in s.client("cloudformation").describe_stacks(StackName=stack)["Stacks"][0]["Outputs"]}
         c = cls(out["GatewayUrl"].rstrip("/") + "/inference/v1/chat/completions", "bedrock-agentcore", **kw)
