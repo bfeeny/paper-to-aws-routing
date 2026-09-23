@@ -27,6 +27,17 @@ with a customer-managed key in any real deployment. Redacting without restoring
 needs no such record, and when you can live with placeholders in the answer,
 that is the safer configuration. The choice is a real one, not an oversight.
 
+`screen: true` puts each prompt to the much cheaper `ContainsPiiEntities`
+first and only locates spans when that says there is something to locate. It
+is off by default because measuring it did not support the idea: on five
+prompts with obvious personal data, the screen reported *no labels at all* for
+an email address, and for a bank account number alongside a name, both of which
+`DetectPiiEntities` found with score 1.0. That is not a threshold that wants
+lowering -- the cheap call answers a weaker question and answers it wrong here.
+Used as a gate, it would forward exactly the data this plugin exists to hide,
+silently. Screen only where a false negative is survivable; never in front of
+masking.
+
 Detection uses Amazon Comprehend's `DetectPiiEntities`, which returns typed
 spans with offsets and confidence -- what you need to substitute precisely.
 Guardrails answers a different question ("does this violate policy"), and a
@@ -60,6 +71,20 @@ def _client():
         import boto3
         _comprehend = boto3.client("comprehend")
     return _comprehend
+
+
+def _contains_pii(text: str, min_score: float) -> bool:
+    """A 50x cheaper question: is there anything in here at all?
+
+    ContainsPiiEntities is billed at $0.000002 per 100-character unit against
+    DetectPiiEntities' $0.0001, both with a three-unit minimum -- $0.000006 a
+    call against $0.0003. The arithmetic is attractive and the behavior is not:
+    see the module docstring. Kept because it is the right tool for deciding
+    whether to *alert* on a prompt, which is a question you are allowed to get
+    wrong occasionally.
+    """
+    r = _client().contains_pii_entities(Text=text[:5000], LanguageCode="en")
+    return any(label["Score"] >= min_score for label in r.get("Labels", []))
 
 
 def _spans_comprehend(text: str, min_score: float) -> list[dict]:
@@ -124,7 +149,11 @@ class Pii(Plugin):
     def _detect(self, text: str) -> list[dict]:
         if self.params.get("detector", "comprehend") == "regex":
             return _spans_regex(text, self.params.get("types"))
-        return _spans_comprehend(text, float(self.params.get("min_score", 0.9)))
+        min_score = float(self.params.get("min_score", 0.9))
+        # Off by default, and deliberately so -- a screen that misses is a leak.
+        if self.params.get("screen") and not _contains_pii(text, min_score):
+            return []
+        return _spans_comprehend(text, min_score)
 
     def on_request(self, call: Call) -> None:
         messages = call.body.get("messages")
@@ -153,7 +182,36 @@ class Pii(Plugin):
             # because the answer has to be readable.
             call.attrs.setdefault("remember", {})["pii_map"] = json.dumps(mapping)
         call.attrs["pii_masked"] = len(mapping)
+        call.attrs["pii_map_live"] = mapping     # for a short-circuit, below
         return None
+
+    def on_abort(self, call: Call, verdict) -> None:
+        """Re-personalize an answer served without a model call.
+
+        Placing this plugin before the cache means the cache key is computed on
+        the masked prompt, so nothing personal is ever stored -- and two
+        different people asking the same question mask to the same text and
+        share an entry, which raises the hit rate rather than lowering it.
+
+        The cost is that the stored answer is full of placeholders. A cache hit
+        short-circuits the chain, so `on_response` never runs and the caller
+        would receive `{EMAIL_0}` verbatim. The substitution has to happen here,
+        against the mapping built from *this* request -- which is the right
+        mapping precisely because the masked prompts matched.
+        """
+        mapping = call.attrs.get("pii_map_live")
+        body = getattr(verdict, "body", None)
+        if not mapping or not isinstance(body, dict) or not body.get("choices"):
+            return
+        restored = 0
+        for choice in body["choices"]:
+            message = choice.get("message") or {}
+            content = message.get("content")
+            if isinstance(content, str):
+                new = unmask(content, mapping)
+                restored += new != content
+                message["content"] = new
+        call.attrs["pii_restored_on_serve"] = restored
 
     def on_response(self, call: Call) -> None:
         raw = call.attrs.get("recalled", {}).get("pii_map")

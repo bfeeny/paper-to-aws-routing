@@ -25,11 +25,22 @@ call and no state to sweep. A sliding window costs a read of the previous
 window per call; `smooth: true` pays that to weight the previous window and
 remove the boundary burst.
 
-Native alternatives, and why this exists anyway: AWS WAF rate-based rules
-attach to the gateway and count *requests* per five-minute window, keyed on IP
-or a header. They stop a flood before it reaches any of your code, which is the
-right place for that job, and they cannot express "this tenant may spend 50,000
-tokens a minute." Use both: WAF for volumetric abuse, this for quota.
+Native alternatives, and why this exists anyway: an AgentCore Gateway can have
+an AWS WAF web ACL associated with it, and a rate-based rule counts requests per
+aggregation key over a 60, 120, 300 or 600 second window (300 by default). It
+can key on source IP, a named header, a cookie, a query argument or a label --
+but not on a JWT claim, because WAF does not decode tokens; a bearer token used
+as a key aggregates per token, not per subject. And it counts requests, never
+tokens. WAF stops a flood before it reaches any of your code, which is the right
+place for that job, and it cannot express "this tenant may spend 50,000 tokens a
+minute." Use both: WAF for volumetric abuse, this for quota.
+
+Why reserving matches the platform: on the `bedrock-mantle` endpoint the input
+tokens plus `max_tokens` are checked against the input-tokens-per-minute quota
+before a request is admitted, and a request that would exceed it is throttled.
+Omitting `max_tokens` does not help -- the model's own maximum is used instead.
+So a gateway limit that waits for actual usage is measuring something the
+platform has already stopped caring about.
 """
 import math
 import os

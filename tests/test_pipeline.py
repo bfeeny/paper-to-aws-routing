@@ -3,6 +3,7 @@
 
     python3 tests/test_pipeline.py
 """
+import json
 import pathlib
 import sys
 
@@ -19,10 +20,13 @@ WEAK, STRONG = "mistral.ministral-3-3b-instruct", "mistral.mistral-large-3-675b-
 class FakeStore:
     """In-memory stand-in for state.DynamoStore, same interface and idempotency."""
     def __init__(self): self.spend, self.reqs, self.settled, self.cache = {}, {}, set(), {}; self.vectors = []; self.windows = {}
-    def get_cached(self, key): return self.cache.get(key)
-    def put_cached(self, key, body, ttl_s=0): self.cache[key] = body
+    # Serializes on write, as the real store does: returning the caller's own
+    # dict would let a later mutation appear to have been cached.
+    def get_cached(self, key):
+        return json.loads(self.cache[key]) if key in self.cache else None
+    def put_cached(self, key, body, ttl_s=0): self.cache[key] = json.dumps(body)
     def spend_today(self, tenant): return self.spend.get(tenant, 0.0)
-    def remember(self, rid, data): self.reqs[rid] = dict(data)
+    def remember(self, rid, data): self.reqs[rid] = json.loads(json.dumps(data))
     def recall(self, rid): return self.reqs.get(rid, {})
     def bump_window(self, tenant, window, window_s, requests=1, tokens=0, smooth=False):
         c = self.windows.setdefault((tenant, window), {"requests": 0.0, "tokens": 0.0})
@@ -449,6 +453,30 @@ check("the caller gets the real address back",
 c = call(text="email bob@acme.com")
 pipe(("tenant", {}), ("pii", {"detector": "regex", "restore": False})).run_request(c)
 check("restore=false never persists the originals", "pii_map" not in c.attrs.get("remember", {}))
+
+# pii before cache: nothing personal is stored, and a hit is re-personalized
+S.set_store(FakeStore())
+cp2 = pipe(("tenant", {}), ("pii", {"detector": "regex"}), ("cache", {}))
+c = call(text="email bob@acme.com")
+cp2.run_request(c)
+resp = P.Call(body={"model": WEAK}, tenant=c.tenant, request_id=c.request_id,
+              response={"choices": [{"message": {"content": "I mailed {EMAIL_0}."},
+                                     "finish_reason": "stop"}]})
+resp.attrs["recalled"] = c.attrs.get("remember", {})
+cp2.run_response(resp)
+stored = json.loads(S.store().cache[c.attrs["cache_key"]])["choices"][0]["message"]["content"]
+check("the cache stores the de-identified answer", "{EMAIL_0}" in stored
+      and "bob@acme.com" not in stored)
+hit = call(text="email bob@acme.com")
+v, _ = cp2.run_request(hit)
+check("a cache hit is re-personalized before it is served", isinstance(v, P.Serve)
+      and v.body["choices"][0]["message"]["content"] == "I mailed bob@acme.com.")
+
+other = call(text="email carol@globex.com")
+v2, _ = cp2.run_request(other)
+check("a different person asking the same question shares the entry",
+      isinstance(v2, P.Serve)
+      and v2.body["choices"][0]["message"]["content"] == "I mailed carol@globex.com.")
 
 # JWT tenancy: the tenant comes from a signed token, not a header
 import gateway.plugins.jwt_tenant as JT  # noqa: E402
