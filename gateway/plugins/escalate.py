@@ -67,12 +67,15 @@ class Escalate(Plugin):
                 call.attrs["remember"]["max_tokens"] = str(call.body.get("max_tokens") or 1024)
         return None
 
-    def _reason(self, body: dict) -> str | None:
+    def _reason(self, body: dict, client_capped: bool) -> str | None:
         choice = (body.get("choices") or [{}])[0]
         usage = body.get("usage") or {}
         out = int(usage.get("completion_tokens") or usage.get("output_tokens") or 0)
         if choice.get("finish_reason") == "length":
-            return "truncated"
+            # Only a failure if the gateway imposed the ceiling. A client that
+            # asks for 16 tokens wants a short answer, and escalating there
+            # means the pipeline pays twice for obeying its own max_tokens cap.
+            return None if client_capped else "truncated"
         if out >= int(self.params.get("verbose_tokens", 400)):
             return "verbose"
         text = (choice.get("message") or {}).get("content") or ""
@@ -86,7 +89,9 @@ class Escalate(Plugin):
         strong = self.params["strong"]
         if bare(call.model) == bare(strong):
             return                      # already the strong model
-        reason = self._reason(call.response)
+        capped_by_client = (call.attrs.get("recalled", {}).get("max_tokens_source")
+                            or call.attrs.get("max_tokens_source")) == "client"
+        reason = self._reason(call.response, capped_by_client)
         call.attrs["escalation_reason"] = reason or "none"
         if not reason:
             return

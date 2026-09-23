@@ -176,6 +176,20 @@ ep.run_response(c)
 check("a good weak answer is left alone", "replacement_body" not in c.attrs
       and c.attrs["escalation_reason"] == "none")
 
+# a client asking for a short answer must not trigger escalation
+ep2 = pipe(("tenant", {}), ("max_tokens", {"default": 1024}),
+           ("router", {"strategy": "pinned", "model": WEAK}), ("metering", {}),
+           ("escalate", {"strong": STRONG}))
+c = call(text="say hi", max_tokens=16); c.request_id = "e3"
+ep2.run_request(c)
+check("client-set max_tokens is recorded as the client's", c.attrs["max_tokens_source"] == "client")
+S.store().remember("e3", {"tenant": "acme", "model": f"mantle/{WEAK}", **c.attrs.get("remember", {})})
+c.attrs["recalled"] = S.store().recall("e3")
+c.response = {"model": WEAK, "choices": [{"message": {"content": "Hi there, I am"}, "finish_reason": "length"}],
+              "usage": {"prompt_tokens": 5, "completion_tokens": 16}}
+ep2.run_response(c)
+check("truncation from the client's own cap does not escalate", "replacement_body" not in c.attrs)
+
 # a broken plugin: fail-open continues, fail-closed refuses
 class Boom(P.Plugin):
     name = "boom"

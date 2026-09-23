@@ -19,6 +19,10 @@ class MaxTokens(Plugin):
         caps = self.params.get("per_model", {})
         cap = int(caps.get(bare(call.model), self.params.get("default", 2048)))
         present = [f for f in FIELDS if f in call.body]
+        # Record who set the ceiling. Escalation must not treat a client's own
+        # short answer as a failure -- see the escalate plugin.
+        call.attrs["max_tokens_source"] = "client" if present else "gateway"
+        call.attrs.setdefault("remember", {})["max_tokens_source"] = call.attrs["max_tokens_source"]
         for f in present or [self.params.get("field", "max_tokens")]:
             asked = call.body.get(f)
             new = cap if asked is None else min(int(asked), cap)

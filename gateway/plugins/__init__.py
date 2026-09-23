@@ -8,5 +8,6 @@ from . import (  # noqa: F401
     metering,
     model_policy,
     router,
+    semantic_cache,
     tenant,
 )
