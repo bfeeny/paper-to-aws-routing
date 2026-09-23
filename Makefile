@@ -3,6 +3,7 @@ SHELL := /bin/bash
 
 PROJECT     ?= paper-to-aws-routing
 AWS_PROFILE ?= personal
+AUTH ?= iam
 AWS_REGION  ?= us-east-1
 ARM         ?= always_strong
 PREFIX      ?= routingstudy$(shell echo $(ARM) | tr -d '_')
@@ -82,6 +83,13 @@ pipeline-build: ## Assemble the interceptor package (gateway/ + router scorer an
 	python3 -m pip install -q --target .build/pipeline --upgrade redis   # ElastiCache (Valkey) client
 	# The runtime's bundled boto3 predates DynamoDB SearchVectors; ship our own.
 	python3 -m pip install -q --target .build/pipeline --upgrade 'boto3>=1.40.100'
+	# JWT verification. cryptography ships compiled wheels, so the target must be
+	# named explicitly: the function is arm64 on Python 3.13, and a wheel built
+	# for the build machine -- or for the wrong architecture -- imports fine here
+	# and fails in the function.
+	python3 -m pip install -q --target .build/pipeline --upgrade \
+		--platform manylinux2014_aarch64 --implementation cp --python-version 3.13 \
+		--only-binary=:all: 'PyJWT>=2.8' 'cryptography>=42'
 	find .build/pipeline \( -name __pycache__ -o -name "*.dist-info" -o -name "tests" \) -prune -exec rm -rf {} +
 
 pipeline-up: pipeline-build ## Deploy the plugin-pipeline gateway
@@ -92,7 +100,7 @@ pipeline-up: pipeline-build ## Deploy the plugin-pipeline gateway
 		--s3-bucket $(PIPE_ARTIFACT) --output-template-file .packaged-pipeline.yaml
 	aws cloudformation deploy --template-file .packaged-pipeline.yaml --stack-name $(PIPE_STACK) \
 		--capabilities CAPABILITY_IAM --tags Project=$(PROJECT) Component=pipeline ManagedBy=cloudformation \
-		--parameter-overrides StackPrefix=$(PIPE_STACK) InterceptorEnabled=$(INTERCEPTOR) CacheBackend=$(BACKEND)
+		--parameter-overrides StackPrefix=$(PIPE_STACK) InterceptorEnabled=$(INTERCEPTOR) CacheBackend=$(BACKEND) AuthMode=$(AUTH)
 	@aws cloudformation describe-stacks --stack-name $(PIPE_STACK) \
 		--query 'Stacks[0].Outputs[].[OutputKey,OutputValue]' --output table
 

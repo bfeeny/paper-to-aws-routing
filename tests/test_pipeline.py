@@ -18,12 +18,16 @@ WEAK, STRONG = "mistral.ministral-3-3b-instruct", "mistral.mistral-large-3-675b-
 
 class FakeStore:
     """In-memory stand-in for state.DynamoStore, same interface and idempotency."""
-    def __init__(self): self.spend, self.reqs, self.settled, self.cache = {}, {}, set(), {}; self.vectors = []
+    def __init__(self): self.spend, self.reqs, self.settled, self.cache = {}, {}, set(), {}; self.vectors = []; self.windows = {}
     def get_cached(self, key): return self.cache.get(key)
     def put_cached(self, key, body, ttl_s=0): self.cache[key] = body
     def spend_today(self, tenant): return self.spend.get(tenant, 0.0)
     def remember(self, rid, data): self.reqs[rid] = dict(data)
     def recall(self, rid): return self.reqs.get(rid, {})
+    def bump_window(self, tenant, window, window_s, requests=1, tokens=0, smooth=False):
+        c = self.windows.setdefault((tenant, window), {"requests": 0.0, "tokens": 0.0})
+        c["requests"] += requests; c["tokens"] += tokens
+        return dict(c)
     def put_vector(self, key, tenant, vec, prompt, ttl_s=0, index_key=None):
         self.vectors.append({"key": key, "tenant": tenant, "vec": list(vec), "prompt": prompt})
     def nearest(self, index, tenant, vec, top_k=1):
@@ -353,6 +357,173 @@ check("buffered stream metered from its final chunk and settled", S.store().spen
 check("event stream passed through unmodified", out == H.PASS)
 check("handler never raises on garbage", H.lambda_handler({"http": {"gatewayRequest": {"body": "!!"}}}, ctx("x"))
       == H.PASS)
+
+# rate limits: reserve max_tokens up front, reconcile with real usage on the way out
+import gateway.plugins.rate_limit as RL  # noqa: E402
+
+S.set_store(FakeStore())
+rp = pipe(("tenant", {}), ("rate_limit", {"requests_per_min": {"*": 3}, "tokens_per_min": {"*": 1000}}))
+v, _ = rp.run_request(call(text="hi", max_tokens=100))
+check("first request passes and counts itself", v is None)
+for _ in range(2):
+    rp.run_request(call(text="hi", max_tokens=100))
+v, _ = rp.run_request(call(text="hi", max_tokens=100))
+check("the request over the limit is the one refused",
+      isinstance(v, P.Reject) and v.status == 429 and v.code == "rate_limit_requests")
+
+S.set_store(FakeStore())
+rp = pipe(("tenant", {}), ("rate_limit", {"tokens_per_min": {"*": 1000}}))
+v, _ = rp.run_request(call(text="hi", max_tokens=900))
+check("a big reservation passes while it fits", v is None)
+c2 = call(text="hi", max_tokens=900)
+v, _ = rp.run_request(c2)
+check("two reservations that cannot both fit are caught before either answers",
+      isinstance(v, P.Reject) and v.code == "rate_limit_tokens")
+check("the refusal names the reservation, not the usage", "reserved 900" in v.message)
+
+S.set_store(FakeStore())
+rp = pipe(("tenant", {}), ("rate_limit", {"tokens_per_min": {"*": 1000}}), ("metering", {}))
+c = call(text="hi", max_tokens=900)
+rp.run_request(c)
+resp = P.Call(body={"model": WEAK}, tenant=c.tenant, request_id=c.request_id,
+              response={"choices": [{"message": {"content": "ok"}, "finish_reason": "stop"}],
+                        "usage": {"prompt_tokens": 5, "completion_tokens": 12}})
+resp.attrs["recalled"] = c.attrs.get("remember", {})
+rp.run_response(resp)
+after, _ = pipe(("tenant", {}), ("rate_limit", {"tokens_per_min": {"*": 1000}})).run_request(
+    call(text="hi", max_tokens=900))
+check("the unused part of a reservation is given back", after is None)
+
+# a reservation must be released when a later plugin ends the call
+S.set_store(FakeStore())
+ap = pipe(("tenant", {}), ("rate_limit", {"tokens_per_min": {"*": 5000}}), ("cache", {}),
+          ("metering", {}))
+c = call(text="what is 2+2", max_tokens=4000)
+ap.run_request(c)
+resp = P.Call(body={"model": WEAK}, tenant=c.tenant, request_id=c.request_id,
+              response={"choices": [{"message": {"content": "4"}, "finish_reason": "stop"}],
+                        "usage": {"prompt_tokens": 5, "completion_tokens": 1}})
+resp.attrs["recalled"] = c.attrs.get("remember", {})
+ap.run_response(resp)
+hit = call(text="what is 2+2", max_tokens=4000)
+v, _ = ap.run_request(hit)
+check("the cached answer is served", isinstance(v, P.Serve))
+check("a cache hit releases the quota it reserved", hit.attrs.get("rl_released") == 4000)
+window = S.store().windows[(hit.tenant, next(iter(k[1] for k in S.store().windows)))]
+check("a cache hit leaves the token window where it found it", round(window["tokens"]) == 6)
+check("but the request still counts as a request", window["requests"] == 2)
+
+S.set_store(FakeStore())
+bp = pipe(("tenant", {}), ("rate_limit", {"tokens_per_min": {"*": 5000}}),
+          ("budget", {"daily_usd": {"*": 0}}))
+c = call(text="hi", max_tokens=4000)
+v, _ = bp.run_request(c)
+check("a budget rejection also releases the reservation",
+      isinstance(v, P.Reject) and c.attrs.get("rl_released") == 4000)
+
+# PII: mask on the way in, restore on the way out
+import gateway.plugins.pii as PII  # noqa: E402
+
+spans = PII._spans_regex("mail bob@acme.com or bob@acme.com, ssn 123-45-6789", None)
+masked, mapping = PII.mask("mail bob@acme.com or bob@acme.com, ssn 123-45-6789", spans)
+check("the same value gets the same placeholder twice", masked.count("{EMAIL_0}") == 2)
+check("distinct types get distinct placeholders", "{SSN_0}" in masked and len(mapping) == 2)
+check("no original value survives masking", "bob@acme.com" not in masked and "123-45-6789" not in masked)
+check("unmasking is exact", PII.unmask(masked, mapping)
+      == "mail bob@acme.com or bob@acme.com, ssn 123-45-6789")
+
+S.set_store(FakeStore())
+pp = pipe(("tenant", {}), ("pii", {"detector": "regex"}))
+c = call(text="email bob@acme.com about invoice 7")
+pp.run_request(c)
+sent = c.body["messages"][0]["content"]
+check("the model never sees the address", "bob@acme.com" not in sent and "{EMAIL_0}" in sent)
+resp = P.Call(body={"model": WEAK}, tenant=c.tenant, request_id=c.request_id,
+              response={"choices": [{"message": {"content": "I emailed {EMAIL_0} about it."},
+                                     "finish_reason": "stop"}]})
+resp.attrs["recalled"] = c.attrs.get("remember", {})
+pp.run_response(resp)
+check("the caller gets the real address back",
+      resp.response["choices"][0]["message"]["content"] == "I emailed bob@acme.com about it.")
+
+c = call(text="email bob@acme.com")
+pipe(("tenant", {}), ("pii", {"detector": "regex", "restore": False})).run_request(c)
+check("restore=false never persists the originals", "pii_map" not in c.attrs.get("remember", {}))
+
+# JWT tenancy: the tenant comes from a signed token, not a header
+import gateway.plugins.jwt_tenant as JT  # noqa: E402
+try:
+    import jwt as _jwtlib
+    from cryptography.hazmat.primitives.asymmetric import rsa
+    HAVE_JWT = True
+except ImportError:  # pragma: no cover - exercised only where PyJWT is absent
+    HAVE_JWT = False
+
+if HAVE_JWT:
+    import time as _t
+    key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    ISS = "https://issuer.example/pool"
+
+    def token(claims, signer=key, alg="RS256"):
+        return _jwtlib.encode({"iss": ISS, "exp": int(_t.time()) + 300, **claims},
+                              signer, algorithm=alg, headers={"kid": "k1"})
+
+    pub = _jwtlib.algorithms.RSAAlgorithm.to_jwk(key.public_key(), as_dict=True)
+    pub["kid"] = "k1"
+    JT._jwks.update(at=_t.time(), url=ISS + "/.well-known/jwks.json", keys={"k1": pub})
+
+    jp = pipe(("jwt_tenant", {"issuer": ISS, "claim": "client_id",
+                              "map": {"abc123": "acme"}, "known": ["acme"]}))
+    c = call(text="hi"); c.headers["authorization"] = "Bearer " + token({"client_id": "abc123"})
+    v, _ = jp.run_request(c)
+    check("a verified token sets the tenant", v is None and c.tenant == "acme"
+          and c.attrs["jwt"] == "verified")
+
+    c = call(text="hi"); c.headers["authorization"] = "Bearer " + token({"client_id": "nope"})
+    v, _ = jp.run_request(c)
+    check("a valid token for an unprovisioned tenant is refused",
+          isinstance(v, P.Reject) and v.code == "unknown_tenant")
+
+    other = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    c = call(text="hi")
+    c.headers["authorization"] = "Bearer " + token({"client_id": "abc123"}, signer=other)
+    v, _ = jp.run_request(c)
+    check("a token signed by the wrong key is refused",
+          isinstance(v, P.Reject) and v.status == 401 and v.code == "invalid_token")
+
+    c = call(text="hi")
+    c.headers["authorization"] = "Bearer " + _jwtlib.encode(
+        {"iss": ISS, "exp": int(_t.time()) - 10, "client_id": "abc123"}, key,
+        algorithm="RS256", headers={"kid": "k1"})
+    v, _ = jp.run_request(c)
+    check("an expired token is refused", isinstance(v, P.Reject) and v.code == "invalid_token")
+
+    c = call(text="hi")
+    v, _ = jp.run_request(c)
+    check("no token at all is refused", isinstance(v, P.Reject) and v.code == "no_token")
+
+    sp = pipe(("jwt_tenant", {"issuer": ISS, "scope_prefix": "tenant-"}))
+    c = call(text="hi")
+    c.headers["authorization"] = "Bearer " + token({"scope": "gw/tenant-globex"})
+    v, _ = sp.run_request(c)
+    check("tenancy can come from a resource-server scope", v is None and c.tenant == "globex")
+
+    c = call(text="hi")
+    c.headers["authorization"] = "Bearer " + token({"scope": "gw/tenant-globex",
+                                                    "client_id": "abc123"})
+    v, _ = sp.run_request(c)
+    check("a scope outranks the client id when both are present",
+          v is None and c.tenant == "globex")
+
+    # The header the rest of the pipeline used to trust
+    hp = pipe(("jwt_tenant", {"issuer": ISS, "claim": "client_id", "map": {"abc123": "acme"}}))
+    c = call(text="hi")
+    c.headers["x-tenant-id"] = "globex"
+    c.headers["authorization"] = "Bearer " + token({"client_id": "abc123"})
+    hp.run_request(c)
+    check("a spoofed tenant header cannot override the token", c.tenant == "acme")
+else:
+    print("skip  JWT tests (PyJWT not installed)")
 
 print(f"\n{'FAILED' if failures else 'all passed'}: {len(failures)} failure(s)")
 sys.exit(1 if failures else 0)

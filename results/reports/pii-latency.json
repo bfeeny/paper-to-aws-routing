@@ -1,0 +1,14 @@
+{
+ "regex": {
+  "n": 20,
+  "median_ms": 0.11,
+  "p90_ms": 0.12,
+  "median_entities_masked": 3.0
+ },
+ "comprehend": {
+  "n": 20,
+  "median_ms": 38.3,
+  "p90_ms": 55.26,
+  "median_entities_masked": 5.0
+ }
+}

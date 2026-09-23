@@ -70,6 +70,45 @@ class DynamoStore:
             "expires_at": {"N": str(int(time.time()) + ttl_s)},
         })
 
+    # ------------------------------------------------------------ rate windows
+    #
+    # One item per tenant per window, incremented with ADD so the counter is
+    # correct under concurrency without a read-modify-write. The returned
+    # attributes are the values *after* this call's increment, which is what
+    # makes the limit check race-free: whoever pushes the counter past the
+    # limit is the one refused.
+
+    def bump_window(self, tenant: str, window: int, window_s: int, requests: int = 1,
+                    tokens: int = 0, smooth: bool = False) -> dict:
+        r = self.ddb.update_item(
+            TableName=self.table,
+            Key={"pk": {"S": f"rate#{tenant}#{window}"}},
+            UpdateExpression="ADD reqs :r, toks :t SET expires_at = :e",
+            ExpressionAttributeValues={
+                ":r": {"N": str(requests)},
+                ":t": {"N": str(tokens)},
+                # Two windows of slack so a smoothed check can still read the
+                # previous window after this one opens.
+                ":e": {"N": str(int(time.time()) + window_s * 3)},
+            },
+            ReturnValues="UPDATED_NEW")
+        attrs = r.get("Attributes", {})
+        out = {"requests": float(attrs.get("reqs", {}).get("N", 0)),
+               "tokens": float(attrs.get("toks", {}).get("N", 0))}
+        if smooth:
+            # Sliding-window approximation: carry the fraction of the previous
+            # window still inside the trailing `window_s` seconds. Costs one
+            # extra read per call and removes the fixed window's boundary burst.
+            prev = self.ddb.get_item(
+                TableName=self.table,
+                Key={"pk": {"S": f"rate#{tenant}#{window - 1}"}},
+                ProjectionExpression="reqs, toks").get("Item", {})
+            elapsed = time.time() - window * window_s
+            carry = max(0.0, 1.0 - elapsed / window_s)
+            out["requests"] += carry * float(prev.get("reqs", {}).get("N", 0))
+            out["tokens"] += carry * float(prev.get("toks", {}).get("N", 0))
+        return out
+
     # ---------------------------------------------------------------- vectors
     #
     # DynamoDB stores an embedding as a list of numbers and searches it with

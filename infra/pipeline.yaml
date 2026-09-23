@@ -40,8 +40,18 @@ Parameters:
     AllowedValues: ["true", "false"]
     Description: Set false to measure the bare gateway hop with no interceptor attached.
 
+  AuthMode:
+    Type: String
+    Default: iam
+    AllowedValues: [iam, jwt]
+    Description: >
+      iam signs requests with SigV4. jwt stands up a Cognito user pool with two
+      machine-to-machine clients and puts the gateway behind a CUSTOM_JWT
+      authorizer, so the tenant comes from a validated token instead of a header.
+
 Conditions:
   WithInterceptor: !Equals [!Ref InterceptorEnabled, "true"]
+  WithJwt: !Equals [!Ref AuthMode, jwt]
   WithValkey: !Equals [!Ref CacheBackend, valkey]
 
 Resources:
@@ -307,6 +317,9 @@ Resources:
                 Resource:
                   - "arn:aws:bedrock:*::foundation-model/*"
                   - !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/*"
+              - Effect: Allow   # the pii plugin's default detector
+                Action: [comprehend:DetectPiiEntities]
+                Resource: "*"
               - Effect: Allow
                 Action: bedrock:ApplyGuardrail
                 Resource: !GetAtt Guardrail.GuardrailArn
@@ -351,6 +364,10 @@ Resources:
           PIPELINE_CONFIG_PARAM: !Ref PipelineConfig
           STATE_TABLE: !Ref StateTable
           VECTOR_INDEX: semantic-cache
+          JWT_ISSUER: !If
+            - WithJwt
+            - !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}"
+            - ""
           METRIC_NAMESPACE: !Sub "${StackPrefix}/Pipeline"
           CONFIG_TTL: "30"
 
@@ -413,6 +430,67 @@ Resources:
               PassRequestHeaders: true
         - !Ref AWS::NoValue
 
+
+  # ---------- Identity: one issuer, one client per tenant (AuthMode=jwt) ----------
+  #
+  # Cognito's client-credentials flow is the machine-to-machine case: each
+  # tenant gets an app client, and the token it mints names that client. The
+  # gateway validates the token before the interceptor is invoked; the
+  # jwt_tenant plugin reads the tenant out of it.
+
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Condition: WithJwt
+    Properties:
+      UserPoolName: !Sub "${StackPrefix}-tenants"
+      AdminCreateUserConfig: { AllowAdminCreateUserOnly: true }
+
+  UserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Condition: WithJwt
+    Properties:
+      Domain: !Sub "${StackPrefix}-${AWS::AccountId}"
+      UserPoolId: !Ref UserPool
+
+  ResourceServer:
+    Type: AWS::Cognito::UserPoolResourceServer
+    Condition: WithJwt
+    Properties:
+      UserPoolId: !Ref UserPool
+      Identifier: gw
+      Name: inference-gateway
+      # A scope per tenant. Machine-to-machine tokens carry no custom claims,
+      # so the scope is where tenancy lives: `gw/tenant-acme`.
+      Scopes:
+        - { ScopeName: tenant-acme, ScopeDescription: Act as tenant acme }
+        - { ScopeName: tenant-globex, ScopeDescription: Act as tenant globex }
+
+  TenantAcmeClient:
+    Type: AWS::Cognito::UserPoolClient
+    Condition: WithJwt
+    DependsOn: ResourceServer
+    Properties:
+      UserPoolId: !Ref UserPool
+      ClientName: !Sub "${StackPrefix}-acme"
+      GenerateSecret: true
+      AllowedOAuthFlows: [client_credentials]
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthScopes: ["gw/tenant-acme"]
+      ExplicitAuthFlows: [ALLOW_REFRESH_TOKEN_AUTH]
+
+  TenantGlobexClient:
+    Type: AWS::Cognito::UserPoolClient
+    Condition: WithJwt
+    DependsOn: ResourceServer
+    Properties:
+      UserPoolId: !Ref UserPool
+      ClientName: !Sub "${StackPrefix}-globex"
+      GenerateSecret: true
+      AllowedOAuthFlows: [client_credentials]
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthScopes: ["gw/tenant-globex"]
+      ExplicitAuthFlows: [ALLOW_REFRESH_TOKEN_AUTH]
+
   MantleTarget:
     Type: AWS::BedrockAgentCore::GatewayTarget
     Properties:
@@ -427,7 +505,71 @@ Resources:
       CredentialProviderConfigurations:
         - CredentialProviderType: GATEWAY_IAM_ROLE
 
+
+  # ---------- A second gateway, behind the token issuer (AuthMode=jwt) ----------
+  #
+  # The authorizer type cannot be changed on an existing gateway -- the service
+  # refuses the update outright -- so IAM and JWT are two gateways, not one
+  # gateway with a setting. They share the interceptor, the state table and the
+  # guardrail; only the front door differs, which is what makes them comparable.
+
+  JwtGateway:
+    Type: AWS::BedrockAgentCore::Gateway
+    Condition: WithJwt
+    Properties:
+      Name: !Sub "${StackPrefix}jwt"
+      RoleArn: !GetAtt GatewayRole.Arn
+      AuthorizerType: CUSTOM_JWT
+      AuthorizerConfiguration:
+        CustomJWTAuthorizer:
+          DiscoveryUrl: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}/.well-known/openid-configuration"
+          AllowedClients:
+            - !Ref TenantAcmeClient
+            - !Ref TenantGlobexClient
+      Description: Inference gateway authorized by a Cognito-issued token
+      InterceptorConfigurations: !If
+        - WithInterceptor
+        - - InterceptionPoints: [REQUEST, RESPONSE]
+            Interceptor:
+              Lambda:
+                Arn: !GetAtt PipelineFunction.Arn
+            InputConfiguration:
+              PassRequestHeaders: true
+        - !Ref AWS::NoValue
+
+  JwtMantleTarget:
+    Type: AWS::BedrockAgentCore::GatewayTarget
+    Condition: WithJwt
+    Properties:
+      GatewayIdentifier: !Ref JwtGateway
+      Name: mantle
+      Description: Bedrock OpenAI-compatible endpoint
+      TargetConfiguration:
+        Inference:
+          Connector:
+            Source:
+              ConnectorId: bedrock-mantle
+      CredentialProviderConfigurations:
+        - CredentialProviderType: GATEWAY_IAM_ROLE
+
 Outputs:
+  TokenUrl:
+    Condition: WithJwt
+    Description: OAuth2 token endpoint for the client-credentials flow
+    Value: !Sub "https://${StackPrefix}-${AWS::AccountId}.auth.${AWS::Region}.amazoncognito.com/oauth2/token"
+  JwtIssuer:
+    Condition: WithJwt
+    Value: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${UserPool}"
+  TenantAcmeClientId:
+    Condition: WithJwt
+    Value: !Ref TenantAcmeClient
+  TenantGlobexClientId:
+    Condition: WithJwt
+    Value: !Ref TenantGlobexClient
+  JwtGatewayUrl:
+    Condition: WithJwt
+    Description: Same pipeline, token-authorized; clients append /inference/v1/chat/completions
+    Value: !GetAtt JwtGateway.GatewayUrl
   GatewayUrl:
     Description: Base URL; clients append /inference/v1/chat/completions
     Value: !GetAtt Gateway.GatewayUrl

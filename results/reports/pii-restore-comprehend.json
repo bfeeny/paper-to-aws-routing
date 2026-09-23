@@ -1,0 +1,78 @@
+{
+ "window": "2026-09-23T19:44:15.051722+00:00",
+ "restore_comprehend": {
+  "detector": "comprehend",
+  "rows": [
+   {
+    "expect": [
+     "priya.raman@northwind.example",
+     "accounts@northwind.example"
+    ],
+    "status": 200,
+    "ms": 1134.1,
+    "answer": "Email the invoice to priya.raman@northwind.example and cc accounts@northwind.example.",
+    "restored": [
+     "priya.raman@northwind.example",
+     "accounts@northwind.example"
+    ],
+    "placeholder_leaked": false
+   },
+   {
+    "expect": [
+     "Priya Raman",
+     "(415) 555-0173"
+    ],
+    "status": 200,
+    "ms": 971.6,
+    "answer": "Priya Raman called about her order; call her back on (415) 555-0173.",
+    "restored": [
+     "Priya Raman",
+     "(415) 555-0173"
+    ],
+    "placeholder_leaked": false
+   },
+   {
+    "expect": [
+     "123-45-6789",
+     "4111 1111 1111 1111"
+    ],
+    "status": 200,
+    "ms": 881.8,
+    "answer": "Customer SSN is 123-45-6789 and the card on file ends 4111 1111 1111 1111.",
+    "restored": [
+     "123-45-6789",
+     "4111 1111 1111 1111"
+    ],
+    "placeholder_leaked": false
+   },
+   {
+    "expect": [
+     "1600 Amphitheatre Parkway",
+     "94043"
+    ],
+    "status": 200,
+    "ms": 1192.4,
+    "answer": "Ship to 1600 Amphitheatre Parkway, Mountain View, CA 94043 by Friday.",
+    "restored": [
+     "1600 Amphitheatre Parkway",
+     "94043"
+    ],
+    "placeholder_leaked": false
+   },
+   {
+    "expect": [
+     "Alejandro N\u00fa\u00f1ez",
+     "47"
+    ],
+    "status": 200,
+    "ms": 1519.1,
+    "answer": "Dr. Alejandro N\u00fa\u00f1ez reviewed the chart for a 47-year-old patient in Seattle.",
+    "restored": [
+     "Alejandro N\u00fa\u00f1ez",
+     "47"
+    ],
+    "placeholder_leaked": false
+   }
+  ]
+ }
+}

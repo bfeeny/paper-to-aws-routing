@@ -18,6 +18,10 @@ Contract:
     The first plugin to do either wins; no later plugin runs.
   * `on_response` sees the provider's response and may record, rewrite or
     annotate it. It cannot reject: by then the tokens are already spent.
+  * `on_abort` is the path back out of an early exit. A plugin that *reserved*
+    something -- quota, a slot, a lock -- has to release it when a later plugin
+    ends the call, because the reservation was for a model call that is now
+    never going to happen. Plugins that only observe do not need it.
   * Responses unwind the chain in reverse, as middleware does: the plugin that
     ran last on the way in runs first on the way out. Metering sits at the end
     of the request chain so that it has priced the call before the budget
@@ -99,6 +103,10 @@ class Plugin:
     def on_response(self, call: Call) -> None:  # noqa: ARG002
         return None
 
+    def on_abort(self, call: Call, verdict) -> None:  # noqa: ARG002
+        """Called on plugins that already ran when a later one ends the call."""
+        return None
+
 
 REGISTRY: dict[str, type[Plugin]] = {}
 
@@ -157,8 +165,23 @@ class Pipeline:
             trace.timings_ms[plugin.name] = (time.perf_counter() - t0) * 1000
             if phase == "request" and isinstance(verdict, (Reject, Serve)):
                 trace.rejected_by = plugin.name
+                self._abort(order, plugin, call, verdict, trace)
                 return verdict, trace
         return None, trace
+
+    def _abort(self, order, stopper, call: Call, verdict, trace: Trace) -> None:
+        """Unwind the plugins that already ran, newest first, as a stack would.
+
+        The plugin that ended the call is skipped: it knows what it did. An
+        exception here is logged and ignored -- a failed release must not turn
+        a clean rejection into a 500.
+        """
+        ran = order[:order.index(stopper)]
+        for plugin in reversed(ran):
+            try:
+                plugin.on_abort(call, verdict)
+            except Exception as exc:  # noqa: BLE001
+                trace.errors[f"{plugin.name}.abort"] = repr(exc)[:200]
 
 
 # ---------------------------------------------------------------- configuration

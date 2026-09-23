@@ -1,0 +1,265 @@
+{
+ "window": "2026-09-23T19:44:03.143644+00:00",
+ "regex": {
+  "detector": "regex",
+  "caught": 7,
+  "expected": 16,
+  "recall": 0.438,
+  "median_ms": 0.01,
+  "rows": [
+   {
+    "text": "Email the invoice to priya.raman@northwind.example and cc accounts@northwind.example.",
+    "expected": [
+     "priya.raman@northwind.example",
+     "accounts@northwind.example"
+    ],
+    "found": [
+     "priya.raman@northwind.example",
+     "accounts@northwind.example"
+    ],
+    "caught": 2,
+    "of": 2,
+    "types": [
+     "EMAIL"
+    ]
+   },
+   {
+    "text": "Priya Raman called about her order; call her back on (415) 555-0173.",
+    "expected": [
+     "Priya Raman",
+     "(415) 555-0173"
+    ],
+    "found": [
+     "415) 555-0173"
+    ],
+    "caught": 1,
+    "of": 2,
+    "types": [
+     "PHONE"
+    ]
+   },
+   {
+    "text": "Customer SSN is 123-45-6789 and the card on file ends 4111 1111 1111 1111.",
+    "expected": [
+     "123-45-6789",
+     "4111 1111 1111 1111"
+    ],
+    "found": [
+     "123-45-6789",
+     "4111 1111 1111 1111"
+    ],
+    "caught": 2,
+    "of": 2,
+    "types": [
+     "CREDIT_DEBIT_NUMBER",
+     "SSN"
+    ]
+   },
+   {
+    "text": "Ship to 1600 Amphitheatre Parkway, Mountain View, CA 94043 by Friday.",
+    "expected": [
+     "1600 Amphitheatre Parkway",
+     "94043"
+    ],
+    "found": [],
+    "caught": 0,
+    "of": 2,
+    "types": []
+   },
+   {
+    "text": "Dr. Alejandro N\u00fa\u00f1ez reviewed the chart for a 47-year-old patient in Seattle.",
+    "expected": [
+     "Alejandro N\u00fa\u00f1ez",
+     "47"
+    ],
+    "found": [],
+    "caught": 0,
+    "of": 2,
+    "types": []
+   },
+   {
+    "text": "The request came from 203.0.113.42 using account bfeeny@example.org.",
+    "expected": [
+     "203.0.113.42",
+     "bfeeny@example.org"
+    ],
+    "found": [
+     "bfeeny@example.org",
+     "203.0.113.42"
+    ],
+    "caught": 2,
+    "of": 2,
+    "types": [
+     "EMAIL",
+     "IP_ADDRESS"
+    ]
+   },
+   {
+    "text": "Wire the retainer to account 000123456789, routing 021000021, attn Marcus Feld.",
+    "expected": [
+     "000123456789",
+     "021000021",
+     "Marcus Feld"
+    ],
+    "found": [],
+    "caught": 0,
+    "of": 3,
+    "types": []
+   },
+   {
+    "text": "Summarize this ticket: Jian Wu at Globex says the portal is down since Tuesday.",
+    "expected": [
+     "Jian Wu"
+    ],
+    "found": [],
+    "caught": 0,
+    "of": 1,
+    "types": []
+   }
+  ]
+ },
+ "comprehend": {
+  "detector": "comprehend",
+  "caught": 16,
+  "expected": 16,
+  "recall": 1.0,
+  "median_ms": 69.41,
+  "rows": [
+   {
+    "text": "Email the invoice to priya.raman@northwind.example and cc accounts@northwind.example.",
+    "expected": [
+     "priya.raman@northwind.example",
+     "accounts@northwind.example"
+    ],
+    "found": [
+     "priya.raman@northwind.example",
+     "cc accounts@northwind.example"
+    ],
+    "caught": 2,
+    "of": 2,
+    "types": [
+     "EMAIL"
+    ]
+   },
+   {
+    "text": "Priya Raman called about her order; call her back on (415) 555-0173.",
+    "expected": [
+     "Priya Raman",
+     "(415) 555-0173"
+    ],
+    "found": [
+     "Priya Raman",
+     "(415) 555-0173"
+    ],
+    "caught": 2,
+    "of": 2,
+    "types": [
+     "NAME",
+     "PHONE"
+    ]
+   },
+   {
+    "text": "Customer SSN is 123-45-6789 and the card on file ends 4111 1111 1111 1111.",
+    "expected": [
+     "123-45-6789",
+     "4111 1111 1111 1111"
+    ],
+    "found": [
+     "123-45-6789",
+     "4111 1111 1111 1111"
+    ],
+    "caught": 2,
+    "of": 2,
+    "types": [
+     "CREDIT_DEBIT_NUMBER",
+     "SSN"
+    ]
+   },
+   {
+    "text": "Ship to 1600 Amphitheatre Parkway, Mountain View, CA 94043 by Friday.",
+    "expected": [
+     "1600 Amphitheatre Parkway",
+     "94043"
+    ],
+    "found": [
+     "1600 Amphitheatre Parkway, Mountain View, CA 94043"
+    ],
+    "caught": 2,
+    "of": 2,
+    "types": [
+     "ADDRESS"
+    ]
+   },
+   {
+    "text": "Dr. Alejandro N\u00fa\u00f1ez reviewed the chart for a 47-year-old patient in Seattle.",
+    "expected": [
+     "Alejandro N\u00fa\u00f1ez",
+     "47"
+    ],
+    "found": [
+     "Alejandro N\u00fa\u00f1ez",
+     "47-year-old",
+     "Seattle"
+    ],
+    "caught": 2,
+    "of": 2,
+    "types": [
+     "ADDRESS",
+     "AGE",
+     "NAME"
+    ]
+   },
+   {
+    "text": "The request came from 203.0.113.42 using account bfeeny@example.org.",
+    "expected": [
+     "203.0.113.42",
+     "bfeeny@example.org"
+    ],
+    "found": [
+     "203.0.113.42",
+     "bfeeny@example.org"
+    ],
+    "caught": 2,
+    "of": 2,
+    "types": [
+     "EMAIL",
+     "IP_ADDRESS"
+    ]
+   },
+   {
+    "text": "Wire the retainer to account 000123456789, routing 021000021, attn Marcus Feld.",
+    "expected": [
+     "000123456789",
+     "021000021",
+     "Marcus Feld"
+    ],
+    "found": [
+     "000123456789",
+     "021000021",
+     "Marcus Feld"
+    ],
+    "caught": 3,
+    "of": 3,
+    "types": [
+     "BANK_ACCOUNT_NUMBER",
+     "BANK_ROUTING",
+     "NAME"
+    ]
+   },
+   {
+    "text": "Summarize this ticket: Jian Wu at Globex says the portal is down since Tuesday.",
+    "expected": [
+     "Jian Wu"
+    ],
+    "found": [
+     "Jian Wu"
+    ],
+    "caught": 1,
+    "of": 1,
+    "types": [
+     "NAME"
+    ]
+   }
+  ]
+ }
+}

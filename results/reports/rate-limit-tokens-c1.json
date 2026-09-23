@@ -1,0 +1,92 @@
+{
+ "summary": {
+  "arm": "tokens",
+  "limits": {
+   "tokens_per_min": {
+    "*": 5000
+   }
+  },
+  "tenant": "rl-tokens-194249",
+  "concurrency": 1,
+  "max_tokens_each": 4000,
+  "requests_sent": 10,
+  "requests_allowed": 10,
+  "tokens_reserved_by_allowed": 40000,
+  "tokens_actually_used": 164,
+  "first_refusal_at": null,
+  "refusal_code": null,
+  "window": "2026-09-23T19:43:10.654526+00:00"
+ },
+ "rows": [
+  {
+   "i": 0,
+   "status": 200,
+   "code": null,
+   "ms": 737.1,
+   "used": 20
+  },
+  {
+   "i": 1,
+   "status": 200,
+   "code": null,
+   "ms": 1260.5,
+   "used": 20
+  },
+  {
+   "i": 2,
+   "status": 200,
+   "code": null,
+   "ms": 1837.4,
+   "used": 17
+  },
+  {
+   "i": 3,
+   "status": 200,
+   "code": null,
+   "ms": 2441.2,
+   "used": 17
+  },
+  {
+   "i": 4,
+   "status": 200,
+   "code": null,
+   "ms": 2365.3,
+   "used": 15
+  },
+  {
+   "i": 5,
+   "status": 200,
+   "code": null,
+   "ms": 2623.8,
+   "used": 15
+  },
+  {
+   "i": 6,
+   "status": 200,
+   "code": null,
+   "ms": 2398.9,
+   "used": 15
+  },
+  {
+   "i": 7,
+   "status": 200,
+   "code": null,
+   "ms": 2487.0,
+   "used": 15
+  },
+  {
+   "i": 8,
+   "status": 200,
+   "code": null,
+   "ms": 2399.4,
+   "used": 15
+  },
+  {
+   "i": 9,
+   "status": 200,
+   "code": null,
+   "ms": 2362.2,
+   "used": 15
+  }
+ ]
+}
