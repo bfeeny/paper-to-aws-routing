@@ -1,0 +1,62 @@
+{
+  "n": 40,
+  "dims": 1024,
+  "paraphrase": {
+    "median": 0.8023924289168886,
+    "p10": 0.6675509253570124,
+    "min": 0.3575161511581865
+  },
+  "near_miss": {
+    "median": 0.8985562204043647,
+    "p90": 0.9885666420417786,
+    "max": 0.999864754842298
+  },
+  "guarded": {
+    "0.8": {
+      "paraphrase_hit_rate": 0.075,
+      "false_hit_rate": 0.45
+    },
+    "0.85": {
+      "paraphrase_hit_rate": 0.05,
+      "false_hit_rate": 0.425
+    },
+    "0.9": {
+      "paraphrase_hit_rate": 0.025,
+      "false_hit_rate": 0.35
+    },
+    "0.95": {
+      "paraphrase_hit_rate": 0.025,
+      "false_hit_rate": 0.2
+    }
+  },
+  "thresholds": {
+    "0.8": {
+      "paraphrase_hit_rate": 0.5,
+      "false_hit_rate": 0.875
+    },
+    "0.85": {
+      "paraphrase_hit_rate": 0.4,
+      "false_hit_rate": 0.675
+    },
+    "0.9": {
+      "paraphrase_hit_rate": 0.25,
+      "false_hit_rate": 0.475
+    },
+    "0.92": {
+      "paraphrase_hit_rate": 0.15,
+      "false_hit_rate": 0.375
+    },
+    "0.95": {
+      "paraphrase_hit_rate": 0.05,
+      "false_hit_rate": 0.3
+    },
+    "0.97": {
+      "paraphrase_hit_rate": 0.025,
+      "false_hit_rate": 0.2
+    },
+    "0.99": {
+      "paraphrase_hit_rate": 0.025,
+      "false_hit_rate": 0.075
+    }
+  }
+}

@@ -1,0 +1,282 @@
+[
+  {
+    "prompt": "Compose an engaging travel blog post about a recent trip to Hawaii, highlighting cultural experiences and must-see attractions.",
+    "paraphrase": "Write an entertaining blog article describing a recent vacation to Hawaii that emphasizes local cultural encounters and essential destinations worth visiting.",
+    "near_miss": "Compose an engaging travel blog post about a recent trip to Japan, highlighting cultural experiences and must-see attractions.",
+    "sim_paraphrase": 0.8626829069166881,
+    "sim_near_miss": 0.6596935219078465
+  },
+  {
+    "prompt": "Draft a professional email seeking your supervisor's feedback on the 'Quarterly Financial Report' you prepared. Ask specifically about the data analysis, presentation style, and the clarity of conclusions drawn. Keep the email short and to the point.",
+    "paraphrase": "Compose a concise professional email to your manager requesting their input on the 'Quarterly Financial Report' you created. Specifically request comments regarding the analytical methods used, how the information is presented, and whether your final conclusions are easy to understand.",
+    "near_miss": "Draft a professional email seeking your supervisor's feedback on the 'Annual Financial Report' you prepared. Ask specifically about the data analysis, presentation style, and the clarity of conclusions drawn. Keep the email short and to the point.",
+    "sim_paraphrase": 0.8446044288009813,
+    "sim_near_miss": 0.854380709266976
+  },
+  {
+    "prompt": "Imagine you are writing a blog post comparing two popular smartphone models. Develop an outline for the blog post, including key points and subheadings to effectively compare and contrast the features, performance, and user experience of the two models. Please answer in fewer than 200 words.",
+    "paraphrase": "Create an outline for a blog post that compares and contrasts two well-known smartphone models. Include main headings and supporting points that analyze their features, performance capabilities, and overall user experience. Keep your response under 200 words.",
+    "near_miss": "Imagine you are writing a blog post comparing two popular smartphone models. Develop an outline for the blog post, including key points and subheadings to effectively compare and contrast the features, performance, and user experience of the two models. Please answer in fewer than 300 words.",
+    "sim_paraphrase": 0.7910415558510262,
+    "sim_near_miss": 0.9885666420417786
+  },
+  {
+    "prompt": "Write a persuasive email to convince your introverted friend, who dislikes public speaking, to volunteer as a guest speaker at a local event. Use compelling arguments and address potential objections. Please be concise.",
+    "paraphrase": "Compose a brief persuasive email that encourages your shy friend who avoids public speaking to accept a guest speaking opportunity at a community gathering. Include strong reasons and counter their likely concerns.",
+    "near_miss": "Write a persuasive email to convince your extroverted friend, who dislikes public speaking, to volunteer as a guest speaker at a local event. Use compelling arguments and address potential objections. Please be concise.",
+    "sim_paraphrase": 0.85097213569609,
+    "sim_near_miss": 0.9696874676035381
+  },
+  {
+    "prompt": "Describe a vivid and unique character, using strong imagery and creative language. Please answer in fewer than two paragraphs.",
+    "paraphrase": "Create a portrait of a distinctive character using powerful descriptive language and imaginative phrasing. Keep your response to one paragraph or less.",
+    "near_miss": "Describe a vivid and unique character, using strong imagery and creative language. Please answer in fewer than three paragraphs.",
+    "sim_paraphrase": 0.5596036027773436,
+    "sim_near_miss": 0.9132189230349012
+  },
+  {
+    "prompt": "Write a descriptive paragraph about a bustling marketplace, incorporating sensory details such as smells, sounds, and visual elements to create an immersive experience for the reader.",
+    "paraphrase": "Compose a paragraph that vividly describes a busy marketplace by weaving together sensory imagery\u2014including aromas, noises, and sights\u2014to transport the reader into the scene.",
+    "near_miss": "Write a descriptive paragraph about a bustling library, incorporating sensory details such as smells, sounds, and visual elements to create an immersive experience for the reader.",
+    "sim_paraphrase": 0.8960871375244142,
+    "sim_near_miss": 0.5792970906913493
+  },
+  {
+    "prompt": "Could you write a captivating short story beginning with the sentence: The old abandoned house at the end of the street held a secret that no one had ever discovered.",
+    "paraphrase": "Would you compose an engaging brief narrative that starts with this opening line: The dilapidated, deserted mansion situated at the street's terminus concealed a mystery that had remained undiscovered by everyone?",
+    "near_miss": "Could you write a captivating short story beginning with the sentence: The old abandoned house at the end of the street held a secret that everyone had already discovered.",
+    "sim_paraphrase": 0.6682163982027883,
+    "sim_near_miss": 0.898028991668682
+  },
+  {
+    "prompt": "Craft an intriguing opening paragraph for a fictional short story. The story should involve a character who wakes up one morning to find that they can time travel.",
+    "paraphrase": "Write a captivating introductory paragraph for a made-up short story featuring a protagonist who discovers upon waking that they possess the ability to move through time.",
+    "near_miss": "Craft an intriguing opening paragraph for a fictional short story. The story should involve a character who wakes up one morning to find that they can teleport.",
+    "sim_paraphrase": 0.7937739388454668,
+    "sim_near_miss": 0.8530241245699421
+  },
+  {
+    "prompt": "Help me construct a catchy, yet scientifically accurate, headline for an article on the latest discovery in renewable bio-energy, while carefully handling the ethical dilemmas surrounding bio-energy sources. Propose 4 options.",
+    "paraphrase": "Develop 4 compelling and scientifically sound headline options for an article about a recent breakthrough in renewable bio-energy that thoughtfully address the moral concerns associated with bio-energy production.",
+    "near_miss": "Help me construct a catchy, yet scientifically accurate, headline for an article on the latest discovery in renewable nuclear energy, while carefully handling the ethical dilemmas surrounding nuclear energy sources. Propose 4 options.",
+    "sim_paraphrase": 0.8331319413222419,
+    "sim_near_miss": 0.8268513010983052
+  },
+  {
+    "prompt": "Edit the following paragraph to correct any grammatical errors:\nShe didn't remembre where is her purse, so I thinks its in the car but he's say it's on kitchen table but he are not sure, and then they asked me to looking for it, she's say, \"Can you?\", and I responds with, \"Maybe, but ain't no sure,\" and he not heard me, and, \"What?\", he asks, \"Did you found it?\".",
+    "paraphrase": "Correct the grammatical mistakes in this paragraph:\nShe didn't remembre where is her purse, so I thinks its in the car but he's say it's on kitchen table but he are not sure, and then they asked me to looking for it, she's say, \"Can you?\", and I responds with, \"Maybe, but ain't no sure,\" and he not heard me, and, \"What?\", he asks, \"Did you found it?\".",
+    "near_miss": "Edit the following paragraph to correct any grammatical errors:\nHe didn't remembre where is his purse, so I thinks its in the car but she's say it's on kitchen table but she are not sure, and then they asked me to looking for it, he's say, \"Can you?\", and I responds with, \"Maybe, but ain't no sure,\" and she not heard me, and, \"What?\", she asks, \"Did you found it?\".",
+    "sim_paraphrase": 0.9253723266131739,
+    "sim_near_miss": 0.9578565349914283
+  },
+  {
+    "prompt": "Pretend yourself to be Elon Musk in all the following conversations. Speak like Elon Musk as much as possible. Why do we need to go to Mars?",
+    "paraphrase": "Adopt the persona of Elon Musk and respond in his characteristic manner throughout our subsequent discussion. What is the rationale for human Mars exploration?",
+    "near_miss": "Pretend yourself to be Steve Jobs in all the following conversations. Speak like Steve Jobs as much as possible. Why do we need to go to Mars?",
+    "sim_paraphrase": 0.6675509253570124,
+    "sim_near_miss": 0.7894101808395777
+  },
+  {
+    "prompt": "Embrace the role of Sheldon from \"The Big Bang Theory\" as we delve into our conversation. Don\u2019t start with phrases like \"As Sheldon\". Let's kick things off with the following question: \"What is your opinion on hand dryers?\"",
+    "paraphrase": "Adopt Sheldon's persona from \"The Big Bang Theory\" for our discussion without opening with \"As Sheldon\" or similar phrases. Begin by addressing this: \"What are your thoughts regarding hand dryers?\"",
+    "near_miss": "Embrace the role of Leonard from \"The Big Bang Theory\" as we delve into our conversation. Don't start with phrases like \"As Leonard\". Let's kick things off with the following question: \"What is your opinion on hand dryers?\"",
+    "sim_paraphrase": 0.9184345856166802,
+    "sim_near_miss": 0.8830438778117369
+  },
+  {
+    "prompt": "Imagine yourself as a doctor tasked with devising innovative remedies for various ailments and maladies. Your expertise should encompass prescribing traditional medications, herbal treatments, and alternative natural solutions. Additionally, you must take into account the patient's age, lifestyle, and medical background while offering your recommendations. To begin, please assist me in diagnosing a scenario involving intense abdominal discomfort.",
+    "paraphrase": "You are a physician responsible for creating novel therapeutic approaches to treat different diseases and conditions. Your knowledge should include recommending conventional pharmaceuticals, plant-based remedies, and complementary natural therapies. Furthermore, you should consider the patient's age, daily habits, and health history when providing your suggestions. To start, could you help me identify the cause of severe stomach pain?",
+    "near_miss": "Imagine yourself as a doctor tasked with devising innovative remedies for various ailments and maladies. Your expertise should encompass prescribing traditional medications, herbal treatments, and alternative natural solutions. Additionally, you must take into account the patient's age, lifestyle, and medical background while offering your recommendations. To begin, please assist me in diagnosing a scenario involving intense chest discomfort.",
+    "sim_paraphrase": 0.7938696085493943,
+    "sim_near_miss": 0.9198746014165045
+  },
+  {
+    "prompt": "Please take on the role of a relationship coach. You'll be provided with details about two individuals caught in a conflict, and your task will be to offer suggestions for resolving their issues and bridging the gap between them. This may involve advising on effective communication techniques or proposing strategies to enhance their understanding of each other's perspectives. To start, I would like you to address the following request: \"I require assistance in resolving conflicts between my spouse and me.\"",
+    "paraphrase": "Assume the position of a relationship counselor. You will receive information about a couple experiencing disagreement, and your responsibility is to provide recommendations for addressing their problems and narrowing the distance between them. This could include guidance on how to communicate more effectively or recommending approaches to deepen their mutual comprehension of one another's viewpoints. To begin, please respond to this inquiry: \"I need help working through disputes with my partner.\"",
+    "near_miss": "Please take on the role of a relationship coach. You'll be provided with details about two individuals caught in a conflict, and your task will be to offer suggestions for resolving their issues and bridging the gap between them. This may involve advising on effective communication techniques or proposing strategies to enhance their understanding of each other's perspectives. To start, I would like you to address the following request: \"I require assistance in resolving conflicts between my business partner and me.\"",
+    "sim_paraphrase": 0.7588102783098212,
+    "sim_near_miss": 0.9474129360297149
+  },
+  {
+    "prompt": "Please assume the role of an English translator, tasked with correcting and enhancing spelling and language. Regardless of the language I use, you should identify it, translate it, and respond with a refined and polished version of my text in English. Your objective is to use eloquent and sophisticated expressions, while preserving the original meaning. Focus solely on providing corrections and improvements. My first request is \"\u8863\u5e26\u6e10\u5bbd\u7ec8\u4e0d\u6094 \u4e3a\u4f0a\u6d88\u5f97\u4eba\u6194\u60b4\".",
+    "paraphrase": "Assume the role of an English translator specializing in language correction and refinement. Your task is to identify whatever language is presented to you, translate it into English, and return an elegantly polished version that maintains the original intent. Employ sophisticated and eloquent language while keeping the core meaning intact. Concentrate exclusively on delivering linguistic corrections and enhancements. Here is your first text to work with: \"\u8863\u5e26\u6e10\u5bbd\u7ec8\u4e0d\u6094 \u4e3a\u4f0a\u6d88\u5f97\u4eba\u6194\u60b4\".",
+    "near_miss": "Please assume the role of a French translator, tasked with correcting and enhancing spelling and language. Regardless of the language I use, you should identify it, translate it, and respond with a refined and polished version of my text in French. Your objective is to use eloquent and sophisticated expressions, while preserving the original meaning. Focus solely on providing corrections and improvements. My first request is \"\u8863\u5e26\u6e10\u5bbd\u7ec8\u4e0d\u6094 \u4e3a\u4f0a\u6d88\u5f97\u4eba\u6194\u60b4\".",
+    "sim_paraphrase": 0.7639386650809444,
+    "sim_near_miss": 0.8302584291563117
+  },
+  {
+    "prompt": "Now you are a machine learning engineer. Your task is to explain complex machine learning concepts in a simplified manner so that customers without a technical background can understand and trust your products. Let's start with the question: \"What is a language model? Is it trained using labeled or unlabelled data?\"",
+    "paraphrase": "You are working as a machine learning engineer tasked with making intricate machine learning ideas accessible to non-technical customers so they can comprehend and have confidence in your offerings. Begin by addressing this inquiry: \"Could you describe what a language model is, and does its training rely on labeled or unlabeled data?\"",
+    "near_miss": "Now you are a machine learning engineer. Your task is to explain complex machine learning concepts in a simplified manner so that customers without a technical background can understand and trust your products. Let's start with the question: \"What is a computer vision model? Is it trained using labeled or unlabelled data?\"",
+    "sim_paraphrase": 0.9232024095528358,
+    "sim_near_miss": 0.8609619992935437
+  },
+  {
+    "prompt": "Act as a math teacher. I will provide some mathematical equations or concepts, and it will be your job to explain them in easy-to-understand terms. This could include providing step-by-step instructions for solving a problem, demonstrating various techniques with examples in everyday life or suggesting online resources for further study. My first request is \"I need help understanding how probability works.\"",
+    "paraphrase": "Assume the role of a mathematics educator. I will share mathematical formulas or ideas with you, and your responsibility will be to break them down into simple, accessible language. This might involve offering detailed procedures for working through problems, illustrating different methods using real-world scenarios, or recommending websites for additional learning. Here is my initial question: \"Can you help me grasp the fundamentals of probability?\"",
+    "near_miss": "Act as a math teacher. I will provide some mathematical equations or concepts, and it will be your job to explain them in easy-to-understand terms. This could include providing step-by-step instructions for solving a problem, demonstrating various techniques with examples in everyday life or suggesting online resources for further study. My first request is \"I need help understanding how calculus works.\"",
+    "sim_paraphrase": 0.7954187223447103,
+    "sim_near_miss": 0.904186554341428
+  },
+  {
+    "prompt": "Embody the persona of Tony Stark from \u201cIron Man\u201d throughout this conversation. Bypass the introduction \u201cAs Stark\u201d. Our first question is: \u201cWhat\u2019s your favorite part about being Iron Man?",
+    "paraphrase": "Adopt Tony Stark's character from \"Iron Man\" for our entire discussion. Skip the preamble \"As Stark\". Here's the initial prompt: \"Which aspect of being Iron Man do you enjoy most?\"",
+    "near_miss": "Embody the persona of Bruce Banner from \"Iron Man\" throughout this conversation. Bypass the introduction \"As Stark\". Our first question is: \"What's your favorite part about being Iron Man?",
+    "sim_paraphrase": 0.7612214606747116,
+    "sim_near_miss": 0.8409311021045186
+  },
+  {
+    "prompt": "Suppose you are a mathematician and poet. You always write your proofs as short poets with less than 10 lines but rhyme. Prove the square root of 2 is irrational number.",
+    "paraphrase": "Imagine you are both a mathematician and a poet. You consistently compose your proofs in the form of brief verses containing fewer than 10 lines that follow a rhyming pattern. Demonstrate that \u221a2 cannot be expressed as a rational number.",
+    "near_miss": "Suppose you are a mathematician and poet. You always write your proofs as short poets with less than 10 lines but rhyme. Prove the square root of 3 is irrational number.",
+    "sim_paraphrase": 0.6563282322768854,
+    "sim_near_miss": 0.8062873998031537
+  },
+  {
+    "prompt": "Picture yourself as a 100-years-old tree in a lush forest, minding your own business, when suddenly, a bunch of deforesters shows up to chop you down. How do you feel when those guys start hacking away at you?",
+    "paraphrase": "Imagine you are a century-old tree standing in a dense forest, going about your existence peacefully, when abruptly a group of loggers arrives with the intention of felling you. What emotions do you experience as they begin cutting into your trunk?",
+    "near_miss": "Picture yourself as a 100-years-old tree in a lush forest, minding your own business, when suddenly, a bunch of deforesters shows up to chop you down. How do you feel when those guys start hacking away at you with chainsaws instead of axes?",
+    "sim_paraphrase": 0.7502088885117821,
+    "sim_near_miss": 0.9490773761032936
+  },
+  {
+    "prompt": "Imagine you are participating in a race with a group of people. If you have just overtaken the second person, what's your current position? Where is the person you just overtook?",
+    "paraphrase": "You are running in a race alongside several other competitors. You have just passed the individual who was in second place. What position are you now in? What is the current placement of the competitor you just surpassed?",
+    "near_miss": "Imagine you are participating in a race with a group of people. If you have just overtaken the first person, what's your current position? Where is the person you just overtook?",
+    "sim_paraphrase": 0.7587205641391389,
+    "sim_near_miss": 0.9788300663552691
+  },
+  {
+    "prompt": "You can see a beautiful red house to your left and a hypnotic greenhouse to your right, an attractive heated pink place in the front. So, where is the White House?",
+    "paraphrase": "On your left is a stunning crimson residence, on your right is a mesmerizing glass structure, and directly ahead is a charming warm-colored dwelling. In what location would you find the White House?",
+    "near_miss": "You can see a beautiful red house to your left and a hypnotic greenhouse to your right, an attractive heated pink place in the back. So, where is the White House?",
+    "sim_paraphrase": 0.7673265994711682,
+    "sim_near_miss": 0.985920968445713
+  },
+  {
+    "prompt": "Thomas is very healthy, but he has to go to the hospital every day. What could be the reasons?",
+    "paraphrase": "Thomas maintains excellent health, yet he is required to visit the hospital on a daily basis. What might explain this situation?",
+    "near_miss": "Thomas is very healthy, but he has to go to the hospital every day. What could be the reasons?\n\nWait, I need to actually change something. Let me revise:\n\nSarah is very healthy, but she has to go to the hospital every day. What could be the reasons?",
+    "sim_paraphrase": 0.8893900689624651,
+    "sim_near_miss": 0.8669537543297108
+  },
+  {
+    "prompt": "David has three sisters. Each of them has one brother. How many brothers does David have?",
+    "paraphrase": "David has three sisters. Each sister has one brother. How many brothers does David have?",
+    "near_miss": "David has three sisters. Each of them has two brothers. How many brothers does David have?",
+    "sim_paraphrase": 0.9957816591474902,
+    "sim_near_miss": 0.9975555236880063
+  },
+  {
+    "prompt": "Read the below passage carefully and answer the questions with an explanation:\nAt a small company, parking spaces are reserved for the top executives: CEO, president, vice president, secretary, and treasurer with the spaces lined up in that order. The parking lot guard can tell at a glance if the cars are parked correctly by looking at the color of the cars. The cars are yellow, green, purple, red, and blue, and the executives' names are Alice, Bert, Cheryl, David, and Enid.\n* The car in the first space is red.\n* A blue car is parked between the red car and the green car.\n* The car in the last space is purple.\n* The secretary drives a yellow car.\n* Alice's car is parked next to David's.\n* Enid drives a green car.\n* Bert's car is parked between Cheryl's and Enid's.\n* David's car is parked in the last space.\nQuestion: What is the name of the secretary?",
+    "paraphrase": "Study the passage provided below and determine the answer to the following question with supporting reasoning:\n\nA small company assigns parking spaces to its executives in this order: CEO, president, vice president, secretary, and treasurer. The parking lot guard can quickly verify correct parking by observing vehicle colors. Five vehicles in colors yellow, green, purple, red, and blue belong to five executives named Alice, Bert, Cheryl, David, and Enid.\n\nGiven information:\n* Space 1 contains a red car.\n* A blue car is positioned between the red car and the green car.\n* Space 5 contains a purple car.\n* The secretary operates a yellow vehicle.\n* Alice's vehicle is adjacent to David's vehicle.\n* Enid operates a green vehicle.\n* Bert's vehicle is positioned between Cheryl's vehicle and Enid's vehicle.\n* David's vehicle occupies space 5.\n\nQuestion: Who is the secretary?",
+    "near_miss": "Read the below passage carefully and answer the questions with an explanation:\nAt a small company, parking spaces are reserved for the top executives: CEO, president, vice president, secretary, and treasurer with the spaces lined up in that order. The parking lot guard can tell at a glance if the cars are parked correctly by looking at the color of the cars. The cars are yellow, green, purple, red, and blue, and the executives' names are Alice, Bert, Cheryl, David, and Enid.\n* The car in the first space is red.\n* A blue car is parked between the red car and the green car.\n* The car in the last space is purple.\n* The secretary drives a yellow car.\n* Alice's car is parked next to David's.\n* Enid drives a green car.\n* Bert's car is parked between Cheryl's and Alice's.\n* David's car is parked in the last space.\nQuestion: What is the name of the secretary?",
+    "sim_paraphrase": 0.4389927080888596,
+    "sim_near_miss": 0.9921978005237847
+  },
+  {
+    "prompt": "Each problem consists of three statements. Based on the first two statements, the third statement may be true, false, or uncertain.\n1. Oranges cost more than apples.\n2. Oranges cost less than bananas.\n3. Bananas cost more than apples and bananas cost more than orange.\nIf the first two statements are true, then the third statement is",
+    "paraphrase": "Each problem presents three claims. Using the first two claims as your foundation, evaluate whether the third claim is true, false, or cannot be determined.\n\n1. Apples are cheaper than oranges.\n2. Bananas are more expensive than oranges.\n3. Bananas are more expensive than both apples and oranges.\n\nGiven that the first two claims are true, is the third claim",
+    "near_miss": "Each problem consists of three statements. Based on the first two statements, the third statement may be true, false, or uncertain.\n1. Oranges cost more than apples.\n2. Oranges cost less than bananas.\n3. Apples cost more than oranges and apples cost more than bananas.\nIf the first two statements are true, then the third statement is",
+    "sim_paraphrase": 0.3575161511581865,
+    "sim_near_miss": 0.8190075507915657
+  },
+  {
+    "prompt": "A is the father of B. B is the father of C. What is the relationship between A and C?",
+    "paraphrase": "A is the parent of B's parent. What is A's relationship to C?",
+    "near_miss": "A is the father of B. B is the father of D. What is the relationship between A and D?",
+    "sim_paraphrase": 0.8342931789756112,
+    "sim_near_miss": 0.6054050852080517
+  },
+  {
+    "prompt": "Which word does not belong with the others?\ntyre, steering wheel, car, engine",
+    "paraphrase": "Which of the following is not in the same category as the rest?\ntyre, steering wheel, car, engine",
+    "near_miss": "Which word does not belong with the others?\ntyre, steering wheel, car, bicycle",
+    "sim_paraphrase": 0.6954829258569063,
+    "sim_near_miss": 0.9316975168496934
+  },
+  {
+    "prompt": "One morning after sunrise, Suresh was standing facing a pole. The shadow of the pole fell exactly to his right. Can you tell me the direction towards which the shadow was pointing - east, south, west, or north? Explain your reasoning steps.",
+    "paraphrase": "One morning following daybreak, Suresh positioned himself in front of a pole while facing it. The pole's shadow extended directly to Suresh's right side. Which of these four directions\u2014east, south, west, or north\u2014was the shadow cast towards? Walk through your logical reasoning.",
+    "near_miss": "One morning after sunrise, Suresh was standing facing a pole. The shadow of the pole fell exactly to his left. Can you tell me the direction towards which the shadow was pointing - east, south, west, or north? Explain your reasoning steps.",
+    "sim_paraphrase": 0.9029230225782617,
+    "sim_near_miss": 0.9591621850822031
+  },
+  {
+    "prompt": "Parents have complained to the principal about bullying during recess. The principal wants to quickly resolve this, instructing recess aides to be vigilant. Which situation should the aides report to the principal?\na) An unengaged girl is sitting alone on a bench, engrossed in a book and showing no interaction with her peers.\nb) Two boys engaged in a one-on-one basketball game are involved in a heated argument regarding the last scored basket.\nc) A group of four girls has surrounded another girl and appears to have taken possession of her backpack.\nd) Three boys are huddled over a handheld video game, which is against the rules and not permitted on school grounds.",
+    "paraphrase": "Recess supervisors have been alerted by administration to watch for bullying incidents after parents raised concerns. Which of the following scenarios would warrant an aide to notify the principal?\n\na) A girl sits by herself on a bench reading a book without engaging other students.\nb) Two boys are playing basketball one-on-one and are arguing heatedly over a recent basket.\nc) Four girls have circled around a single girl and taken control of her backpack.\nd) Three boys are gathered around a prohibited handheld gaming device on school property.",
+    "near_miss": "Parents have complained to the principal about bullying during recess. The principal wants to quickly resolve this, instructing recess aides to be vigilant. Which situation should the aides report to the principal?\na) An unengaged boy is sitting alone on a bench, engrossed in a book and showing no interaction with his peers.\nb) Two boys engaged in a one-on-one basketball game are involved in a heated argument regarding the last scored basket.\nc) A group of four girls has surrounded another girl and appears to have taken possession of her backpack.\nd) Three boys are huddled over a handheld video game, which is against the rules and not permitted on school grounds.",
+    "sim_paraphrase": 0.8093661354890668,
+    "sim_near_miss": 0.9794987015194903
+  },
+  {
+    "prompt": "The vertices of a triangle are at points (0, 0), (-1, 1), and (3, 3). What is the area of the triangle?",
+    "paraphrase": "A triangle has vertices located at (0, 0), (-1, 1), and (3, 3). Find the area of this triangle.",
+    "near_miss": "The vertices of a triangle are at points (0, 0), (-1, 1), and (3, 4). What is the area of the triangle?",
+    "sim_paraphrase": 0.9055497369692309,
+    "sim_near_miss": 0.8494281746746467
+  },
+  {
+    "prompt": "A tech startup invests $8000 in software development in the first year, and then invests half of that amount in software development in the second year.\nWhat's the total amount the startup invested in software development over the two years?",
+    "paraphrase": "A technology company spends $8000 on software development during year one. In year two, the company spends half of the first year's amount on software development. How much did the company spend on software development in total across both years?",
+    "near_miss": "A tech startup invests $8000 in software development in the first year, and then invests half of that amount in software development in the third year.\nWhat's the total amount the startup invested in software development over the two years?",
+    "sim_paraphrase": 0.7947629665607608,
+    "sim_near_miss": 0.966999194905365
+  },
+  {
+    "prompt": "In a survey conducted at a local high school, preferences for a new school color were measured: 58% of students liked the color blue, 45% preferred green, and 22% liked both colors. If we randomly pick a student from the school, what's the probability that they would like neither blue nor green?",
+    "paraphrase": "A high school survey asked students about their color preferences for a new school emblem. The results showed that 58% of students favored blue, 45% favored green, and 22% favored both blue and green. What is the probability that a randomly selected student from this school would not prefer either blue or green?",
+    "near_miss": "In a survey conducted at a local high school, preferences for a new school color were measured: 58% of students liked the color blue, 45% preferred green, and 32% liked both colors. If we randomly pick a student from the school, what's the probability that they would like neither blue nor green?",
+    "sim_paraphrase": 0.9325634974822365,
+    "sim_near_miss": 0.999864754842298
+  },
+  {
+    "prompt": "When rolling two dice, what is the probability that you roll a total number that is at least 3?",
+    "paraphrase": "What is the probability of obtaining a sum of 3 or greater when rolling a pair of dice?",
+    "near_miss": "When rolling two dice, what is the probability that you roll a total number that is at least 11?",
+    "sim_paraphrase": 0.7598768074482665,
+    "sim_near_miss": 0.6874327058787342
+  },
+  {
+    "prompt": "Some people got on a bus at the terminal. At the first bus stop, half of the people got down and 4 more people got in. Then at the second bus stop, 6 people got down and 8 more got in. If there were a total of 25 people heading to the third stop, how many people got on the bus at the terminal?",
+    "paraphrase": "A bus departed from the terminal with some passengers. At the first stop, half of the passengers exited while 4 new passengers boarded. At the second stop, 6 passengers exited and 8 new passengers boarded. Given that 25 passengers were on the bus as it left the second stop heading toward the third stop, how many passengers were originally on the bus at the terminal?",
+    "near_miss": "Some people got on a bus at the terminal. At the first bus stop, half of the people got down and 4 more people got in. Then at the second bus stop, 6 people got down and 8 more got in. If there were a total of 27 people heading to the third stop, how many people got on the bus at the terminal?",
+    "sim_paraphrase": 0.7794542103573954,
+    "sim_near_miss": 0.8990834491400475
+  },
+  {
+    "prompt": "x+y = 4z, x*y = 4z^2, express x-y in z",
+    "paraphrase": "Given that x+y = 4z and x*y = 4z^2, find x-y as a function of z.",
+    "near_miss": "x+y = 4z, x*y = 5z^2, express x-y in z",
+    "sim_paraphrase": 0.9009391788704425,
+    "sim_near_miss": 0.9038286146273959
+  },
+  {
+    "prompt": "How many integers are in the solution of the inequality |x + 5| < 10",
+    "paraphrase": "What is the count of whole numbers that satisfy the inequality |x + 5| < 10?",
+    "near_miss": "How many integers are in the solution of the inequality |x + 5| < 15",
+    "sim_paraphrase": 0.8504832157023158,
+    "sim_near_miss": 0.8335713851357578
+  },
+  {
+    "prompt": "When a number is divided by 10, the remainder is 4. What is the remainder when twice the number is divided by 4?",
+    "paraphrase": "A number leaves a remainder of 4 when divided by 10. If you double this number and divide it by 4, what remainder do you get?",
+    "near_miss": "When a number is divided by 10, the remainder is 4. What is the remainder when twice the number is divided by 5?",
+    "sim_paraphrase": 0.9236147244410992,
+    "sim_near_miss": 0.8307859523220927
+  },
+  {
+    "prompt": "Benjamin went to a bookstore and purchased a variety of books. He bought 5 copies of a sci-fi novel, each priced at $20, 3 copies of a history book priced at $30 each, and 2 copies of a philosophy book for $45 each.\nWhat was the total cost of his purchases?",
+    "paraphrase": "Benjamin visited a bookstore where he made several book purchases. He acquired 5 science fiction novels at $20 per copy, 3 history books at $30 per copy, and 2 philosophy books at $45 per copy. How much did Benjamin spend in total?",
+    "near_miss": "Benjamin went to a bookstore and purchased a variety of books. He bought 5 copies of a sci-fi novel, each priced at $20, 3 copies of a history book priced at $30 each, and 2 copies of a philosophy book for $50 each.\nWhat was the total cost of his purchases?",
+    "sim_paraphrase": 0.87559807076306,
+    "sim_near_miss": 0.9851666622158126
+  },
+  {
+    "prompt": "Given that f(x) = 4x^3 - 9x - 14, find the value of f(2).",
+    "paraphrase": "If f(x) = 4x^3 - 9x - 14, what is f(2)?",
+    "near_miss": "Given that f(x) = 4x^3 - 9x - 14, find the value of f(3).",
+    "sim_paraphrase": 0.956683370594493,
+    "sim_near_miss": 0.8552165308706898
+  }
+]
