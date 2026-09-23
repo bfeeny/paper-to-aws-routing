@@ -12,9 +12,11 @@ Two facts about AgentCore Gateway interceptors force this module to exist:
     marker on the request record and the spend increment commit in a single
     DynamoDB transaction, and a retry finds the marker and changes nothing.
 
-One on-demand table holds both kinds of item, told apart by key prefix.
+One on-demand table holds every kind of item, told apart by key prefix:
+`spend#`, `req#` and `cache#`.
 """
 import datetime as dt
+import json
 import time
 from decimal import Decimal
 
@@ -47,6 +49,19 @@ class DynamoStore:
     def recall(self, request_id: str) -> dict:
         r = self.ddb.get_item(TableName=self.table, Key={"pk": {"S": f"req#{request_id}"}})
         return {k: v["S"] for k, v in r.get("Item", {}).items() if "S" in v and k != "pk"}
+
+    def get_cached(self, key: str):
+        r = self.ddb.get_item(TableName=self.table, Key={"pk": {"S": f"cache#{key}"}},
+                              ProjectionExpression="payload")
+        item = r.get("Item")
+        return json.loads(item["payload"]["S"]) if item else None
+
+    def put_cached(self, key: str, body: dict, ttl_s: int) -> None:
+        self.ddb.put_item(TableName=self.table, Item={
+            "pk": {"S": f"cache#{key}"},
+            "payload": {"S": json.dumps(body)},
+            "expires_at": {"N": str(int(time.time()) + ttl_s)},
+        })
 
     def settle(self, request_id: str, tenant: str, cost: float) -> bool:
         """Charge once per request. Returns False if this request was already settled."""

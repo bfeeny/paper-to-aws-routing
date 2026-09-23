@@ -13,8 +13,9 @@ Contract:
   * A plugin sees a `Call` -- the parsed request body, headers, the resolved
     tenant, and a scratch dict (`attrs`) that plugins use to hand facts to
     later plugins (a price estimate, a routing score).
-  * `on_request` may mutate the body, or return a `Reject` to stop the chain.
-    The first rejection wins; no later plugin runs.
+  * `on_request` may mutate the body, or end the call early by returning
+    `Reject` (an error) or `Serve` (a ready-made answer, as the cache does).
+    The first plugin to do either wins; no later plugin runs.
   * `on_response` sees the provider's response and may record, rewrite or
     annotate it. It cannot reject: by then the tokens are already spent.
   * Responses unwind the chain in reverse, as middleware does: the plugin that
@@ -75,6 +76,14 @@ class Reject:
         return {"error": {"type": self.code, "code": self.code, "message": self.message}}
 
 
+@dataclass
+class Serve:
+    """Answer the call from the interceptor, without calling a model."""
+
+    body: dict
+    status: int = 200
+
+
 class Plugin:
     """Base class. Override `on_request` and/or `on_response`."""
 
@@ -84,7 +93,7 @@ class Plugin:
     def __init__(self, **params):
         self.params = params
 
-    def on_request(self, call: Call) -> Reject | None:  # noqa: ARG002
+    def on_request(self, call: Call) -> Reject | Serve | None:  # noqa: ARG002
         return None
 
     def on_response(self, call: Call) -> None:  # noqa: ARG002
@@ -125,7 +134,7 @@ class Pipeline:
             plugins.append(REGISTRY[name](**spec.get("params", {})))
         return cls(plugins, fail_open=cfg.get("fail_open", True))
 
-    def run_request(self, call: Call) -> tuple[Reject | None, Trace]:
+    def run_request(self, call: Call) -> tuple[Reject | Serve | None, Trace]:
         return self._run("request", call, lambda p: p.on_request(call))
 
     def run_response(self, call: Call) -> Trace:
@@ -146,7 +155,7 @@ class Pipeline:
                                   f"{plugin.name} failed and the pipeline is fail-closed"), trace
                 continue
             trace.timings_ms[plugin.name] = (time.perf_counter() - t0) * 1000
-            if phase == "request" and isinstance(verdict, Reject):
+            if phase == "request" and isinstance(verdict, (Reject, Serve)):
                 trace.rejected_by = plugin.name
                 return verdict, trace
         return None, trace
@@ -197,7 +206,7 @@ def emit(trace: Trace, call: Call, namespace: str, outcome: str) -> None:
         "outcome": outcome,
         "tenant": call.tenant,
         "model": call.model,
-        "rejected_by": trace.rejected_by,
+        "ended_by": trace.rejected_by,
         "errors": trace.errors or None,
         "attrs": {k: v for k, v in call.attrs.items() if isinstance(v, (str, int, float, bool))},
         "PipelineMs": round(sum(trace.timings_ms.values()), 3),

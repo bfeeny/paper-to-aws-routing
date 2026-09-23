@@ -23,7 +23,7 @@ import os
 import time
 
 from . import plugins  # noqa: F401  (registers every plugin)
-from .pipeline import Call, emit, load_pipeline
+from .pipeline import Call, Reject, Serve, emit, load_pipeline
 from .state import store
 
 log = logging.getLogger()
@@ -108,21 +108,27 @@ def _on_request(req: dict, rid: str):
     headers = {k.lower(): v for k, v in (req.get("headers") or {}).items()}
     call = Call(body=body, headers=headers, path=req.get("path", ""), request_id=rid)
     pipeline = load_pipeline()
-    reject, trace = pipeline.run_request(call)
-    emit(trace, call, NAMESPACE, "rejected" if reject else "forwarded")
+    verdict, trace = pipeline.run_request(call)
+    outcome = ("rejected" if isinstance(verdict, Reject)
+               else "served" if isinstance(verdict, Serve) else "forwarded")
+    emit(trace, call, NAMESPACE, outcome)
 
-    if reject:
+    # Both kinds of early exit use the same mechanism: a REQUEST interceptor
+    # that returns a response short-circuits the call, and the model is never
+    # invoked. A rejection is an error; a Serve is a real answer from cache.
+    if isinstance(verdict, (Reject, Serve)):
+        body = verdict.as_body() if isinstance(verdict, Reject) else verdict.body
         return {"interceptorOutputVersion": "1.0", "http": {"transformedGatewayResponse": {
-            "statusCode": reject.status,
+            "statusCode": verdict.status,
             "contentType": "application/json",
-            "headers": {"x-gateway-rejected-by": trace.rejected_by or "pipeline"},
-            "body": _enc(reject.as_body()),
+            "body": _enc(body),
         }}}
 
     # Only pay for a correlation write when some plugin will need it on the way out.
     if TABLE and any(p.needs_response for p in pipeline.plugins):
         store(TABLE).remember(rid, {"tenant": call.tenant, "model": call.model,
-                                    "t0": f"{time.time():.3f}"})
+                                    "t0": f"{time.time():.3f}",
+                                    **call.attrs.get("remember", {})})
     return {"interceptorOutputVersion": "1.0",
             "http": {"transformedGatewayRequest": {"body": _enc(call.body)}}}
 
@@ -148,6 +154,14 @@ def _on_response(resp: dict, rid: str):
     if streamed:
         return PASS          # never rewrite an event stream
 
+    if call.attrs.get("replacement_body"):
+        # A response plugin rewrote the answer (escalation). Ship the new body.
+        new = call.attrs["replacement_body"]
+        new["x_gateway"] = {k: v for k, v in call.attrs.items()
+                            if k in ("escalated_from", "escalated_to", "escalation_reason",
+                                     "cost_usd", "tenant")} | {"tenant": call.tenant}
+        return {"interceptorOutputVersion": "1.0", "http": {"transformedGatewayResponse": {
+            "body": _enc(new)}}}
     if "cost_usd" not in call.attrs or ANNOTATE == "none":
         return PASS
     note = {"cost_usd": call.attrs["cost_usd"], "tenant": call.tenant}

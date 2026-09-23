@@ -18,7 +18,9 @@ WEAK, STRONG = "mistral.ministral-3-3b-instruct", "mistral.mistral-large-3-675b-
 
 class FakeStore:
     """In-memory stand-in for state.DynamoStore, same interface and idempotency."""
-    def __init__(self): self.spend, self.reqs, self.settled = {}, {}, set()
+    def __init__(self): self.spend, self.reqs, self.settled, self.cache = {}, {}, set(), {}
+    def get_cached(self, key): return self.cache.get(key)
+    def put_cached(self, key, body, ttl_s=0): self.cache[key] = body
     def spend_today(self, tenant): return self.spend.get(tenant, 0.0)
     def remember(self, rid, data): self.reqs[rid] = dict(data)
     def recall(self, rid): return self.reqs.get(rid, {})
@@ -117,6 +119,57 @@ S.set_store(FakeStore())
 c = call(text="stream me", max_tokens=500); c.body["stream"] = True
 p.run_request(c)
 check("streamed request asks the provider for usage", c.body.get("stream_options", {}).get("include_usage") is True)
+
+# cache: a hit answers the call without a model
+S.set_store(FakeStore())
+cp = pipe(("tenant", {}), ("cache", {}), ("router", {"strategy": "pinned", "model": WEAK}), ("metering", {}))
+c = call(text="what is 2+2")
+v, tr = cp.run_request(c)
+check("cache miss forwards", v is None and c.attrs["cache"] == "miss")
+c.response = {"choices": [{"message": {"content": "4"}, "finish_reason": "stop"}],
+              "usage": {"prompt_tokens": 5, "completion_tokens": 1}}
+cp.run_response(c)
+c2 = call(text="what is 2+2")
+v2, tr2 = cp.run_request(c2)
+check("cache hit answers from the interceptor", isinstance(v2, P.Serve)
+      and v2.body["choices"][0]["message"]["content"] == "4" and v2.body["x_gateway"]["cached"] is True)
+check("cache hit ends the chain before the router", "router" not in tr2.timings_ms)
+c3 = call(text="what is 2+2"); c3.body["stream"] = True
+v3, _ = cp.run_request(c3)
+check("streamed requests bypass the cache", v3 is None)
+
+# escalation: a weak answer that hit the ceiling is replaced by the strong model
+import gateway.plugins.escalate as E  # noqa: E402
+S.set_store(FakeStore())
+E._mantle = lambda model, messages, max_tokens, region: {
+    "model": model, "choices": [{"message": {"content": "a better, complete answer"},
+                                 "finish_reason": "stop"}],
+    "usage": {"prompt_tokens": 20, "completion_tokens": 120}}
+ep = pipe(("tenant", {}), ("router", {"strategy": "pinned", "model": WEAK}),
+          ("metering", {}), ("escalate", {"strong": STRONG, "verbose_tokens": 400}))
+c = call(text="explain the ocean"); c.request_id = "e1"
+ep.run_request(c)
+S.store().remember("e1", {"tenant": "acme", "model": f"mantle/{WEAK}", **c.attrs.get("remember", {})})
+check("request phase remembered the prompt for a second call",
+      "messages" in S.store().recall("e1"))
+c.response = {"model": WEAK, "choices": [{"message": {"content": "half an ans"}, "finish_reason": "length"}],
+              "usage": {"prompt_tokens": 20, "completion_tokens": 8}}
+ep.run_response(c)
+check("truncated weak answer is escalated", c.attrs.get("escalated_to") == STRONG
+      and c.attrs["escalation_reason"] == "truncated")
+check("replacement body is the strong model's answer",
+      c.attrs["replacement_body"]["choices"][0]["message"]["content"].startswith("a better"))
+check("both calls are billed", c.attrs["cost_usd"] >
+      __import__("gateway.prices", fromlist=["x"]).cost_usd(STRONG, 20, 120))
+
+c = call(text="explain the ocean"); c.request_id = "e2"
+ep.run_request(c)
+S.store().remember("e2", {"tenant": "acme", "model": f"mantle/{WEAK}", **c.attrs.get("remember", {})})
+c.response = {"model": WEAK, "choices": [{"message": {"content": "a fine short answer"}, "finish_reason": "stop"}],
+              "usage": {"prompt_tokens": 20, "completion_tokens": 12}}
+ep.run_response(c)
+check("a good weak answer is left alone", "replacement_body" not in c.attrs
+      and c.attrs["escalation_reason"] == "none")
 
 # a broken plugin: fail-open continues, fail-closed refuses
 class Boom(P.Plugin):

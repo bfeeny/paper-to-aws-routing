@@ -91,13 +91,15 @@ Resources:
           "plugins": [
             {"plugin": "tenant", "params": {"header": "x-tenant-id", "default": "anonymous"}},
             {"plugin": "max_tokens", "params": {"default": 1024}},
+            {"plugin": "cache", "params": {"ttl_s": 3600}},
             {"plugin": "router", "params": {"strategy": "length", "threshold": 2000,
                                             "strong": "${StrongModel}", "weak": "${WeakModel}"}},
             {"plugin": "model_policy", "params": {"allow": {"*": ["*"]}}},
             {"plugin": "budget", "params": {"daily_usd": {"*": ${DailyBudgetUsd}}}},
             {"plugin": "guardrail", "params": {"guardrail_id": "${Guardrail.GuardrailId}",
                                                "version": "${GuardrailVersion.Version}"}},
-            {"plugin": "metering", "params": {}}
+            {"plugin": "metering", "params": {}},
+            {"plugin": "escalate", "params": {"strong": "${StrongModel}", "verbose_tokens": 400}}
           ]
         }
 
@@ -127,6 +129,12 @@ Resources:
               - Effect: Allow
                 Action: bedrock:ApplyGuardrail
                 Resource: !GetAtt Guardrail.GuardrailArn
+              - Effect: Allow   # the escalate plugin calls the strong model itself
+                Action: bedrock-mantle:CreateInference
+                Resource: !Sub "arn:aws:bedrock-mantle:${AWS::Region}:${AWS::AccountId}:project/*"
+              - Effect: Allow
+                Action: [bedrock-mantle:Get*, bedrock-mantle:List*]
+                Resource: "*"
               - Effect: Allow   # only the `learned` router strategy uses this
                 Action: bedrock:InvokeModel
                 Resource: !Sub "arn:aws:bedrock:${AWS::Region}::foundation-model/amazon.titan-embed-text-v2:0"
@@ -146,7 +154,7 @@ Resources:
       Architectures: [arm64]
       Handler: gateway.handler.lambda_handler
       Role: !GetAtt PipelineRole.Arn
-      Timeout: 10
+      Timeout: 60   # an escalation calls the strong model from inside the response phase
       MemorySize: 512
       # `make pipeline-up` assembles this directory and uploads it with `aws cloudformation package`.
       Code: ../.build/pipeline/

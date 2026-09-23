@@ -41,6 +41,11 @@ class Metering(Plugin):
         tin = int(usage.get("prompt_tokens") or usage.get("input_tokens") or 0)
         tout = int(usage.get("completion_tokens") or usage.get("output_tokens") or 0)
         cost = cost_usd(call.model, tin, tout)
+        # An escalated call paid for the weak answer too; bill both.
+        extra = call.attrs.get("extra_usage")
+        if extra and cost is not None:
+            first = cost_usd(extra["model"], extra["in"], extra["out"])
+            cost = cost + (first or 0)
         call.attrs.update(input_tokens=tin, output_tokens=tout)
         if cost is not None:
             call.attrs["cost_usd"] = round(cost, 8)
