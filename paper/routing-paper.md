@@ -8,8 +8,8 @@ date: 2026-09-21
 
 **Brian Feeny**
 
-*21 September 2026. Independent work. I work at Amazon Web Services; the views and
-assessments here are my own.*
+*21 September 2026. Independent work. The views and assessments here are my own
+and do not represent those of my employer.*
 
 ---
 
